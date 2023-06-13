@@ -1,0 +1,11 @@
+G:\projects\C# Projects\rises_dotnet\rises_dotnet\bin\Release\rises_dotnet.exe.config
+G:\projects\C# Projects\rises_dotnet\rises_dotnet\bin\Release\rises_dotnet.exe
+G:\projects\C# Projects\rises_dotnet\rises_dotnet\bin\Release\rises_dotnet.pdb
+G:\projects\C# Projects\rises_dotnet\rises_dotnet\obj\Release\rises_dotnet.csproj.AssemblyReference.cache
+G:\projects\C# Projects\rises_dotnet\rises_dotnet\obj\Release\rises_dotnet.csproj.SuggestedBindingRedirects.cache
+G:\projects\C# Projects\rises_dotnet\rises_dotnet\obj\Release\Rise.Rise.resources
+G:\projects\C# Projects\rises_dotnet\rises_dotnet\obj\Release\rises_dotnet.Properties.Resources.resources
+G:\projects\C# Projects\rises_dotnet\rises_dotnet\obj\Release\rises_dotnet.csproj.GenerateResource.cache
+G:\projects\C# Projects\rises_dotnet\rises_dotnet\obj\Release\rises_dotnet.csproj.CoreCompileInputs.cache
+G:\projects\C# Projects\rises_dotnet\rises_dotnet\obj\Release\rises_dotnet.exe
+G:\projects\C# Projects\rises_dotnet\rises_dotnet\obj\Release\rises_dotnet.pdb
