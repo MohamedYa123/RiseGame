@@ -37,7 +37,7 @@ namespace Rise
                     continue;
                 }
                 it.read();
-                if (it.health >= 0&&it.type!=type.bullet)
+                if (it.health >= 0)//&&it.type!=type.bullet
                 {
                     map.putpieceinsquares(it);
                 }

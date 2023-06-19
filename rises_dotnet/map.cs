@@ -116,9 +116,9 @@ namespace Rise
         public void putpieceinsquares(item it)
         {
 
-            for (int i = (int)it.x / mod; i < (it.x + it.squarewidth) / mod; i++)
+            for (int i = (int)it.x / mod; i <= (it.x + it.squarewidth) / mod; i++)
             {
-                for (int j = (int)it.y / mod; j < (it.y + it.squareheight) / mod; j++)
+                for (int j = (int)it.y / mod; j <= (it.y + it.squareheight) / mod; j++)
                 {
                     if (i >= xlen || j >= ylen)
                     {
@@ -126,8 +126,9 @@ namespace Rise
                     }
                     var old = squares[i, j].piecethere;
 
-                    if (old != it&&old!=null)
-                    { 
+                    if (old!=null&& old.type!=type.bullet&&it.type==type.bullet)
+                    {
+                        continue;
                     }
                     //&&old.orderid!=it.orderid
                     if (old != null &&old.leader!=it&& true && old.type != type.bullet && it.type != type.bullet)

@@ -323,7 +323,7 @@ namespace Rise
         }
         public float squarewidth
         {
-            get { return MathF.Min(width, height); }
+            get { return MathF.Max(width, height); }
         }
         public float squareheight
         {

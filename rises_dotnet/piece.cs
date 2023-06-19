@@ -87,8 +87,8 @@ namespace Rise
             if(type==type.bullet)
             {
                 //   change = 0.03f;
-                var xx = (int)x / engine.gm.map.mod;
-                var yy = (int)y / engine.gm.map.mod;
+                var xx = (int)(x / engine.gm.map.mod);//Math.Round
+                var yy = (int)(y / engine.gm.map.mod);//Math.Round
                 engine.gm.map.squares[xx, yy].Rockettail = 50;
 
             }
@@ -354,17 +354,46 @@ namespace Rise
                 }
                 if (z < 3)
                 {
-                    int newx = (int)(x / engine.gm.map.mod);
-                    int newy = (int)(y / engine.gm.map.mod);
+                    int newx = (int)Math.Round((x) / engine.gm.map.mod);
+                    int newy = (int)Math.Round((y) / engine.gm.map.mod);
                     
                     var a = engine.gm.map.squares[newx, newy].piecethere;
+                   
                     if (!(a == this || a == mother || a == null))
                     {
+                        if (a != null)
+                        {
+                            int ix = (int)a.x / engine.gm.map.mod;
+                            int iy = (int)a.y / engine.gm.map.mod;
+                            int nx = (int)(a.x + a.width) / engine.gm.map.mod;
+                            int ny = (int)(a.y + a.height) / engine.gm.map.mod;
+                            bool done = true;
+                            if (Math.Abs(newx - nx) <= 1&&!done)
+                            {
+                                newx = nx;
+                                done= true;
+                            }
+                            if (Math.Abs(newx - ix) <= 1&&!done)
+                            {
+                                newx = ix;
+                                done= true;
+                            }
+                            if (Math.Abs(newy - ny) <= 1&&!done)
+                            {
+                                newy = ny;
+                                done= true;
+                            }
+                            if (Math.Abs(newy - iy) <= 1&&!done)
+                            {
+                                newy = iy;
+                                done= true;
+                            }
+                        }
                         health = -10;
                         engine.gm.map.squares[newx, newy].Explosion = 150;
                         
-                        engine.gm.map.squares[newx, newy].Rockettail = 65;
-                        engine.gm.map.squares[newx, newy].dx = 8;
+                      //  engine.gm.map.squares[newx, newy].Rockettail = 80;
+                      //  engine.gm.map.squares[newx, newy].dx = 8;
                         a.health -= power;
                     }
                     health *= healthdecrease;
@@ -435,10 +464,20 @@ namespace Rise
                     a.minitargety = a.targety;
                     a.power = power;
                     // engine.gm.map.items.Add(a);
-                    var xy = MathF.Sqrt(a.speedx * a.speedx + a.speedy * a.speedy);
+                    var xy = a.basespeed;// MathF.Sqrt(a.speedx * a.speedx + a.speedy * a.speedy);
                     //var xy2=MathF.Sqrt(speedx *speedx + speedy*speedy);
-                    a.speedx = xy * speedx / basespeed;
-                    a.speedy = xy * speedy / basespeed;
+               //     a.speedx = xy * speedx / basespeed;
+                    a.speedy=(float)Math.Sqrt((xy*xy)/(1+Math.Pow(speedx/speedy,2)));
+                    a.speedx=(float)(a.speedy*speedx/speedy);
+                    if (speedy < 0)
+                    {
+                        a.speedy *= -1;
+                    }
+                    if(speedx < 0 != a.speedx < 0)
+                    {
+                        a.speedx *= -1;
+                    }
+                    //a.speedy = xy * speedy / basespeed;
                     
                     a.mother = this;
                     engine.additem(a);

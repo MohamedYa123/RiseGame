@@ -51,8 +51,8 @@ namespace Rise
             building.engine = this;
             building.stealth = false;
             //building.y = 100;
-            building.health = 5000;
-            building.maxhealth = 5000;
+            building.health = 8000;
+            building.maxhealth = 8000;
             building.type = type.building;
             building.available = true;
             building.image = "1.png";
@@ -107,8 +107,8 @@ namespace Rise
             bullet.type = type.bullet;
             bullet.width = 5;
             bullet.height = 10;
-            bullet.speedx = 30;
-            bullet.speedy = 30;
+            bullet.speedx = 10;
+            bullet.speedy = 10;
             bullet.basespeed = 30;
             bullet.x = -400;
             bullet.basicdirection = 7;
@@ -390,7 +390,8 @@ namespace Rise
                 {
                     a.loadframe.loadframes = (int)framenum;
                     var btmp= a.load(gm);
-                    
+                    xx -= (btmp.Width - a.width) / 2;
+                    yy -= (btmp.Height - a.height) / 2;
                     int negx = (int)(a.width * a.z / 20 / 2 * 3*factow);//بيغير موضع الرسمة علشان الطيران
                     int negy = (int)(a.height * a.z / 20 / 2 * 3*factoh);
                     if (a.type != type.building)
@@ -448,19 +449,22 @@ namespace Rise
                     float fact = (float)(sqrc.Rockettail / 50.0);
                     int sz = (int)(fact * 10);
                     // sqrc.Rockettail++;
-                    if (sz > 0)
+                    if (sz > 0&&fact<1.9f)
                     {
-                        System.Drawing.Rectangle rect = new Rectangle((int)sqrc.x * gm.map.mod - pl.x - sz / 2, (int)sqrc.y * gm.map.mod - pl.y - sz / 2, sz, sz);
-                        g.FillEllipse(Brushes.DarkRed, rect);
-
+                        for (int u = 0; u < 1; u++)
+                        {
+                            Rectangle rect = new Rectangle((int)(sqrc.x+1+u) * gm.map.mod - pl.x - sz / 2+ gm.map.mod/2*0, (int)(sqrc.y + 1 + u * 0) * gm.map.mod - pl.y - sz / 2 + gm.map.mod / 2*0, sz, sz);
+                            g.FillEllipse(Brushes.DarkRed, rect);
+                        }
                     }
                     fact = (float)(sqrc.Explosion / 150.0);
-                    sz = (int)((1 - fact) * 150);
+                    sz = (int)((1 - fact) * 50);
                     if (sz > 0 && sqrc.Explosion > 0)
                     {
 
-                        Brush b = new SolidBrush(Color.FromArgb(50, 250, 100, 0));
-                        System.Drawing.Rectangle rect = new Rectangle((int)sqrc.x * gm.map.mod - pl.x - sz / 2, (int)sqrc.y * gm.map.mod - pl.y - sz / 2, sz, sz);
+                        Brush b = new SolidBrush(Color.FromArgb(120-(int)(sz/50.0*100), 250, 50, 0));
+                        
+                        Rectangle rect = new Rectangle((int)(sqrc.x+0) * gm.map.mod+ gm.map.mod/2 - pl.x - sz / 2, (int)(sqrc.y+0) * gm.map.mod - pl.y - sz / 2+ gm.map.mod/2, sz, sz);
                         g.FillEllipse(b, rect);
                     }
                 }

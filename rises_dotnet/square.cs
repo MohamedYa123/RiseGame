@@ -31,11 +31,11 @@ namespace Rise
         public float fcost
         {
             get {
-                if (timing > 1)
-                {
-
+                int tt = 1;
+                if(piecethere != null) {
+                    tt = 3;
                 }
-                return (gcost+hcost)*timing; }
+                return (gcost+hcost)*timing*tt; }
         }
         //public float fcost
         //{
@@ -135,7 +135,7 @@ namespace Rise
         public void decreasestaff()
         {
             Rockettail -= dx;
-            Explosion -= 30;
+            Explosion -= 40;
             if (explosion >= 100)
             {
 
@@ -143,7 +143,7 @@ namespace Rise
         }
         int rockettail;
         int explosion;
-        public int dx = 3;
+        public int dx = 7;
         public int Rockettail
         {
             get
