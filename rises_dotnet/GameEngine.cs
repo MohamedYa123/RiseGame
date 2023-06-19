@@ -1,4 +1,5 @@
 ﻿//using Microsoft.VisualBasic.Devices;
+using rises_dotnet;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,7 +14,9 @@ using System.Security.Policy;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+//using System.Windows;
 using System.Windows.Forms;
+//using System.Windows.Media;
 using System.Xml.Linq;
 
 namespace Rise
@@ -27,6 +30,8 @@ namespace Rise
            // init();
         }
         public game gm = new game();
+
+
         public void init(int widthresolution,int heightresolution,int realwidth,int realheight)
         {
             map mp = new map("desert2", 10000, 10000, "desert.jpg", widthresolution, heightresolution);
@@ -37,12 +42,14 @@ namespace Rise
             player.army = army.create_usa_army(this);
 
             building building = new building();
-            building.width = 500;
-            building.height = 500;
+            building.width = 250;
+            building.height = 250;
             building.owner = player;
             building.x = 5000;
             building.y = 5000;
+         //   building.stealth = true;
             building.engine = this;
+            building.stealth = false;
             //building.y = 100;
             building.health = 5000;
             building.maxhealth = 5000;
@@ -53,13 +60,15 @@ namespace Rise
             building.army = player.army;
             piece pc = new piece();
             pc.owner = player;
-            pc.buildtime_ms = 300;
-            pc.buildtime = 300;
+
+            pc.stealth = true;
+            pc.buildtime_ms = 150;
+            pc.buildtime = 150;
             pc.army = player.army;
             pc.image = "tank.png";
             pc.name = "tank";
-            pc.width = 80;
-            pc.height = 80;
+            pc.width = 40;
+            pc.height = 40;
             pc.speedx = 0f;
             pc.newspeedx = 0.0f;
             pc.speedy = -0.01f;
@@ -75,13 +84,13 @@ namespace Rise
             pc.maxbullets = 2;
             pc.health = 100;
             pc.maxhealth = 100;
-            pc.x = 5700;
+            pc.x = 5600;
             pc.y = 5200;
-            pc.z = 0;
+        //    pc.z = 20;
             pc.type = type.vehicle;
             pc.track = tracktype.full;
             pc.type = type.vehicle;
-            pc.rangeofattack = 500f;
+            pc.rangeofattack = 1000f;
             mp.items.Add(building);
             mp.items.Add(pc);
 
@@ -96,7 +105,7 @@ namespace Rise
             bullet.name = "bullet";
             bullet.sound = "bullet.wav";
             bullet.type = type.bullet;
-            bullet.width = 10;
+            bullet.width = 5;
             bullet.height = 10;
             bullet.speedx = 30;
             bullet.speedy = 30;
@@ -125,25 +134,27 @@ namespace Rise
         }
         public void requestchangeposition(item it)
         {
-
+            //  return;
+            var hh = it.timeaway;
+            var hh2 = it.pathfindingorder;
             var newx = it.x + it.speedx*speedfactor;
             var newy = it.y + it.speedy*speedfactor;
             var newz = it.z + it.speedz * speedfactor;
-            if (gm.map.accept(it, newx, newy, newz))
+            if (gm.map.accept(it, newx, newy, newz,true))
             {
                 it.canceledx = false;
                 it.canceledy = false;
                 it.x = newx;
                 it.y = newy;
             }
-            else if (gm.map.accept(it, newx, it.y, newz))
+            else if (gm.map.accept(it, newx, it.y, newz,true))
             {
                 it.canceledy = true;
                 it.x = newx;
                 //it.speedy = 0;
 
             }
-            else if (gm.map.accept(it, it.x, newy, newz))
+            else if (gm.map.accept(it, it.x, newy, newz,true))
             {
                 it.canceledx = true;
                 it.y = newy;
@@ -162,7 +173,7 @@ namespace Rise
             it.z = newz;
 
         }
-        public float speedfactor = 2f;
+        public float speedfactor = 1f;
         public void loadselection(item it, Panel panel3)
         {
             building b = null;
@@ -334,11 +345,11 @@ namespace Rise
             gm.tick(pl);
            // gm.drawmap();
         }
-        public Bitmap todraw=null;
+        public System.Drawing.Bitmap todraw=null;
         long framenum = 0;
         DateTime startmilisecs;
         DateTime lastmillisecs;
-        public void fill( player pl,ref string message)
+        public void fill( player pl,ref string message,int resizingframe)
         {
             var bitmap = (Bitmap)gm.map.image.Bitmap.Clone();
             lastmillisecs =DateTime.Now;
@@ -357,7 +368,7 @@ namespace Rise
             
             float factow = gm.map.factorw;
             float factoh = gm.map.factorh;
-            Rectangle main = new Rectangle(0,0,width,height);
+            System.Drawing.Rectangle main = new Rectangle(0,0,width,height);
             var g = Graphics.FromImage(bitmap);
 
             g.SmoothingMode = SmoothingMode.AntiAlias;
@@ -366,35 +377,51 @@ namespace Rise
             for (int i = 0; i < ld.Count; i++)
             {
 
+
                 var a = ld[i];
-                float xx = (a.x * dt  - pl.x ) * factow-a.width*1*factow;// + a.width * dt * factow;
-                float yy = (a.y * dt  - pl.y ) * factoh-a.height*1*factoh;// + a.height * dt * factow;
-                Rectangle rect2=new Rectangle((int)(xx+a.width*factow),(int)(yy+a.height*factoh),(int)(a.width*factow),(int)(a.height*factoh));
+                if (a.health <= 0)
+                {
+                    continue;
+                }
+                float xx = (a.x * dt  - pl.x ) * factow-a.width*1*factow*0;// + a.width * dt * factow;
+                float yy = (a.y * dt  - pl.y ) * factoh-a.height*1*factoh*0;// + a.height * dt * factow;
+                System.Drawing.Rectangle rect2=new Rectangle((int)(xx+a.width*factow),(int)(yy+a.height*factoh),(int)(a.width*factow),(int)(a.height*factoh));
                 if (rect2.IntersectsWith(main))
                 {
+                    a.loadframe.loadframes = (int)framenum;
                     var btmp= a.load(gm);
+                    
                     int negx = (int)(a.width * a.z / 20 / 2 * 3*factow);//بيغير موضع الرسمة علشان الطيران
                     int negy = (int)(a.height * a.z / 20 / 2 * 3*factoh);
-                    
-                    draw( btmp, (int)xx - negx, (int)yy - negy, (int)a.z,g);
+                    if (a.type != type.building)
+                    {
+                        xx -= 5;
+                        yy -= 5;
+                    }
+               //     g.TranslateTransform(xx+a.width/2 - negx, yy+a.height/2 - negy);
+               //     g.TranslateTransform(-a.width/2,-a.height/2);
+                    draw( btmp, (int)(xx +a.width* Math.Tan(a.direction)*0) , (int)(yy+a.height*Math.Tan(a.direction)*0) , (int)a.z,g);
+                //    g.ResetTransform();
                   //  sp.Stop();
                     if (a.selected)
                     {
                         drawhealth( a.health / a.maxhealth, (int)((a.x - 15 - pl.x + (int)a.width / 2)*factow), (int)((a.y - pl.y + (int)a.height / 2 - 15)*factoh), 0, (int)(50* factow*a.width/150),g);
                     }
                     shows++;
+                    
                 }
                
-                if (a.selected&&a.walk&&framenum%1==0)//01010420095//
+                if (a.selected&&a.walk&&framenum%1==1)//01010420095//
                 {
                     //draw path squares
                     for (int ii = 0; ii < a.pathsquares.Count; ii++)
                     {
-                        Color cl = Color.Blue;
+                        System.Drawing.Color cl = Color.FromArgb(100,0,0,255);
                         var sqrc = a.pathsquares[ii];
                         if (ii == a.pointer+1)
                         {
-                            cl = Color.Red;
+                            cl = Color.FromArgb(100, 255, 0, 0);
+                          //  cl = Color.Red;
                         }
                         var xxx = (int)sqrc.x * gm.map.mod+0f;// - pl.x;
                         var yyy = (int)sqrc.y * gm.map.mod+0f;// - pl.y;
@@ -412,7 +439,33 @@ namespace Rise
             }
             
             //sp.Stop();
-            
+            //explosions and fire
+            for(int i=0;i<gm.squaresofinterest.Count;i++)
+            {
+                try
+                {
+                    var sqrc = gm.squaresofinterest[i];
+                    float fact = (float)(sqrc.Rockettail / 50.0);
+                    int sz = (int)(fact * 10);
+                    // sqrc.Rockettail++;
+                    if (sz > 0)
+                    {
+                        System.Drawing.Rectangle rect = new Rectangle((int)sqrc.x * gm.map.mod - pl.x - sz / 2, (int)sqrc.y * gm.map.mod - pl.y - sz / 2, sz, sz);
+                        g.FillEllipse(Brushes.DarkRed, rect);
+
+                    }
+                    fact = (float)(sqrc.Explosion / 150.0);
+                    sz = (int)((1 - fact) * 150);
+                    if (sz > 0 && sqrc.Explosion > 0)
+                    {
+
+                        Brush b = new SolidBrush(Color.FromArgb(50, 250, 100, 0));
+                        System.Drawing.Rectangle rect = new Rectangle((int)sqrc.x * gm.map.mod - pl.x - sz / 2, (int)sqrc.y * gm.map.mod - pl.y - sz / 2, sz, sz);
+                        g.FillEllipse(b, rect);
+                    }
+                }
+                catch (Exception ex){ }
+            }
             for (int i = 0; i < ld.Count; i++)
             {
                 var a = ld[i];
@@ -425,17 +478,23 @@ namespace Rise
                 if (xx > -0 && xx < width && yy > -0 && yy < height)
                 {
                     
-                    if (framenum % 2 == 0 && a.selected && a.owner == pl)
+                    if (resizingframe % 2 == 0 && a.selected && a.owner == pl)
                     {
                         if (a.targetx != -1 && a.target == null && a.walk)
                         {
                           //  gm.drawsquare(bitmap, (int)a.targetx - pl.x, (int)a.targety - pl.y, Color.LightBlue, 20, true);
                           //  gm.drawsquare(bitmap, (int)a.targetx - pl.x+5, (int)a.targety - pl.y+5, Color.LightGreen, 10, true);
-                            gm.drawstring(bitmap, "×", (int)((a.targetx - pl.x-15)*factow), (int)((a.targety - pl.y-15)*factoh), Color.LightGreen, 30);
+
+                            gm.drawstring(bitmap, "⛯", (int)((a.targetx - pl.x-15)*factow), (int)((a.targety - pl.y-15)*factoh), Color.LightGreen, 15);
                         }
-                        else if (a.target != null)
+                         if (a.target != null)
                         {
-                            gm.drawsquare(bitmap, (int)((a.target.x + a.target.width / 2 - pl.x)*factow), (int)((a.target.y + a.target.height / 2 - pl.y)*factoh), Color.Red, 10, true);
+                            gm.drawstring(bitmap, "⛯", (int)((a.targetx - pl.x - 15) * factow), (int)((a.targety - pl.y - 15) * factoh), Color.Red, 15);
+
+                            //⚔️
+                     //       gm.drawstring(bitmap, "⛯󠁧󠁢󠁥󠁮󠁧󠁿", (int)((a.target.x + a.target.width / 2 - pl.x) * factow), (int)((a.target.y + a.target.height / 2 - pl.y) * factoh), Color.Red, 30);
+
+                           // gm.drawsquare(bitmap, (int)((a.target.x + a.target.width / 2 - pl.x)*factow), (int)((a.target.y + a.target.height / 2 - pl.y)*factoh), Color.Red, 10, true);
 
                         }
                     }
@@ -455,7 +514,7 @@ namespace Rise
             }
 
             gm.drawstring(bitmap, $"{Math.Round(shotframe+0.0, 2)} fps objects on screen : {shows} out of {ld.Count}", 0, 0, Color.Aqua, 10);
-            if (message != "")
+            if (message != ""&& fullmessage < 6)
             {
                 gm.drawstring(bitmap, $"{message}", 0, 20, Color.Red, 10);
             }
@@ -465,8 +524,8 @@ namespace Rise
             }
             if (fullmessage > 6)
             {
-                fullmessage = 0;
-                message = "";
+             //   fullmessage = 0;
+               // message = "";
             }
             // gm.drawstring(bitmap, $"{Math.Round(shotframe+0.0, 2)} fps", 0, 0, Color.Aqua, 10);
             if (pl.fx != -1)
@@ -492,7 +551,7 @@ namespace Rise
             var width = ratio * 100; 
           //  var width2 = ratio * 100; 
             g.DrawRectangle(Pens.White, x, y, (int)size, (float)size / 50 * 8+1);
-            var b = new SolidBrush(Color.FromArgb(255, (byte)(255 * (1 - width / 100)), (byte)(155 * (width / 100)), 0));
+            var b = new SolidBrush(Color.FromArgb(100, (byte)(255 * (1 - width / 100)), (byte)(155 * (width / 100)), 0));
             g.FillRectangle(b, x + 1, y + 1, (int)(width* ((float)size/50) ) / 2-1 , (float)size / 50 * 8);
 
         }
@@ -502,12 +561,12 @@ namespace Rise
 
             // var g = Graphics.FromImage(bitmp1);
 
-          //  g.SmoothingMode = SmoothingMode.AntiAlias;
-          //    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            //  g.SmoothingMode = SmoothingMode.AntiAlias;
+            //    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
 
             //  var area = new Rectangle(0, 0, bitmp2.Width/2, bitmp2.Height/2);
             //  g.FillRectangle(new LinearGradientBrush(area, Color.PaleGoldenrod, Color.OrangeRed, 45), area);
-
+          //  bitmp2 = resource.SetOpacity(bitmp2, 0.8f);
             g.DrawImage(bitmp2, new Point(x, y));
        //     g.Dispose();
         }
@@ -518,7 +577,12 @@ namespace Rise
         public void stopwalk(item item)
         {
             makeorder(0, 0, 1);
-            item.walk = !item.walk;
+            item.walk = false;
+            item.targetx = -1;
+            item.targety = -1;
+            item.target = null;
+            item.pathsquares.Clear();
+            item.orderid = item.orderid/2;
         }
         Random rd = new Random();
         public void additem(item item)
@@ -526,14 +590,15 @@ namespace Rise
             //   item.x += rd.Next(-30, 30);
             //   item.y += rd.Next(-30, 30);
             makeorder(0, 0, 0);
-
+            item.orderid=gm.map.items.Count+1;
+            item.id=gm.map.items.Count+1;
             gm.map.items.Add(item);
         }
 
         public void change_direction(item item, int x, int y, player pl)
         {
             item.resettarget = false;
-            x += pl.x; y += pl.y;
+            
             item.targetx = x; item.targety = y;
             item.minitargetx = x; item.minitargety = y;
             var xx = item.x + item.width / 2;
@@ -587,13 +652,17 @@ namespace Rise
     }
     public class GameEngineManager
     {
-        public GameEngineManager(GameEngine engine, player player,int realwidth,int realheight)
+        public GameEngineManager(GameEngine engine, player player, int realwidth, int realheight, int mappicwidth, int mappicheight)
         {
             GameEngine = engine;
             this.player = player;
             this.realwidth = realwidth;
             this.realheight = realheight;
+            this.mappicwidth = mappicwidth;
+            this.mappicheight = mappicheight;
         }
+        int mappicwidth;
+        int mappicheight;
         GameEngine GameEngine;
         bool run = true;
         public int plusx;
@@ -602,42 +671,45 @@ namespace Rise
         public int mousey;
         public int plusz;
         public int mousemode;
-        public Bitmap imagetoshowready;
+        public System.Drawing.Bitmap imagetoshowready;
         Thread thr;
         Thread thr2;
         Thread thr3;
         Thread thr4;
+        Thread thr5;
         player player;
         int mapframe = 0;
+        public System.Drawing.Bitmap mappic;
+        int lastcleanup;
+        bool mapreading = false;
         void readmap()
         {
-          //  return;
+            //  return;
             while (true)
             {
                 try
                 {
-                  //  Stopwatch sw = Stopwatch.StartNew();
-                    if (imsleepy||true)
+                    //  Stopwatch sw = Stopwatch.StartNew();
+                    if (imsleepy || true)
                     {
+                        mapreading = true;
                         GameEngine.gm.drawmap(enginespeed);
-                        if (enginespeed <64)
+                        mappic = resource.ResizeImage(GameEngine.gm.mappic, new Size(mappicwidth, mappicheight));
+                        mapreading = false;
+                        if (enginespeed < 64)
                         {
                             Thread.Sleep(enginespeed);
                         }
                         else
                         {
-                            Thread.Sleep(20);
+                            Thread.Sleep(30);
                         }
                     }
                     else
                     {
-                     //   Thread.Sleep(1);
+                        //   Thread.Sleep(1);
                     }
-                    if (mapframe % 50 == 0)
-                    {
-                        GC.Collect();
-                        GC.WaitForPendingFinalizers();
-                    }
+
                     //  sw.Stop();
                     //var x = sw.ElapsedMilliseconds;
                     // GameEngine.gm.drawmap();
@@ -666,9 +738,9 @@ namespace Rise
             {
                 return msg;
             }
-            set { msg = value;GameEngine.fullmessage = 0; }
+            set { msg = value; GameEngine.fullmessage = 0; }
         }
-        int restnum=250;
+        int restnum = 200;
         void readimage()
         {
             int i = 0;
@@ -678,43 +750,48 @@ namespace Rise
                 {
                     imsleepy = false;
                     player.mousex = mousex; player.mousey = mousey;
-                    //Stopwatch sw = Stopwatch.StartNew();
-                    GameEngine.fill(player,ref msg);
-                    //sw.Stop();
-                    // var x = sw.ElapsedMilliseconds;
-                    //       break;
+                    try
+                    {
+                        GC.TryStartNoGCRegion(1);
+                    }
+                    catch { }
+
+                    GameEngine.fill(player, ref msg, resizingframe);
                     imsleepy = true;
-                   // Thread.Sleep(0);
+
+                    //  Thread.Sleep(1);
                     if (i % 5 == 0)
                     {
                         Thread.Sleep(1);
                     }
-                    if (i == 0)
+                    if (false)
                     {
+
                         Thread.Sleep(50);
                     }
-                    
+
                     if (i % restnum == 0)
                     {
-                        //rest time;
+
+
                         Thread.Sleep(20);
                     }
                     i++;
                 }
                 catch (Exception ex)
                 {
-                 
+
                     if (ex.Source == "System.Private.CoreLib")
                     {
                         break;
                     }
-                    if(ex.Message== "Out of memory.")
+                    if (ex.Message == "Out of memory.")
                     {
                         GC.Collect();
                         GC.WaitForPendingFinalizers();
                         Thread.Sleep(15);
                     }
-                    message= $"(*)Frame read error : ' {ex.Message} '";
+                    message = $"(*)Frame read error : ' {ex.Message} '";
                     Thread.Sleep(3);
                 }
             }
@@ -725,7 +802,7 @@ namespace Rise
             switch (enginespeed)
             {
                 case 0:
-                enginespeed = 64; break;
+                    enginespeed = 64; break;
                 case 2:
                     enginespeed = 1;
                     break;
@@ -761,8 +838,10 @@ namespace Rise
                     enginespeed = 2;
                     break;
             }
-            message = $"Engine speed set to { Math.Round(64.0/enginespeed,1)}x";
+            message = $"Engine speed set to {Math.Round(64.0 / enginespeed, 1)}x";
         }
+        int engineframe = 0;
+        bool engineworking;
         void runme()
         {
             if (run)
@@ -771,81 +850,76 @@ namespace Rise
                 ThreadStart thrr = new ThreadStart(readimage);
                 thr = new Thread(thrr);
                 thr.Start();
-                // thr = new Thread(() => readimage());
                 thr2 = new Thread(() => readmap());
-                // thr.Start();
                 thr2.Start();
-                // Task.Run(() => { readimage(); });
-                //  Task.Run(() => { readmap(); });
-                // Task.Run(() => { load_selection(); });
             }
-            try
-            {
-            //    thr.Interrupt();
-            //    thr2.Interrupt();
-            }
-            catch
-            {
-
-            }
-           
             while (true)
             {
                 run = false;
 
-            //    try
+                //   try
                 {
-                    try
-                    {
-                        GC.TryStartNoGCRegion(1);
-                    }
-                    catch { }
-                    Thread.Sleep(enginespeed);
-                    //   Stopwatch sp = new Stopwatch();
-                    //    sp.Start();
+                    engineworking = true;
                     GameEngine.update(player);
-                    try
-                    {
-                        GC.EndNoGCRegion();
-                    }catch { }
-                    //    sp.Stop();
-                    //    var a = sp.ElapsedMilliseconds;
-                    // break;
+
+                    engineworking = false;
+                    Thread.Sleep(enginespeed);
+                    engineframe++;
                 }
-             /*   catch (Exception ex)
+                //   catch (Exception ex)
                 {
-                    // Get stack trace for the exception with source file information
-                    if(ex.Message== "Thread was being aborted.")
-                    {
-                        return;
-                    }
-                    var st = new StackTrace(ex, true);
-                    // Get the top stack frame
-                    var frame = st.GetFrame(0);
-                    // Get the line number from the stack frame
-                    var line = frame.GetFileLineNumber();
-                    message = $"($)Engine error : ' {ex.Message} ' at line '{line}'";
-                    Thread.Sleep(25);
-                }*/
+                    //     message = $"($)Engine error {ex.Message}";
+                    //   Thread.Sleep(100);
+                }
+
+
             }
         }
         int realwidth;
-        int realheight; 
+        int realheight;
+        void clean()
+        {
+            while (true)
+            {
+                Thread.Sleep(1);
+            }
+        }
+        bool imresizing = false;
+        int resizingframe = 0;
+        int lastresizingframe = 0;
         void resizeandshow()
         {
             while (true)
             {
                 try
                 {
-                    if (imsleepy||true)
+                    if (imsleepy || true)
                     {
-                       // imagetoshowready = (Bitmap)GameEngine.todraw.Clone();
-                        imagetoshowready = resource.ResizeImage((Bitmap)GameEngine.todraw.Clone(), new Size(realwidth, realheight));
-                        Thread.Sleep(25);
+                        imresizing = true;
+                        imagetoshowready = resource.ResizeImage(GameEngine.todraw, new Size(realwidth, realheight));
+                        imresizing = false;
+                        if (imsleepy && !imresizing && resizingframe - lastresizingframe > 500 && !engineworking)
+                        {//&&resizingframe==0
+                            Stopwatch sp = new Stopwatch();
+                            sp.Start();
+                            GC.Collect();
+                            if (resizingframe == 0)
+                            { GC.WaitForPendingFinalizers(); }
+                            sp.Stop();
+                            lastresizingframe = resizingframe;
+                            message = $"Cleanup took time {sp.ElapsedMilliseconds} ms";
+                            //    Thread.Sleep(25);
+                        }
+                        else
+                        {
+                            Thread.Sleep(10);
+                        }
+                        resizingframe++;
+
                     }
                     else
                     {
-                     //   Thread.Sleep(3);
+                        //   Thread.Sleep(3);
                     }
                 }
                 catch (Exception e)
@@ -871,11 +945,261 @@ namespace Rise
                 thrr = new ThreadStart(resizeandshow);
                 thr4 = new Thread(thrr);
                 thr4.Start();
+                thrr = new ThreadStart(clean);
+                thr5 = new Thread(thrr);
+                thr5.Start();
                 //Task.Run(() => { runme(); });
             }
             else if (!ifpossible)
             {
                 shutdown();
+            }
+        }
+        List<order> orders = new List<order>();
+        public int fx;
+        public int fy;
+        public item selected;
+        public building selected_b;
+        item a;
+        public void cancelselection()
+        {
+            foreach (var it in GameEngine.gm.map.items)
+            {
+                it.selected = false;
+            }
+        }
+        square getnextsquare(int x, int y, item it, int orderid, int plusorminusx,int plusorminusy)
+        {
+            square square = null;// = new square();
+            int modx = ((int)it.squarewidth) / GameEngine.gm.map.mod + 2;
+            x = x / GameEngine.gm.map.mod;
+            y = y / GameEngine.gm.map.mod;
+            var xlen = GameEngine.gm.map.xlen;
+            var ylen = GameEngine.gm.map.ylen;
+            //for (  i += modx * plusorminusx)
+            {
+                for (int j = 0, i = 0; j + y < ylen && j + y >= 0&& i + x < xlen && x + i >= 0; j += modx * plusorminusy, i += modx * plusorminusx)
+                {
+                    var square2 = GameEngine.gm.map.squares[x + i, y + j];
+                    if (square2.issitastarget != orderid&&square2.isavailable(it,null)&&it.checksurroundings(square2,x+i,y+j,null,null))
+                    {
+                        if(square2.piecethere!=null && square2.piecethere.type == type.building)
+                        {
+
+                        }
+                        square2.issitastarget = orderid;
+                        square2.x = x + i;
+                        square2.y = y + j;
+                        return square2;
+                    }
+
+                }
+            }
+            return square;
+        }
+        internal class comparesquares : IComparer<square>
+        {
+            public int targetx;
+            public int targety;
+            public comparesquares(int mousex,int mousey,int mod)
+            {
+                targetx=mousex/mod;
+                targety=mousey/mod;
+            }
+            public int Compare(square x, square y)
+            {
+                float dist1=(float)Math.Abs(Math.Abs(x.x - targetx)+Math.Abs(x.y-targety));
+                float dist2=(float)Math.Abs(Math.Abs(y.x - targetx) + Math.Abs(y.y - targety));
+                return -dist1.CompareTo(dist2);
+            }
+        }
+
+        public void sendorder()
+        {
+            order order = new order();
+          //  GameEngine.selectitems(player, fx, fy, mousex, mousey);
+            item fv = GameEngine.match(mousex, mousey, player);
+            if (selected == null)
+            {
+                //a = GameEngine.match(mousex, mousey, player);
+            }
+            int ise = 0;
+            //x += pl.x; y += pl.y;
+            int nextx = mousex+player.x;
+            int nexty = mousey+player.y;
+            int mx=mousex+player.x;
+            int my=mousey+player.y;
+            int plusorminusx = 1;
+            int plusorminusy = 1;
+            int time=0;
+            void getnext()
+            {
+                switch (time)
+                {
+                    case 0:
+                        plusorminusx=1;
+                        plusorminusy=1;
+                        break;
+                    case 1:
+                        plusorminusx=1;
+                        plusorminusy=-1;
+                        break;
+                    case 2:
+                        plusorminusx=-1;
+                        plusorminusy=1;
+                        break;
+                    case 3:
+                        plusorminusx=1;
+                        plusorminusy=0;
+                        break;
+                    case 4:
+                        plusorminusx=0;
+                        plusorminusy=1;
+                        break;
+                    case 5:
+                        plusorminusx=-1;
+                        plusorminusy=-1;
+                        break;
+                    case 6:
+                        plusorminusx=-1;
+                        plusorminusy=0;
+                        break;
+                    case 7:
+                        plusorminusx=0;
+                        plusorminusy=-1;
+                        break;
+                }
+                if (time == 7)
+                {
+                    time = -1;
+                }
+                time++;
+                
+            }
+            List<item> selecteditems = new List<item>();
+            List<square> selectedsquares = new List<square>();
+            int found = 7;
+            int iss = 0;
+            int cx = mx;int cy= my;
+            void getnextsq()
+            {
+                if(selectedsquares.Count > iss) {
+                    cx = (int)selectedsquares[iss].x * GameEngine.gm.map.mod;
+                    cy = (int)selectedsquares[iss].y * GameEngine.gm.map.mod;
+                }
+                if (iss < selectedsquares.Count)
+                {
+                    iss++;
+                }
+            }
+            for (int i = 0; i < GameEngine.gm.map.items.Count; i++)
+            {
+                var it = GameEngine.gm.map.items[i];
+                if (it.selected&&it!=fv&&it.type!=type.building)
+                {
+                    if (fv == null)
+                    {
+
+                        square s = null;// getnextsquare(mx, my, it, order.orderid,plusorminus);
+                        int counts = 0;
+                        
+                        while (counts<8)
+                        {
+                            if (found >= 7)
+                            {
+                                getnextsq();
+                                found = 0;
+                            }
+                            found++;
+                            getnext();
+                            if (s == null)
+                            {
+
+                                s = getnextsquare(cx, cy, it, order.orderid, plusorminusx,plusorminusy);
+                                if (s != null)
+                                {
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                break;
+                            }
+                            counts++;
+                        }
+                        if (s != null)
+                        {
+                            
+                            selectedsquares.Add(s);
+                            nextx = (int)s.x * GameEngine.gm.map.mod;
+                            nexty = (int)s.y * GameEngine.gm.map.mod;
+                            //GameEngine.change_direction(it, nextx, nexty, player);
+                            selecteditems.Add(it);
+                        }
+                    }
+                    it.walk = true;
+                    it.target = fv;
+                    it.orderid = order.orderid;
+                    ise++;
+                }
+            }
+            float centerx = 0;
+            float centery = 0;
+            for(int i = 0; i < selecteditems.Count; i++)
+            {
+                centerx += selecteditems[i].x;
+                centery += selecteditems[i].y;
+            }
+            centerx/=selecteditems.Count;
+            centery/=selecteditems.Count;
+            comparesquares comp=new comparesquares((int)centerx, (int)centery,GameEngine.gm.map.mod);
+            selectedsquares.Sort(comp);
+            int pointt = 0;
+            
+            while (selecteditems.Count > 0)
+            {
+                item topcloses = null;
+                float topdist=float.MaxValue;
+                int dx = (int)selectedsquares[pointt].x*GameEngine.gm.map.mod;
+                int dy = (int)selectedsquares[pointt].y*GameEngine.gm.map.mod;
+                for(int i=0;i<selecteditems.Count;i++)
+                {
+                    var dist = selecteditems[i].getdistance(dx,dy);
+                    if (dist < topdist)
+                    {
+                        topdist = dist;
+                        topcloses = selecteditems[i];
+                    }
+                }
+                selecteditems.Remove(topcloses);
+                GameEngine.change_direction(topcloses, dx, dy, player);
+                pointt++;
+            }
+            if (ise == 0)
+            {
+                selected = fv;
+                selected.selected = true;
+              
+            }
+            else
+            {
+                if (selected != null)
+                {
+                    selected.selected = false;
+                    selected = null;
+                }
+            }
+            fx = -1;
+            fy = -1;
+            orders.Add(order);
+            if (selected!=null&& selected.type == type.building)
+            {
+                selected_b = (building)selected;
+               // selected = null;
+            }
+            else
+            {
+                selected_b=null;
             }
         }
         public void shutdown()
@@ -884,6 +1208,7 @@ namespace Rise
             thr2.Abort();
             thr3.Abort();
             thr4.Abort();
+            thr5.Abort();
         }
     }
 

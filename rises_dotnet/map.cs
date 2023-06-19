@@ -41,7 +41,7 @@ namespace Rise
             {
                 for (int j = 0; j < ylen; j++)
                 {
-                    squares[i, j].resetpathfindingstaff(0);
+                    squares[i, j].resetpathfindingstaff(0,0);
                     squares[i, j].x = i;
                     squares[i, j].y = j;
                 }
@@ -56,17 +56,28 @@ namespace Rise
                 for (int j = 0; j < ylen; j++)
                 {
                     squares[i, j].piecethere = null;
+                    squares[i, j].decreasestaff();
                 }
             }
             
         }
-        public void swapawayfrompoint(item it,int x,int y)
+        public void swapawayfrompoint(item it,int x,int y,bool sweet=false)
         {
             var ot =0f; var ot2 = 0f;
             //  old.newspeedx *= -1;
             //  old.newspeedy *= -1;
             ot = it.newspeedx; ot2 = it.newspeedy;
+            if (it.timeaway >= 0)
+            {
+             //   return;
+            }
             it.timeaway = 4;
+            if (sweet)
+            {
+               // return;
+                it.timeaway = 2;
+            }
+            it.sweetswap = sweet;
             engine.change_direction_direct(it, x, y);
             it.newspeedxtimed = it.newspeedx * -1;
             it.newspeedytimed = it.newspeedy * -1;
@@ -114,7 +125,12 @@ namespace Rise
                         continue;
                     }
                     var old = squares[i, j].piecethere;
-                    if (old != null && true && old.type != type.bullet && it.type != type.bullet)
+
+                    if (old != it&&old!=null)
+                    { 
+                    }
+                    //&&old.orderid!=it.orderid
+                    if (old != null &&old.leader!=it&& true && old.type != type.bullet && it.type != type.bullet)
                     {
                         swapaway(old, it, true);
 
@@ -123,7 +139,7 @@ namespace Rise
                 }
             }
         }
-        public bool accept(item it, float newx, float newy, float newz)
+        public bool accept(item it, float newx, float newy, float newz,bool moving=false)
         {
             
             int nx = (int)(newx / mod);
@@ -168,7 +184,7 @@ namespace Rise
                         return false;
                     }
 
-                    if (!squares[i, j].accept(it, this,timeaway))
+                    if (!squares[i, j].accept(it, this,timeaway,moving))
                     {
                         tf++;
                         return false;
@@ -186,7 +202,7 @@ namespace Rise
         public float factorh;
         public void load_resources(int realwidth,int realheight)
         {
-            image = new resource($"maps/{picture}", "", "mappicture", null,1,1,1,1,1);
+            image = new resource($"maps/{picture}", "", "mappicture", null,1,1,1,1,1,1);
             image.Bitmap = resource.ResizeImage(image.Bitmap, new Size(width_resolution, height_resolution));
             Stopwatch sp = Stopwatch.StartNew();
            // engine.gm.drawstring(image.Bitmap, "cool", 0, 0, Color.Red, 10);
@@ -199,15 +215,16 @@ namespace Rise
             }
         }
         int resourcesnum1=361;
-        int resourcesnum2=21;
-        int resourcesnum3=1;
+        int resourcesnum2=201;
+        int resourcesnum3=401;
+        int resourcesnum4=1;
         public int load_resource(string pic, string sound, string name, item item,float fw,float fh)
         {
-            resource rsc = new resource(pic, sound, name, item,fw,fh, resourcesnum1, resourcesnum2, resourcesnum3);
+            resource rsc = new resource(pic, sound, name, item,fw,fh, resourcesnum1, resourcesnum2, resourcesnum3,resourcesnum4);
             resources.Add(rsc);
             return resources.Count - 1;
         }
-        public int mod = 40;//بيقسم مربعات الخريطة لمربعات أكبر علشان يوفر وقت في البروسيسنج
+        public int mod = 20;//بيقسم مربعات الخريطة لمربعات أكبر علشان يوفر وقت في البروسيسنج
         public int safzone = 0;
         public int xlen;
         public int ylen;

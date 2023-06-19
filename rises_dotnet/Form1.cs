@@ -25,12 +25,14 @@ namespace Rise
         player player;
         private void Form1_Load(object sender, EventArgs e)
         {
+            particleSystem = new ParticleSystem();
             GameEngine.init(pictureBox1.Width, pictureBox1.Height, pictureBox1.Width, pictureBox1.Height);
             player = GameEngine.gm.players[0];
-            GameEngineManager = new GameEngineManager(GameEngine,player,pictureBox1.Width,pictureBox1.Height);
+            GameEngineManager = new GameEngineManager(GameEngine,player,pictureBox1.Width,pictureBox1.Height,pictureBox2.Width,pictureBox2.Height);
             GameEngineManager.runorclose(true);
         }
-
+        int timx = 3;
+        int timy = 3;
         private void timer1_Tick(object sender, EventArgs e)
         {
             
@@ -56,19 +58,19 @@ namespace Rise
                         GameEngineManager.mousey = Cursor.Position.Y;
                         if (GameEngineManager.mousex >= Width * 99 / 100)
                         {
-                            GameEngineManager.plusx = (int)(10 / GameEngine.gm.map.factorw);
+                            GameEngineManager.plusx = (int)(10 / GameEngine.gm.map.factorw*timx);
                         }
                         if (GameEngineManager.mousey >= Height * 99 / 100)
                         {
-                            GameEngineManager.plusy = (int)(10 / GameEngine.gm.map.factorh);
+                            GameEngineManager.plusy = (int)(10 / GameEngine.gm.map.factorh*timy);
                         }
                         if (GameEngineManager.mousex <= Width * 1 / 100)
                         {
-                            GameEngineManager.plusx = -(int)(10 / GameEngine.gm.map.factorw);
+                            GameEngineManager.plusx = -(int)(10 / GameEngine.gm.map.factorw*timx);
                         }
                         if (GameEngineManager.mousey <= Height * 1 / 100)
                         {
-                            GameEngineManager.plusy = -(int)(10 / GameEngine.gm.map.factorh);
+                            GameEngineManager.plusy = -(int)(10 / GameEngine.gm.map.factorh*timy);
                         }
                     }
                     player.x += Convert.ToInt32(GameEngineManager.plusx * player.settings.mousespeed);
@@ -85,6 +87,7 @@ namespace Rise
                     //  label1.Text = $"{player.x}:{player.y}:{player.z}";
                     //  pictureBox2.Image = (Bitmap)GameEngine.gm.mappic.Clone();
                     pictureBox2.Image = (Bitmap)GameEngine.gm.mappic.Clone();
+                    pictureBox2.Image = (Bitmap)GameEngineManager.mappic.Clone();
                     pictureBox1.Image = GameEngineManager.imagetoshowready;// (Bitmap)GameEngine.todraw.Clone();
                                                                            //   xv = 0
                 }
@@ -129,53 +132,51 @@ namespace Rise
             item a = null;
 
             item fv = GameEngine.match(GameEngineManager.mousex, GameEngineManager.mousey, player);
-            if (selcted == null)
-            {
-                a = GameEngine.match(GameEngineManager.mousex, GameEngineManager.mousey, player);
-            }
+           
             try
             {
-                var gg = lista;
-                for (int i = 0; i < gg.Count; i++)
-                {
-                    var aselect = gg[i];
-                    if (fv == null)
-                    {
-                        if (aselect.target != null)
-                        {
-                            aselect.target.selected = false;
-                        }
-                    }
-                    aselect.target = fv;
-                    if (fv == null)
-                    {
-                        aselect.walk = true;
-                    }
-                    GameEngine.change_direction(aselect, GameEngineManager.mousex, GameEngineManager.mousey, player);
-                    // return;
-                }
+                //var gg = lista;
+                //for (int i = 0; i < gg.Count; i++)
+                //{
+                //    var aselect = gg[i];
+                //    if (fv == null)
+                //    {
+                //        if (aselect.target != null)
+                //        {
+                //            aselect.target.selected = false;
+                //        }
+                //    }
+                //    aselect.target = fv;
+                //    if (fv == null)
+                //    {
+                //        aselect.walk = true;
+                //    }
+                //    GameEngine.change_direction(aselect, GameEngineManager.mousex, GameEngineManager.mousey, player);
+                //    // return;
+                //}
 
-                if (a == null && selcted != null)
-                {
-                    if (fv != selcted.target)
-                    {
-                        selcted.walk = true;
-                    }
-                    selcted.target = fv;
+                //if (a == null && selcted != null)
+                //{
+                //    if (fv != selcted.target)
+                //    {
+                //        selcted.walk = true;
+                //    }
+                //    selcted.target = fv;
 
-                    selcted.selected = true;
+                //    selcted.selected = true;
 
-                    GameEngine.change_direction(selcted,GameEngineManager.mousex, GameEngineManager.mousey, player);
+                //    GameEngine.change_direction(selcted,GameEngineManager.mousex, GameEngineManager.mousey, player);
 
-                    return;
-                }
-                if (lista.Count != 0)
-                {
-                    return;
-                }
-                selcted = (piece)a;
-                selected_b = null;
-                GameEngine.fill_selection(panel2, a, player);
+                //    return;
+                //}
+                //if (lista.Count != 0)
+                //{
+                //    return;
+                //}
+                //selcted = (piece)a;
+                //selected_b = null;
+                GameEngineManager.sendorder();
+                GameEngine.fill_selection(panel2, GameEngineManager.selected, player);
             }
             catch
             {
@@ -202,6 +203,10 @@ namespace Rise
                 {
 
                 }
+            } 
+            if (e.KeyChar == 'e')
+            {
+                GameEngine.fullmessage = 0;
             }
             if (e.KeyChar == 'q')
             {
@@ -229,10 +234,18 @@ namespace Rise
                 GameEngineManager.setenginespeednext();
             }
         }
-
+        private ParticleSystem particleSystem;
         private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
         {
+            if (e.Button == MouseButtons.Left)
+            {
+                PointF center = e.Location;
+                float radius = 10;
+                int particleCount = 100;
+                int particleLife = 70;
 
+              //  particleSystem.CreateSmoke(center, radius, particleCount, particleLife);
+            }
             fx = e.X; fy = e.Y;
 
             if (e.Button == MouseButtons.Right)
@@ -262,6 +275,8 @@ namespace Rise
             }
             selcted = null;
             selected_b = null;
+            GameEngineManager.fx = fx;
+            GameEngineManager.fy = fy;
             lista = GameEngine.selectitems(player, fx, fy, GameEngineManager.mousex, GameEngineManager.mousey);
         }
 
@@ -269,9 +284,17 @@ namespace Rise
         {
             try
             {
-                GameEngine.loadselection(selected_b, panel3);
+                GameEngine.loadselection(GameEngineManager.selected_b, panel3);
             }
             catch { }
+        }
+
+        private void pictureBox1_Paint(object sender, PaintEventArgs e)
+        {
+            particleSystem.UpdateParticles();
+            particleSystem.DrawParticles(e.Graphics);
+
+            Invalidate();
         }
     }
 }

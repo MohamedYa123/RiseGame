@@ -9,3 +9,8 @@ G:\projects\C# Projects\rises_dotnet\rises_dotnet\obj\Release\rises_dotnet.cspro
 G:\projects\C# Projects\rises_dotnet\rises_dotnet\obj\Release\rises_dotnet.csproj.CoreCompileInputs.cache
 G:\projects\C# Projects\rises_dotnet\rises_dotnet\obj\Release\rises_dotnet.exe
 G:\projects\C# Projects\rises_dotnet\rises_dotnet\obj\Release\rises_dotnet.pdb
+G:\projects\C# Projects\rises_dotnet\rises_dotnet\bin\Release\Interop.WMPLib.dll
+G:\projects\C# Projects\rises_dotnet\rises_dotnet\bin\Release\AxInterop.WMPLib.dll
+G:\projects\C# Projects\rises_dotnet\rises_dotnet\obj\Release\Interop.WMPLib.dll
+G:\projects\C# Projects\rises_dotnet\rises_dotnet\obj\Release\AxInterop.WMPLib.dll
+G:\projects\C# Projects\rises_dotnet\rises_dotnet\obj\Release\rises_dotnet.csproj.ResolveComReference.cache

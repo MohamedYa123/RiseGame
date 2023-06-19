@@ -18,6 +18,8 @@ namespace Rise
         public long time;
         public player plformap;
         int frame = 0;
+        public List<square> squaresofinterest=new List<square>();
+         List<square> squaresofinterest2=new List<square>();
         public void tick(player pl)
         {
             plformap = pl;
@@ -50,10 +52,41 @@ namespace Rise
                     map.putpieceinsquares(it);
                 }
             }
+
             map.sqauresreset = false;
             map.cloneitems();
+            var gm = this;
+            squaresofinterest2.Clear();
+            for (int i = pl.x / gm.map.mod; i - pl.x / gm.map.mod < pl.width && i < gm.map.xlen; i++)
+            {
+                for (int j = pl.y / gm.map.mod; j - pl.y / gm.map.mod < pl.height && j < gm.map.ylen; j++)
+                {
+                    var sqrc = gm.map.squares[i, j];
+                    sqrc.x = i;
+                    sqrc.y = j;
+                    float fact = (float)(sqrc.Rockettail / 50.0);
+                    int sz = (int)(fact * 10);
+                    // sqrc.Rockettail++;
+                    if (sz > 0)
+                    {
+                   //     System.Drawing.Rectangle rect = new Rectangle(i * gm.map.mod - pl.x - sz / 2, j * gm.map.mod - pl.y - sz / 2, sz, sz);
+                     //   g.FillEllipse(Brushes.DarkRed, rect);
+                     squaresofinterest2.Add(sqrc);
+                    }
+                    fact = (float)(sqrc.Explosion / 150.0);
+                    sz = (int)((1 - fact) * 150);
+                    if (sz > 0 && sqrc.Explosion > 0)
+                    {
+                        squaresofinterest2.Add(sqrc);
+                     //   Brush b = new SolidBrush(Color.FromArgb(50, 100, 100, 0));
+                     //   System.Drawing.Rectangle rect = new Rectangle(i * gm.map.mod - pl.x - sz / 2, j * gm.map.mod - pl.y - sz / 2, sz, sz);
+                     //   g.FillEllipse(b, rect);
+                    }
+                }
+            }
             time++;
-            
+            squaresofinterest.Clear();
+            squaresofinterest.AddRange(squaresofinterest2);
             frame++;
         }
         public void drawmap(int enginespeed) {
@@ -78,7 +111,8 @@ namespace Rise
             var mappic = (Bitmap)map.image.bitmap2.Clone();
             if (mappic.Width != map.xlen && mappic.Height != map.ylen)
             {
-               mappic= resource.ResizeImage(map.image.bitmap2, new Size(map.xlen / dx, map.ylen / dx));
+                mappic = map.image.bitmap2;// resource.ResizeImage(map.image.bitmap2, new Size(map.xlen / dx, map.ylen / dx));
+                mappic =resource.ResizeImage(map.image.bitmap2, new Size(map.xlen / dx, map.ylen / dx));
                 map.image.bitmap2 = (Bitmap)mappic.Clone();
             }
             //  var mappic = resource.ResizeImage(map.image.bitmap2, new Size(map.xlen / dx, map.ylen / dx));
@@ -87,6 +121,7 @@ namespace Rise
             if (true)
             {
                 int skipfactor = dx2;
+                Dictionary<item, int> drawnpieces=new Dictionary<item,int>();
                 for (int i = 0; i < map.xlen; i += skipfactor)
                 {
                     for (int j = 0; j < map.ylen; j += skipfactor)
@@ -96,8 +131,9 @@ namespace Rise
                         {
                             goto hello;
                         }
-                        if (sqrpiece != null)
+                        if (sqrpiece != null&&sqrpiece.type!=type.bullet&&!drawnpieces.ContainsKey(sqrpiece))
                         {
+                            drawnpieces.Add(sqrpiece, sqrpiece.id);
                             squares++;
                             if (sqrpiece.basespeed > 0)
                             {
@@ -106,11 +142,33 @@ namespace Rise
                             var x = (int)(sqrpiece.x / dx / map.mod);
                             var y = (int)(sqrpiece.y / dx / map.mod);
                             int sqrwidth = (int)sqrpiece.squarewidth / map.mod / dx;
+                            if (sqrwidth <2)
+                            {
+                                sqrwidth = 2;
+                            }
                             if (sqrwidth == 0)
                             {
                                 sqrwidth = 1;
                             }
-                            drawsquare(mappic, x, y, sqrpiece.army.armycolor, sqrwidth);
+                            int alpha = (int)(sqrpiece.loadframe.opacity * 255);
+                            //alpha = 255;
+                            if (alpha < 255)
+                            {
+                                if (sqrpiece.loadframe.opacity < 0.55f)
+                                {
+                                    alpha -= 50;
+                                }
+                                else
+                                {
+                                    //alpha += 50;
+                                }
+                                alpha -= 50;
+                            }
+                            Color armycolor = Color.FromArgb(alpha, sqrpiece.army.armycolor.R, sqrpiece.army.armycolor.G, sqrpiece.army.armycolor.B);
+                            if (sqrpiece.loadframe.opacity>0.5f||true)
+                            {
+                                drawsquare(mappic, x, y, armycolor, sqrwidth);
+                            }
                             if (sqrpiece.selected && frame % 2 == 0)
                             {
                                 var a = sqrpiece;
@@ -199,12 +257,8 @@ namespace Rise
             var g = Graphics.FromImage(bitmp1);
 
             g.SmoothingMode = SmoothingMode.AntiAlias;
-            //  g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-
-            //    var area = new Rectangle(0, 0, bitmp2.Width / 2, bitmp2.Height / 2);
-            //  g.FillRectangle(new LinearGradientBrush(area, Color.PaleGoldenrod, Color.OrangeRed, 45), area);
-            var width = 1;
-            //  g.DrawRectangle(Pens.LightCyan, x, y, 1, 1);
+            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+          //  g.DrawRectangle(Pens.LightCyan, x, y, 1, 1);
             var b = new SolidBrush(cl);
             if (circle)
             {
@@ -214,6 +268,10 @@ namespace Rise
             {
                 g.FillRectangle(b, x, y, size, size);
             }
+            //  g.DrawRectangle(Pens.White, x, y, (int)size, (float)size / 50 * 8 + 1);
+            // var b = new SolidBrush(Color.FromArgb(20, (byte)(255 * (1 - width / 100)), (byte)(155 * (width / 100)), 0));
+            // g.FillRectangle(b, x + 1, y + 1, (int)(width * ((float)size / 50)) / 2 - 1, (float)size / 50 * 8);
+            // g.FillRectangle(b, x, y, size, size);
             g = null;
         }
         public Bitmap mappic;

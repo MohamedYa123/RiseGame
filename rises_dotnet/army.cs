@@ -21,9 +21,10 @@ namespace Rise
         public double sellfactor = 1;
         public double buyfactor = 1;
         public player owner;
-        public Color armycolor = Color.Cyan;
+        public Color armycolor = Color.Red;
         public List<building> buildings = new List<building>();
         public GameEngine engine;
+        public int teamid;
         public static army create_usa_army(GameEngine engine)
         {
             army army = new army(engine);

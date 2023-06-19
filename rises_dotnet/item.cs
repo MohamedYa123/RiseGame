@@ -7,6 +7,32 @@ using System.Threading.Tasks;
 
 namespace Rise
 {
+    public  class frameload
+    {
+        public int loadframes;
+        public float opacity = 0.5f;
+        public float plusopacityframe;
+        public void load(bool stealth)
+        {
+            loadframes++;
+            if (!stealth)
+            {
+                opacity= 1.0f;
+            }
+            if (loadframes % 1 == 0 && stealth)
+            {
+                if (opacity <= 0.5f)
+                {
+                    plusopacityframe = 0.003f;
+                }
+                else if (opacity >= 0.65 && opacity <= 1.1f)
+                {
+                    plusopacityframe = -0.003f;
+                }
+                opacity += plusopacityframe;
+            }
+        }
+    }
     public class item
     {
         public List<square> pathsquares = new List<square>();
@@ -35,12 +61,25 @@ namespace Rise
         public List<square> openlist = new List<square>();
         protected int minus = 0;
         protected int originalnum;
-        int pathfindingorder;
+        public  int pathfindingorder;
+        public bool stealth;
+        public int orderid;
+      
+        public float getdistance(int mousex,int mousey)
+        {
+            return (float)Math.Sqrt(Math.Pow(mousex-x,2)+Math.Pow(mousey-y,2));
+        }
+        
         Random random=new Random();
         public int id;
         public item() { 
             id=random.Next();
+           // public item()
+            {
+                orderid = random.Next(int.MinValue,int.MaxValue);
+            }
         }
+        public bool sweetswap;
         public List<square> pathfinding(square startpoint, square targetpoint, float x, float y)
         {
             originalnum = (int)Math.Ceiling(squarewidth / engine.gm.map.mod);
@@ -61,8 +100,8 @@ namespace Rise
                 return path;
             }
             pathfindingorder = random.Next(int.MinValue,int.MaxValue);
-            startpoint.checkpathprops(pathfindingorder);
-            targetpoint.checkpathprops(pathfindingorder);
+            startpoint.checkpathprops(pathfindingorder,orderid);
+            targetpoint.checkpathprops(pathfindingorder, orderid);
             startpoint.startpoint = true;
             targetpoint.targetpoint = true;
             openlist.Clear();
@@ -85,6 +124,7 @@ namespace Rise
                     break;
                 }
                 last = curretpoint;
+                curretpoint.marked = true;
                 curretpoint = curretpoint.parent;
                 // var dist = MathF.Sqrt(MathF.Pow(curretpoint.x - x, 2) + MathF.Pow(curretpoint.y - y, 2));
                 // path.Add(curretpoint);
@@ -110,7 +150,7 @@ namespace Rise
         {
             best = startpoint;
             int step = 0;
-            while (step < 5000 && !(best == null && step > 0))
+            while (step < 500 && !(best == null && step > 0))
             {
                 var b = search(best, startpoint, targetpoint);
                 if (b||best!=null&&best.targetpoint)
@@ -122,17 +162,20 @@ namespace Rise
             return false;
         }
         protected float basicdoublingfactor = 1;
-        bool checksurroundings(int x, int y,square targetpoint,square startpoint)
+        public item leader;
+        public bool checksurroundings(square mother, int x, int y, square targetpoint, square startpoint)
         {
             if (num == 0)
             {
                 return true;
             }
-            float doublingfactor = basicdoublingfactor;
-            var diffx=Math.Abs(x-startpoint.x);
-            var diffy=Math.Abs(y-startpoint.y);
             float product = 1;
             bool doubleme = false;
+            float doublingfactor = basicdoublingfactor;
+            if(startpoint!=null&&targetpoint!=null){ 
+            var diffx = Math.Abs(x - startpoint.x);
+            var diffy = Math.Abs(y - startpoint.y);
+
             if (diffx <= num && diffy <= num)
             {
                 doubleme = true;
@@ -140,23 +183,24 @@ namespace Rise
                 {
                     doublingfactor = basicdoublingfactor * 1.5f;
                 }
-              //  product = 5;
-               // return true;
+                //  product = 5;
+                // return true;
             }
-             diffx = Math.Abs(x - targetpoint.x);
-             diffy = Math.Abs(y - targetpoint.y);
+            diffx = Math.Abs(x - targetpoint.x);
+            diffy = Math.Abs(y - targetpoint.y);
             if (diffx <= num && diffy <= num)
             {
-                doubleme= true;
-               // product = 5;
-               // return true;
-            }
+                doubleme = true;
+                // product = 5;
+                // return true;
+            } }
             var xlen = engine.gm.map.xlen - 1;
             var ylen = engine.gm.map.ylen - 1;
             if (engine.gm.map.squares[x, y].startpoint|| engine.gm.map.squares[x, y].targetpoint)
             {
                 return true;
             }
+            
             for (int i = -num; i < num; i++)
             {
                 for (int j = -num; j < num; j++)
@@ -168,8 +212,10 @@ namespace Rise
                     {
                         continue;
                     }
-                    engine.gm.map.squares[nx, ny].checkpathprops(pathfindingorder);
+                    engine.gm.map.squares[nx, ny].checkpathprops(pathfindingorder, orderid);
                     engine.gm.map.squares[nx, ny].isavailable(this, target);
+                    mother.addswaps(engine.gm.map.squares[nx, ny]);
+                    mother.settiming(engine.gm.map.squares[nx, ny]);
                     if (!engine.gm.map.squares[nx, ny].available)
                     {
                         if (!doubleme)
@@ -213,7 +259,7 @@ namespace Rise
                     }
 
                     var squarec = engine.gm.map.squares[(int)nx, (int)ny];
-                    squarec.checkpathprops(pathfindingorder);
+                    squarec.checkpathprops(pathfindingorder, orderid);
                     if (!squarec.targetpoint)
                     {
                         if (i == 0 || j == 0)
@@ -222,7 +268,7 @@ namespace Rise
                         }
                     }
                     squarec.isavailable(this, target);
-                    if (squarec.examined || squarec.startpoint || !squarec.available || squarec.open || !checksurroundings((int)nx, (int)ny,startpoint,targetpoint))
+                    if (squarec.examined || squarec.startpoint || !squarec.available || squarec.open || !checksurroundings(squarec,(int)nx, (int)ny,startpoint,targetpoint))
                     {
                         continue;
                     }
@@ -309,7 +355,9 @@ namespace Rise
         public float rangeofattack;
         public item clone()
         {
-            return (item)MemberwiseClone();
+            var x = (item)MemberwiseClone();
+
+            return x;
         }
 
         public virtual void read()
@@ -318,6 +366,7 @@ namespace Rise
         }
         private Bitmap RotateImageBasic(Bitmap bmp, double angle2)
         {
+           // return bmp;
             float angle = Convert.ToSingle(angle2);
             bmp = (Bitmap)bmp.Clone();
             Bitmap rotatedImage = new Bitmap(bmp.Width * 1, bmp.Height * 1);
@@ -340,21 +389,27 @@ namespace Rise
         }
         private Bitmap RotateImage(Bitmap bmp, double angle2)
         {
+         //   return bmp;
             float angle = Convert.ToSingle(angle2);
-            Bitmap rotatedImage = new Bitmap(bmp.Width * 3, bmp.Height * 3);
+            Bitmap rotatedImage = new Bitmap(bmp.Width * 4, bmp.Height * 4);
             //rotatedImage.SetResolution(bmp.HorizontalResolution, bmp.VerticalResolution);
 
             using (Graphics g = Graphics.FromImage(rotatedImage))
             {
 
                 // Set the rotation point to the center in the matrix
-                g.TranslateTransform(bmp.Width / 2 * 3, bmp.Height / 2 * 3);
+              //  g.TranslateTransform(bmp.Width / 2 * 3, bmp.Height / 2 * 3);
+                g.FillRectangle(Brushes.Green,0,0,10,10);
+                g.FillRectangle(Brushes.Green, rotatedImage.Width / 2-5, rotatedImage.Height / 2-5, 10,10);
+             //   g.FillRectangle(Brushes.Green, rotatedImage.Width / 3, rotatedImage.Height / 3, 10,10);
+                g.TranslateTransform(rotatedImage.Width/2,rotatedImage.Height/2);
                 // Rotate
                 g.RotateTransform(angle);
                 // Restore rotation point in the matrix
                 g.TranslateTransform(-bmp.Width / 2, -bmp.Height / 2);
                 // Draw the image on the bitmap
                 g.DrawImage(bmp, new Point(0, 0));
+                //g=null;
             }
 
             return rotatedImage;
@@ -372,25 +427,25 @@ namespace Rise
             direction = MathF.Atan(MathF.Abs(speedy) / MathF.Abs(speedx));
             if (speedx > 0 && speedy < 0)
             {
-                direction = 3.14f - direction;
-                direction += 3.14f * 4 / 4;
+                direction = pi - direction;
+                direction += pi * 4 / 4;
             }
             else if (speedx < 0 && speedy > 0)
             {
-                direction = 3.14f - direction;
-                direction += 3.14f * 7 / 4;
+                direction = pi - direction;
+                direction += pi * 7 / 4;
                 direction += 0.6f;
             }
             else if (speedx < 0 && speedy < 0)
             {
-                direction += 3.14f * 3 / 4;
+                direction += pi * 3 / 4;
                 direction += 0.7f;
             }
             else
             {
                 //  direction += 3.14f/2f;
             }
-            direction += 3.14f / 2f;
+            direction += pi / 2f;
             return direction;
         }
         public void copybitmapdata(item it)
@@ -403,14 +458,22 @@ namespace Rise
             it.olddirection = olddirection;
         }
         public Bitmap resourcebitmap;
+        public Bitmap resourcebitmap2;
          void prepareresourcebitmap(game gm)
         {
             resourcebitmap = (Bitmap)gm.map.resources[resourceid].Bitmap.Clone();
+            resourcebitmap2 = (Bitmap)gm.map.resources[resourceid].bitmap2.Clone();
         }
         float anglestep = 1f;
+        float opacitystep = 3f;
         float zstep = 1f;
+        public frameload loadframe =new frameload();
+        public float direction;
+        public static float pi = (float)Math.PI;
         public Bitmap load(game gm, bool basic = false)
         {
+           
+            loadframe.load(stealth);
             float trx = 1;
             float tryy = 1;
             if (canceledx)
@@ -421,7 +484,7 @@ namespace Rise
             {
                 tryy = 0.0001f;
             }
-            float direction = 0;
+             direction=0;//= 0;
             if (true)
             {
                 if (speedy == 0)
@@ -435,27 +498,35 @@ namespace Rise
                 direction = getdirection(speedx * trx, speedy * tryy);
             }
 
-            direction += basicdirection / 180 * 3.14f;
+            direction += basicdirection / 180 * pi;
             if (speedx == speedy && speedx == 0.00001f)
             {
                 direction = olddirection;
             }
             
             Bitmap btmp;
-            var directionindegrees = direction * 180 / 3.14;
+            var directionindegrees = direction * 180 / pi;
             directionindegrees -= (int)(directionindegrees / 360)*360;
+            if (loadframe.opacity != 1)
+            {
+                anglestep = 1;
+            }
             var id1 = (int)Math.Round( directionindegrees/ anglestep);
             var id2 = (int)Math.Round(z / zstep);
-            var id3 = 0;
-            var sr = gm.map.resources[resourceid].GetSecondresource(id1, id2, id3);
-            directionindegrees = id1 * anglestep;
+            var id3 = (int)((loadframe.opacity *100)/opacitystep);
+            var id4 = 0;
+            var sr = gm.map.resources[resourceid].GetSecondresource(id1, id2, id3,id4);
             if (sr != null&&!basic)
             {
                 return sr.bitmap;
             }
             prepareresourcebitmap( gm);
             btmp = resourcebitmap;
-            if (!basic && type != type.bullet&&false)
+            if (basic)
+            {
+                btmp = resourcebitmap2;
+            }
+            if (!basic && type != type.bullet)
             {
                 int tz = 1;
                 if (type == type.building)
@@ -468,26 +539,33 @@ namespace Rise
             {
                 if (basic)
                 {
+
                     btmp = RotateImageBasic(btmp, directionindegrees);
                 }
                 else
                 {
-                    btmp = RotateImage(btmp, directionindegrees);
+                    btmp= resource.RotateAndCropBitmap(btmp, directionindegrees,type);
                 }
             }
             
-            
-            if (z <3)
+
+            if (z >3)
             {
                 btmp = resource.ResizeImage(btmp, new Size((int)(btmp.Width + btmp.Width / 20 * z), (int)(btmp.Height + btmp.Height / 20 * z)));
                 
             }
             if (!basic)
             {
-                gm.map.resources[resourceid].setsecondresource(btmp, id1, id2, id3);
+                if (loadframe.opacity < 1)
+                {
+                    btmp = resource.SetOpacity(btmp, loadframe.opacity);
+                }
             }
-           // lastbitmapclonned = (Bitmap)btmp.Clone();
-           // lastbitmap = btmp;
+            if (!basic)
+            {
+                gm.map.resources[resourceid].setsecondresource(btmp, id1, id2, id3,id4);
+            }
+
             return btmp;
         }
         public virtual void load_resouces(game gm,float fw,float fh)

@@ -1,14 +1,19 @@
 ﻿using Microsoft.Win32.SafeHandles;
+using rises_dotnet.Properties;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Media;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
+using System.Windows.Media.Effects;
+using static System.Net.Mime.MediaTypeNames;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-
 namespace Rise
 {
 
@@ -25,7 +30,6 @@ namespace Rise
         public string picture = "";
         
         public bool viewed;
-        public bool stealth;
         public bool detcted;
 
         public float power;
@@ -71,12 +75,21 @@ namespace Rise
         int numofhits;
         
         int zz;
-        
+        int frames=-1;
+        float plusopacity = -1;
+        [DllImport("winmm.dll")]
+        static extern Int32 mciSendString(string command, StringBuilder buffer, int bufferSize, IntPtr hwndCallback);
+
         public override void read()
         {
+            frames++;
+            
             if(type==type.bullet)
             {
-             //   change = 0.03f;
+                //   change = 0.03f;
+                var xx = (int)x / engine.gm.map.mod;
+                var yy = (int)y / engine.gm.map.mod;
+                engine.gm.map.squares[xx, yy].Rockettail = 50;
 
             }
             else
@@ -95,6 +108,7 @@ namespace Rise
             }
             if (timeaway > 0)
             {
+                walk = true;
                 speedx = newspeedxtimed * change + speedx * (1 - change);
                 speedy = newspeedytimed * change + speedy * (1 - change);
                 goto g;
@@ -112,9 +126,35 @@ namespace Rise
             {
                 if (sound != "")
                 {
-                    SoundPlayer sdp = new SoundPlayer();
-                    sdp.SoundLocation = sound;
+                    //SoundPlayer sdp = new SoundPlayer();
+                    //sdp.SoundLocation = sound;
                     //  Task.Run(() => { sdp.Play(); });
+                //    Task.Run(() =>
+                    {
+                        //  var c = new MediaPlayer();
+                        //  c.Open(new System.Uri(@"G:\projects\C# Projects\rises_dotnet\rises_dotnet\bin\Debug\resources\USA\pieces\sound\bullet.wav"));
+                        //  c.Play();
+                        // mciSendString(@"open G:\projects\C# Projects\rises_dotnet\rises_dotnet\bin\Debug\resources\USA\pieces\sound\bullet.wav type waveaudio alias applause", null, 0, IntPtr.Zero);
+                        // mciSendString(@"play applause", null, 0, IntPtr.Zero);
+                        //Player pl = new Player();
+                        //byte[] arr = File.ReadAllBytes(@"in.wav");
+                        //pl.Play(arr);
+                        //Player pl2 = new Player();
+                        //pl2.FileName = "123.mp3";
+                        //pl2.Play();
+                        //SoundEffectInstance Sound = SoundEffect.FromStream(Application.GetResourceStream(new Uri("Assets/Sounds/wav/sound.wav", UriKind.Relative)).Stream).CreateInstance();
+                        //Sound.IsLooped = true;
+                        //Sound.Play();
+                        // windowsm
+                        //    c.Close();
+                        effect = new SoundPlayer(sound);
+                        BackgroundWorker effectPlayer;
+                        effectPlayer = new BackgroundWorker();
+                        effectPlayer.DoWork += new DoWorkEventHandler(backgroundWorker_DoWork);
+                        //effectPlayer.RunWorkerAsync();
+
+                        // axWindowsMediaPlayer1.pl
+                    }//);
                 }
 
             }
@@ -136,9 +176,12 @@ namespace Rise
                     var dist = MathF.Sqrt((targetx - xx) * (targetx - xx) + (targety - yy) * (targety - yy));
                     if (dist < 20)
                     {
+                        pathsquares.Clear();
+                        targetx = -1;
+                        targety = -1;
                         walk = false;
                     }
-                    else
+                    else if(targetx!=-1)
                     {
                         walk = true;
                     }
@@ -159,7 +202,7 @@ namespace Rise
                     }
                     if (true)
                     {
-                        if (oldtargetx != targetx && oldtargety != targety||pathsquares.Count==0)
+                        if (oldtargetx != targetx && oldtargety != targety||(pathsquares.Count<0))
                         {
                             var xt = (int)targetx / engine.gm.map.mod;
                             var yt = (int)targety / engine.gm.map.mod;
@@ -214,10 +257,17 @@ namespace Rise
                         if (pointer >= 0 && pathsquares.Count > 1)
                         {
                             var sqrc = pathsquares[pointer];
+                            int aa = 0;
+                            for(int i = pointer; i >=0 && aa < 8; i--, aa++)
+                            {
+                                var sqrc2 = pathsquares[pointer];
+                                sqrc2.makesweetswap(engine.gm.map, pathfindingorder,orderid,this);
+
+                            }
                             minitargetx = sqrc.x * engine.gm.map.mod;
                             minitargety = sqrc.y * engine.gm.map.mod;
                             var dist = MathF.Sqrt(MathF.Pow(minitargetx - x-width/2, 2) + MathF.Pow(minitargety - y-height/2, 2));
-                            if (dist <= (float)engine.gm.map.mod*2f)
+                            if (dist <= (float)engine.gm.map.mod*4f)
                             {
                                 pointer--;
                                 numofhits = 0;
@@ -298,7 +348,7 @@ namespace Rise
                         z = 0;
                     }
                 }
-                if (dist < target.squarewidth*3)
+                if (target!=null&& dist <Math.Min( 200,target.squarewidth*3))
                 {
                     z = 0;
                 }
@@ -311,6 +361,10 @@ namespace Rise
                     if (!(a == this || a == mother || a == null))
                     {
                         health = -10;
+                        engine.gm.map.squares[newx, newy].Explosion = 150;
+                        
+                        engine.gm.map.squares[newx, newy].Rockettail = 65;
+                        engine.gm.map.squares[newx, newy].dx = 8;
                         a.health -= power;
                     }
                     health *= healthdecrease;
@@ -323,7 +377,7 @@ namespace Rise
             }
             if (type!=type.air)
             {
-                z *= 0.9f;
+                z *= 0.95f;
                 //  x -= width / 20 * z*0.03f;
                 //  y -= height / 20 * z*0.03f;
             }
@@ -349,9 +403,12 @@ namespace Rise
                 {
                     fire = true;
                 }
-                if (dist < rangeofattack)
+                if (dist-target.squarewidth/2 < rangeofattack)
                 {
-
+                    targetx = -1;
+                    targety=-1;
+                    pathsquares.Clear();
+                    pointer = -1;
                     walk = false;
 
                 }
@@ -368,7 +425,7 @@ namespace Rise
                     a.justcreated = true;
                     a.x = x + width / 2;
                     a.y = y + height / 2;
-                    a.z = 10;
+                    a.z = 0;
                     a.target = target;
                     a.targetx = target.x + target.width / 2; a.targety = target.y + target.height / 2;
                  //   a.x += (width / 2 + 20) * speedx / speed;
@@ -404,6 +461,10 @@ namespace Rise
             }
             g:
             ticks++;
+            if (targetx == -1 && timeaway < 0)
+            {
+                walk = false;
+            }
             if (walk)
             {
                 if (type != type.bullet)
@@ -426,7 +487,7 @@ namespace Rise
                             }
 
                         }
-                        else if(track==tracktype.full)
+                        else if(track==tracktype.full&&false)
                         {
                          //   minus=0;
                             oldtargetx = -1;
@@ -480,5 +541,11 @@ namespace Rise
             }
 
         }
+        SoundPlayer effect;
+        void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            effect.PlaySync();
+        }
     }
+
 }

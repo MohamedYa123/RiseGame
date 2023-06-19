@@ -57,7 +57,7 @@ namespace Rise
         }
         public override void read()
         {
-            adddpiece(piecesallowed[0]);
+            //adddpiece(piecesallowed[0]);
             if (pieces_tobuild.Count > 0)
             {
                 if (pieces_tobuild[0].buildtime_ms == 0)
