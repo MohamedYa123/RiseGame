@@ -475,6 +475,8 @@ namespace Rise
         public frameload loadframe =new frameload();
         public float direction;
         public static float pi = (float)Math.PI;
+        public int posx = 0;
+        public int posy = 0;
         public Bitmap load(game gm, bool basic = false)
         {
             if (!available)
@@ -555,8 +557,12 @@ namespace Rise
                 if (type == type.building)
                 {
                     tz = 0;
+                    gm.drawsquare(btmp, posx, posy, army.armycolor, btmp.Width / 10);
                 }
-                gm.drawsquare(btmp, 0 + (btmp.Width / 2-btmp.Width/20) * tz, 0 + btmp.Height /2 * tz, army.armycolor, btmp.Width / 10);
+                else
+                {
+                    gm.drawsquare(btmp, 0 + (btmp.Width / 2 - btmp.Width / 20) * tz, 0 + btmp.Height / 2 * tz, army.armycolor, btmp.Width / 10);
+                }
             }
             if (true)
             {

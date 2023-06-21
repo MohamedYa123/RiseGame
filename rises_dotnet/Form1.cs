@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Reflection.Emit;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -33,6 +34,12 @@ namespace Rise
         }
         int timx = 3;
         int timy = 3;
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetForegroundWindow();
+
+        [DllImport("user32.dll")]
+        private static extern int GetWindowThreadProcessId(IntPtr hWnd, out int processId);
+
         private void timer1_Tick(object sender, EventArgs e)
         {
             
@@ -40,6 +47,21 @@ namespace Rise
        //     Width;
        //     Height;
             {
+                IntPtr foregroundWindowHandle = GetForegroundWindow();
+
+                // Get the process ID of the foreground window
+                GetWindowThreadProcessId(foregroundWindowHandle, out int processId);
+
+                // Get the current process ID
+                int currentProcessId = System.Diagnostics.Process.GetCurrentProcess().Id;
+
+                // Check if the current process has focus
+                bool isAppInFocus = (processId == currentProcessId);
+
+                if (!isAppInFocus)
+                {
+                    return;
+                }
                 try
                 {
                     label2.Text = $"{GameEngineManager.mousex} : {GameEngineManager.mousey}";

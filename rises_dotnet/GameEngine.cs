@@ -42,8 +42,8 @@ namespace Rise
             player.army = army.create_usa_army(this);
             //
             building warfactory=new building();
-            warfactory.width = 200;
-            warfactory.height = 200;
+            warfactory.width = 300;
+            warfactory.height = 300;
             warfactory.owner = player;
             warfactory.engine = this;
             warfactory.health = 1500;
@@ -55,10 +55,12 @@ namespace Rise
             warfactory.image = "war factory.png";
             warfactory.buildtime_ms = 500;
             warfactory.buildtime = 500;
+            warfactory.posx = 20;
+            warfactory.posy = 30;
             //
             building building = new building();
-            building.width = 300;
-            building.height = 300;
+            building.width = 400;
+            building.height = 400;
             building.owner = player;
             building.x = 5000;
             building.y = 5000;
@@ -162,6 +164,8 @@ namespace Rise
             var newx = it.x + it.speedx*speedfactor;
             var newy = it.y + it.speedy*speedfactor;
             var newz = it.z + it.speedz * speedfactor;
+            it.canceledx = true;
+            it.canceledy = true;
             if (gm.map.accept(it, newx, newy, newz,true))
             {
                 it.canceledx = false;
@@ -430,7 +434,7 @@ namespace Rise
                 }
                 float xx = (a.x * dt  - pl.x ) * factow-a.width*1*factow*0;// + a.width * dt * factow;
                 float yy = (a.y * dt  - pl.y ) * factoh-a.height*1*factoh*0;// + a.height * dt * factow;
-                System.Drawing.Rectangle rect2=new Rectangle((int)(xx+a.width*factow),(int)(yy+a.height*factoh),(int)(a.width*factow),(int)(a.height*factoh));
+                System.Drawing.Rectangle rect2=new Rectangle((int)(xx),(int)(yy),(int)(a.width*factow),(int)(a.height*factoh));
                 if (rect2.IntersectsWith(main))
                 {
                     a.loadframe.loadframes = (int)framenum;
@@ -460,6 +464,10 @@ namespace Rise
                     }
                     shows++;
                     
+                }
+                else
+                {
+
                 }
                
                 if (a.selected&&a.walk&&framenum%1==1)//01010420095//
@@ -1127,6 +1135,18 @@ namespace Rise
                 xb.available = false;
                 xb.x = mx - xb.width / 2;
                 xb.y = my - xb.height / 2;
+                while (engineworking)
+                {
+
+                }
+                xb.canceledx = false;
+                xb.canceledy = false;
+                GameEngine.requestchangeposition(xb);
+                if (xb.canceledx||xb.canceledy)
+                {
+                    message = "Inavailable place to build";
+                    return;
+                }
                 GameEngine.gm.map.items.Add(xb);
                 GameEngine.tobuild = null;
             }
