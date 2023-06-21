@@ -121,6 +121,7 @@ namespace Rise
                 selcted = null;
                 selected_b = null;
                 GameEngine.fill_selection(panel2, selcted, player);
+                GameEngine.tobuild = null;
                 GameEngine.selectitems(player, -1, -1, -1, -1);
                 return;
             }
@@ -219,8 +220,11 @@ namespace Rise
                     lista.Clear();
                     foreach (var item in GameEngine.gm.map.items)
                     {
-                        item.selected = true;
-                        lista.Add(item);
+                        if (item.type != type.bullet && item.type != type.building)
+                        {
+                            item.selected = true;
+                            lista.Add(item);
+                        }
                     }
                     //  GameEngine.stopwalk(selcted);
                 }

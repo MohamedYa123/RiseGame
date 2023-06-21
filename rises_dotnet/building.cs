@@ -12,7 +12,8 @@ namespace Rise
         public zonetype allowedzone;
         public List<piece> piecesallowed = new List<piece>();
         public List<piece> pieces_tobuild = new List<piece>();
-        public List<building> buildings = new List<building>();
+        public List<building> buildingsallowed = new List<building>();
+        public List<building> buildings_tobuild = new List<building>();
         public int silver;
         public int gold;
         public int iron;
@@ -30,6 +31,7 @@ namespace Rise
         {
             resourceid = gm.map.load_resource($"resources/{army.name}/buildings/{image}", $"{army.name} - " + name, "", this, fw,fh);
         }
+
         public void adddpiece(piece piece)
         {
             if (!available)
@@ -57,7 +59,22 @@ namespace Rise
         }
         public override void read()
         {
-            //adddpiece(piecesallowed[0]);
+            walk = false;
+            if (buildtime_ms <= 0)
+            {
+                available = true;
+            }
+            if (!available)
+            {
+                buildtime_ms -= 1;
+                return;
+            }
+        
+            try
+            {
+                adddpiece(piecesallowed[0]);
+            }
+            catch { }
             if (pieces_tobuild.Count > 0)
             {
                 if (pieces_tobuild[0].buildtime_ms == 0)

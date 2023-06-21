@@ -40,10 +40,25 @@ namespace Rise
             mp.gm = gm;
             player player = new player();
             player.army = army.create_usa_army(this);
-
+            //
+            building warfactory=new building();
+            warfactory.width = 200;
+            warfactory.height = 200;
+            warfactory.owner = player;
+            warfactory.engine = this;
+            warfactory.health = 1500;
+            warfactory.stealth = false;
+            warfactory.maxhealth = 1500;
+            warfactory.type = type.building;    
+            warfactory.available= true;
+            warfactory.army = player.army;
+            warfactory.image = "war factory.png";
+            warfactory.buildtime_ms = 500;
+            warfactory.buildtime = 500;
+            //
             building building = new building();
-            building.width = 250;
-            building.height = 250;
+            building.width = 300;
+            building.height = 300;
             building.owner = player;
             building.x = 5000;
             building.y = 5000;
@@ -91,8 +106,6 @@ namespace Rise
             pc.track = tracktype.full;
             pc.type = type.vehicle;
             pc.rangeofattack = 1000f;
-            mp.items.Add(building);
-            mp.items.Add(pc);
 
             piece bullet = new piece();
             bullet.type = type.bullet;
@@ -100,7 +113,7 @@ namespace Rise
             bullet.track = tracktype.simple;
             bullet.timed = true;
             bullet.type = type.bullet;
-            bullet.change = 0.06f;
+            bullet.change = 0.16f;
             bullet.image = "bullet1.png";
             bullet.name = "bullet";
             bullet.sound = "bullet.wav";
@@ -109,25 +122,34 @@ namespace Rise
             bullet.height = 10;
             bullet.speedx = 10;
             bullet.speedy = 10;
-            bullet.basespeed = 30;
+            bullet.basespeed = 25;
             bullet.x = -400;
             bullet.basicdirection = 7;
             bullet.engine = this;
             bullet.health = 5;
             bullet.maxhealth = 5;
             bullet.power = 10;
-            mp.items.Add(bullet);
             player.name = "medo";
             player.engine = this;
             player.settings.mousespeed = 1;
 
             gm.map = mp;
             gm.players.Add(player);
-            mp.load_resources(realwidth,realheight);
-            mp.asstes.Add(bullet.clone());
-            var xp = pc.clone();
-            mp.asstes.Add(xp);
-            building.piecesallowed.Add((piece)xp);
+           
+            mp.asstes.Add(bullet);
+            mp.asstes.Add(pc);
+            mp.asstes.Add(building);
+            mp.asstes.Add(warfactory);
+            var xp = pc;
+            warfactory.piecesallowed.Add((piece)xp);
+            building.buildingsallowed.Add((building)warfactory);
+            mp.load_resources(realwidth, realheight);
+            mp.items.Add(pc.clone());
+            mp.items.Add(building.clone());
+
+           
+            //mp.asstes.Add(xp);
+            
             gm.start();
             player.x = (int)building.x-100;
             player.y = (int)building.y-100;
@@ -234,6 +256,7 @@ namespace Rise
             }
 
         }
+       public  building tobuild;
         public void fill_selection(Panel panel, item it, player pl)
         {
             //try if it is building
@@ -251,11 +274,15 @@ namespace Rise
                     else if (control.Name == "panel3") { panel3 = (Panel)control; }
                 }
                 var b = (building)it;
+                if (!b.available)
+                {
+                    return;
+                }
                 int left = panel2.Left + panel2.Width + 80;
                 foreach (var a in b.piecesallowed)
                 {
                     PictureBox pic = new PictureBox();
-                    pic.SizeMode = PictureBoxSizeMode.StretchImage;
+                    pic.SizeMode = PictureBoxSizeMode.Zoom;
                    // a.prepareresourcebitmap(gm);
                     pic.Image = (Bitmap)a.load(gm, true).Clone();
                     pic.Height = panel.Height;
@@ -265,6 +292,23 @@ namespace Rise
                     pic.Click += delegate
                     {
                         b.adddpiece((piece)a.clone());
+                        //    this.additem(a.clone());
+                    };
+                    panel.Controls.Add(pic);
+                }
+                foreach (var a in b.buildingsallowed)
+                {
+                    PictureBox pic = new PictureBox();
+                    pic.SizeMode = PictureBoxSizeMode.Zoom;
+                   // a.prepareresourcebitmap(gm);
+                    pic.Image = (Bitmap)a.load(gm, true).Clone();
+                    pic.Height = panel.Height;
+                    pic.Left = left;
+                    left += pic.Width + 10;
+                  //  pic.BackColor = Color.Red;
+                    pic.Click += delegate
+                    {
+                        tobuild = (building)a;
                         //    this.additem(a.clone());
                     };
                     panel.Controls.Add(pic);
@@ -349,6 +393,7 @@ namespace Rise
         long framenum = 0;
         DateTime startmilisecs;
         DateTime lastmillisecs;
+        public  GameEngineManager GameEngineManager ;
         public void fill( player pl,ref string message,int resizingframe)
         {
             var bitmap = (Bitmap)gm.map.image.Bitmap.Clone();
@@ -402,8 +447,13 @@ namespace Rise
                //     g.TranslateTransform(xx+a.width/2 - negx, yy+a.height/2 - negy);
                //     g.TranslateTransform(-a.width/2,-a.height/2);
                     draw( btmp, (int)(xx +a.width* Math.Tan(a.direction)*0) , (int)(yy+a.height*Math.Tan(a.direction)*0) , (int)a.z,g);
-                //    g.ResetTransform();
-                  //  sp.Stop();
+                    //    g.ResetTransform();
+                    //  sp.Stop();
+                    if (!a.available&&!a.selected)
+                    {
+                        drawhealth(1-(a.buildtime_ms+0.0 )/ a.buildtime, (int)((a.x - 15 - pl.x + (int)a.width / 2) * factow), (int)((a.y - pl.y + (int)a.height / 2 - 15) * factoh), 0, (int)(50 * factow * a.width / 150), g,true);
+
+                    }
                     if (a.selected)
                     {
                         drawhealth( a.health / a.maxhealth, (int)((a.x - 15 - pl.x + (int)a.width / 2)*factow), (int)((a.y - pl.y + (int)a.height / 2 - 15)*factoh), 0, (int)(50* factow*a.width/150),g);
@@ -449,7 +499,7 @@ namespace Rise
                     float fact = (float)(sqrc.Rockettail / 50.0);
                     int sz = (int)(fact * 10);
                     // sqrc.Rockettail++;
-                    if (sz > 0&&fact<1.9f)
+                    if (sz > 0&&fact<.9f)
                     {
                         for (int u = 0; u < 1; u++)
                         {
@@ -509,14 +559,24 @@ namespace Rise
                 }
 
             }
-            
-            if((lastmillisecs - onesecdate).TotalMilliseconds >= 1000)
+            if (tobuild != null)
+            {
+                var b=tobuild.clone();
+                b.stealth = true;
+                b.loadframe.opacity = 0.5f;
+                var btmp = b.load(gm);
+                draw(btmp, (int)(GameEngineManager.mousex-b.width/2), (int)(GameEngineManager.mousey-b.height/2), (int)b.z, g);
+            }
+            // drawnight(g, bitmap, 0);
+            if ((lastmillisecs - onesecdate).TotalMilliseconds >= 1000)
             {
                 onesecdate = lastmillisecs;
                 shotframe = framenum-oldframe;
                 oldframe = framenum;
             }
-
+            //night and light effects
+            //   makenormallight(g, 400, 200, 400, 400);
+            //   drawnight(g, bitmap, 1.9f);
             gm.drawstring(bitmap, $"{Math.Round(shotframe+0.0, 2)} fps objects on screen : {shows} out of {ld.Count}", 0, 0, Color.Aqua, 10);
             if (message != ""&& fullmessage < 6)
             {
@@ -531,32 +591,58 @@ namespace Rise
              //   fullmessage = 0;
                // message = "";
             }
+           
             // gm.drawstring(bitmap, $"{Math.Round(shotframe+0.0, 2)} fps", 0, 0, Color.Aqua, 10);
             if (pl.fx != -1)
             {
                 gm.drawmousselction(bitmap, (int)(pl.fx*factow), (int)(pl.fy*factoh), (int)(pl.mousex*factow), (int)(pl.mousey*factoh));
             }
-            g.Dispose();
-            g = null;
+            
+             g = null;
             
             todraw = bitmap;
             framenum++;
+        }
+        void makenormallight(Graphics g,int x,int y,int w,int h)
+        {
+            GraphicsPath ellipsePath = new GraphicsPath();
+            ellipsePath.AddEllipse(x, y, w, h);
+            g.SetClip(ellipsePath, CombineMode.Exclude);//light
+        }
+        void drawnight(Graphics g,Bitmap bitmap,float nightfactor)
+        {
+            Rectangle rectangle = new Rectangle(0, 0, bitmap.Width, bitmap.Height);
+            Color ccl = Color.FromArgb((int)(125*nightfactor), 0, 0, 0);
+        //    ccl = Color.FromArgb((int)(200), 250, 250, 150);//bomb effect
+            g.FillRectangle(new SolidBrush(ccl), rectangle);
         }
         public long shotframe;
         public int fullmessage;
         long oldframe;
         DateTime onesecdate;
-        public void drawhealth( double ratio, int x, int y, int z, int size,Graphics g)
+        public void drawhealth( double ratio, int x, int y, int z, int size,Graphics g,bool buildin=false)
         {
             //  
             //    var area = new Rectangle(0, 0, bitmp2.Width / 2, bitmp2.Height / 2);
             //  g.FillRectangle(new LinearGradientBrush(area, Color.PaleGoldenrod, Color.OrangeRed, 45), area);
             ratio = Math.Min(0.995, ratio);
-            var width = ratio * 100; 
-          //  var width2 = ratio * 100; 
-            g.DrawRectangle(Pens.White, x, y, (int)size, (float)size / 50 * 8+1);
-            var b = new SolidBrush(Color.FromArgb(100, (byte)(255 * (1 - width / 100)), (byte)(155 * (width / 100)), 0));
-            g.FillRectangle(b, x + 1, y + 1, (int)(width* ((float)size/50) ) / 2-1 , (float)size / 50 * 8);
+
+            //  var width2 = ratio * 100; 
+            Color cl=Color.Red;//=  Color.FromArgb(170, (byte)(255 * (1 - width / 100)), (byte)(155 * (width / 100)), 0);
+            if (buildin)
+            {
+                cl = Color.FromArgb(255,205,195,0);
+                //ratio=Math.Max(0.2, ratio);
+            }
+            var width = ratio * 100;
+            if (!buildin)
+            {
+                cl = Color.FromArgb(170, (byte)(255 * (1 - width / 100)), (byte)(155 * (width / 100)), 0);
+            }
+            g.DrawRectangle(Pens.White, x - size / 4, y, (int)size, (float)size / 50 * 8 + 1);
+
+            var b = new SolidBrush(cl);
+            g.FillRectangle(b, x + 1-size/4, y + 1, (int)(width* ((float)size/50) ) / 2-1 , (float)size / 50 * 8);
 
         }
         public void draw( Bitmap bitmp2, int x, int y, int z,Graphics g)
@@ -764,7 +850,7 @@ namespace Rise
                     imsleepy = true;
 
                     //  Thread.Sleep(1);
-                    if (i % 5 == 0)
+                    if (i % 1 == 0)
                     {
                         Thread.Sleep(1);
                     }
@@ -842,12 +928,13 @@ namespace Rise
                     enginespeed = 2;
                     break;
             }
-            message = $"Engine speed set to {Math.Round(64.0 / enginespeed, 1)}x";
+            message = $"Engine speed set to {Math.Round(64.0 / enginespeed, 3)}x";
         }
         int engineframe = 0;
         bool engineworking;
         void runme()
         {
+            GameEngine.GameEngineManager = this;
             if (run)
             {
                 //   return;
@@ -1020,6 +1107,7 @@ namespace Rise
 
         public void sendorder()
         {
+            
             order order = new order();
           //  GameEngine.selectitems(player, fx, fy, mousex, mousey);
             item fv = GameEngine.match(mousex, mousey, player);
@@ -1033,6 +1121,15 @@ namespace Rise
             int nexty = mousey+player.y;
             int mx=mousex+player.x;
             int my=mousey+player.y;
+            if (GameEngine.tobuild != null)
+            {
+                var xb=GameEngine.tobuild.clone();
+                xb.available = false;
+                xb.x = mx - xb.width / 2;
+                xb.y = my - xb.height / 2;
+                GameEngine.gm.map.items.Add(xb);
+                GameEngine.tobuild = null;
+            }
             int plusorminusx = 1;
             int plusorminusy = 1;
             int time=0;

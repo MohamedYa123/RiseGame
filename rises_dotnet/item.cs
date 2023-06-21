@@ -150,7 +150,7 @@ namespace Rise
         {
             best = startpoint;
             int step = 0;
-            while (step < 500 && !(best == null && step > 0))
+            while (step < 100 && !(best == null && step > 0))
             {
                 var b = search(best, startpoint, targetpoint);
                 if (b||best!=null&&best.targetpoint)
@@ -349,14 +349,19 @@ namespace Rise
         public bool timed = false;
         public int buildtime_ms = 1000;
         public int buildtime;
-        public bool available;
+        public bool available=true;
         public bool walk = true;
         public item target = null;
         public float rangeofattack;
         public item clone()
         {
             var x = (item)MemberwiseClone();
-
+            if (x.type == type.building)
+            {
+                var b = (building)x;
+                b.pieces_tobuild = new List<piece>();
+                b.buildings_tobuild = new List<building>();
+            }
             return x;
         }
 
@@ -472,8 +477,26 @@ namespace Rise
         public static float pi = (float)Math.PI;
         public Bitmap load(game gm, bool basic = false)
         {
-           
-            loadframe.load(stealth);
+            if (!available)
+            {
+                loadframe.opacity = (float)(buildtime- buildtime_ms/2 +0.0)/buildtime;
+                
+            }
+            else
+            {
+                if(!stealth)
+                {
+                    loadframe.opacity = 1f;
+                }
+            }
+            if (!available)
+            {
+            //    loadframe.load(true);
+            }
+            else
+            {
+                loadframe.load(stealth);
+            }
             float trx = 1;
             float tryy = 1;
             if (canceledx)

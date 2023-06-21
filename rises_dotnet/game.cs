@@ -163,6 +163,7 @@ namespace Rise
                                     //alpha += 50;
                                 }
                                 alpha -= 50;
+                                alpha = Math.Max(0, alpha);
                             }
                             Color armycolor = Color.FromArgb(alpha, sqrpiece.army.armycolor.R, sqrpiece.army.armycolor.G, sqrpiece.army.armycolor.B);
                             if (sqrpiece.loadframe.opacity>0.5f||true)

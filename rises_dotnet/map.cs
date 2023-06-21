@@ -210,7 +210,7 @@ namespace Rise
             sp.Stop();
             factorw = (float)(width_resolution) / (float)(realwidth);
             factorh = (float)(height_resolution) / (float)(realheight);
-            foreach (var a in items)
+            foreach (var a in asstes)
             {
                 a.load_resouces(gm,factorw,factorh);
             }
@@ -225,7 +225,7 @@ namespace Rise
             resources.Add(rsc);
             return resources.Count - 1;
         }
-        public int mod = 20;//بيقسم مربعات الخريطة لمربعات أكبر علشان يوفر وقت في البروسيسنج
+        public int mod = 40;//بيقسم مربعات الخريطة لمربعات أكبر علشان يوفر وقت في البروسيسنج
         public int safzone = 0;
         public int xlen;
         public int ylen;

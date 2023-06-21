@@ -348,7 +348,7 @@ namespace Rise
                         z = 0;
                     }
                 }
-                if (target!=null&& dist <Math.Min( 200,target.squarewidth*3))
+                if (target==null|| dist <Math.Min( 200,target.squarewidth*3))
                 {
                     z = 0;
                 }
@@ -454,7 +454,7 @@ namespace Rise
                     a.justcreated = true;
                     a.x = x + width / 2;
                     a.y = y + height / 2;
-                    a.z = 0;
+                    a.z = 20;
                     a.target = target;
                     a.targetx = target.x + target.width / 2; a.targety = target.y + target.height / 2;
                  //   a.x += (width / 2 + 20) * speedx / speed;
