@@ -14,12 +14,7 @@ namespace Rise
         public List<piece> pieces_tobuild = new List<piece>();
         public List<building> buildingsallowed = new List<building>();
         public List<building> buildings_tobuild = new List<building>();
-        public int silver;
-        public int gold;
-        public int iron;
-        public int rock;
-        public int food;
-        public int wood;
+        public float producesmoney=0;
         //    public player owner;
         // public string image;
         public string name;
@@ -34,6 +29,7 @@ namespace Rise
 
         public void adddpiece(piece piece)
         {
+            
             if (!available)
             {
                 return;
@@ -42,6 +38,12 @@ namespace Rise
             {
                 piece = (piece)piece.clone();
                 piece.buildtime_ms = piece.buildtime;
+                var xxg = owner.silver - piece.silver;
+                if (xxg < 0)
+                {
+                    return;
+                }
+                owner.silver = xxg;
                 pieces_tobuild.Add(piece);
             }
         }
@@ -67,14 +69,15 @@ namespace Rise
             if (!available)
             {
                 buildtime_ms -= 1;
+                health+=maxhealth/buildtime;
                 return;
             }
-        
+            owner.silver += producesmoney;
             try
             {
                 adddpiece(piecesallowed[0]);
             }
-            catch { }
+            catch { return; }
             if (pieces_tobuild.Count > 0)
             {
                 if (pieces_tobuild[0].buildtime_ms == 0)

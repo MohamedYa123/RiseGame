@@ -64,6 +64,7 @@ namespace Rise
         public  int pathfindingorder;
         public bool stealth;
         public int orderid;
+        public float silver;
       
         public float getdistance(int mousex,int mousey)
         {
@@ -150,7 +151,7 @@ namespace Rise
         {
             best = startpoint;
             int step = 0;
-            while (step < 100 && !(best == null && step > 0))
+            while (step < 300 && !(best == null && step > 0))
             {
                 var b = search(best, startpoint, targetpoint);
                 if (b||best!=null&&best.targetpoint)

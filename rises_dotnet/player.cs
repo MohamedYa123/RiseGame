@@ -15,8 +15,8 @@ namespace Rise
         public int fy = -1;
         public string name = "";
         public int id;
-        public int silver;
-        public int gold;
+        public float silver;
+        public float gold;
         public double debt_gold;
         public double debt_silver;
         public double inflationlevel;

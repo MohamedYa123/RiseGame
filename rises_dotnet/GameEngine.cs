@@ -57,8 +57,10 @@ namespace Rise
             warfactory.buildtime = 500;
             warfactory.posx = 20;
             warfactory.posy = 30;
+            warfactory.silver = 10000;
             //
             building building = new building();
+            building.producesmoney = 10;
             building.width = 400;
             building.height = 400;
             building.owner = player;
@@ -103,6 +105,7 @@ namespace Rise
             pc.maxhealth = 100;
             pc.x = 5600;
             pc.y = 5200;
+            pc.silver = 500;
         //    pc.z = 20;
             pc.type = type.vehicle;
             pc.track = tracktype.full;
@@ -470,7 +473,7 @@ namespace Rise
 
                 }
                
-                if (a.selected&&a.walk&&framenum%1==1)//01010420095//
+                if (a.selected&&a.walk&&framenum%1==0)//01010420095//
                 {
                     //draw path squares
                     for (int ii = 0; ii < a.pathsquares.Count; ii++)
@@ -569,6 +572,7 @@ namespace Rise
             }
             if (tobuild != null)
             {
+                
                 var b=tobuild.clone();
                 b.stealth = true;
                 b.loadframe.opacity = 0.5f;
@@ -586,6 +590,8 @@ namespace Rise
             //   makenormallight(g, 400, 200, 400, 400);
             //   drawnight(g, bitmap, 1.9f);
             gm.drawstring(bitmap, $"{Math.Round(shotframe+0.0, 2)} fps objects on screen : {shows} out of {ld.Count}", 0, 0, Color.Aqua, 10);
+            gm.drawstring(bitmap, $"silver : {pl.silver}", 400, 0, Color.LightGreen, 10);
+            gm.drawstring(bitmap, $"gold : {pl.gold}", 750, 0, Color.Gold, 10);
             if (message != ""&& fullmessage < 6)
             {
                 gm.drawstring(bitmap, $"{message}", 0, 20, Color.Red, 10);
@@ -1131,10 +1137,18 @@ namespace Rise
             int my=mousey+player.y;
             if (GameEngine.tobuild != null)
             {
+                var xxg = player.silver - GameEngine.tobuild.silver;
+                if (xxg < 0)
+                {
+                    message = "Insuffcient funds ";
+                    return;
+                }
+
                 var xb=GameEngine.tobuild.clone();
                 xb.available = false;
                 xb.x = mx - xb.width / 2;
                 xb.y = my - xb.height / 2;
+                xb.health = 1;
                 while (engineworking)
                 {
 
@@ -1147,6 +1161,7 @@ namespace Rise
                     message = "Inavailable place to build";
                     return;
                 }
+                player.silver = xxg;
                 GameEngine.gm.map.items.Add(xb);
                 GameEngine.tobuild = null;
             }
