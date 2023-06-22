@@ -58,12 +58,13 @@ namespace Rise
                 // Check if the current process has focus
                 bool isAppInFocus = (processId == currentProcessId);
 
-                if (!isAppInFocus)
-                {
-                    return;
-                }
+                
                 try
                 {
+                    if (!isAppInFocus)
+                    {
+                        goto hh;
+                    }
                     label2.Text = $"{GameEngineManager.mousex} : {GameEngineManager.mousey}";
                     // var bb = resource.ResizeImage((Bitmap)GameEngine.todraw.Clone(), new Size(1920, 1080));
                    // if (xv < 100)
@@ -108,6 +109,7 @@ namespace Rise
                     }
                     //  label1.Text = $"{player.x}:{player.y}:{player.z}";
                     //  pictureBox2.Image = (Bitmap)GameEngine.gm.mappic.Clone();
+                   hh:
                     pictureBox2.Image = (Bitmap)GameEngine.gm.mappic.Clone();
                     pictureBox2.Image = (Bitmap)GameEngineManager.mappic.Clone();
                     pictureBox1.Image = GameEngineManager.imagetoshowready;// (Bitmap)GameEngine.todraw.Clone();

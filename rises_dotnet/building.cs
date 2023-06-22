@@ -75,15 +75,18 @@ namespace Rise
             owner.silver += producesmoney;
             try
             {
-                adddpiece(piecesallowed[0]);
+           //     adddpiece(piecesallowed[0]);
             }
             catch { return; }
             if (pieces_tobuild.Count > 0)
             {
-                if (pieces_tobuild[0].buildtime_ms == 0)
+                if (pieces_tobuild[0].buildtime_ms <= 0)
                 {
-                    engine.additem(pieces_tobuild[0]);
-                    pieces_tobuild.RemoveAt(0);
+                    var b= engine.additem(pieces_tobuild[0]);
+                    if (b)
+                    {
+                        pieces_tobuild.RemoveAt(0);
+                    }
                 }
                 else
                 {

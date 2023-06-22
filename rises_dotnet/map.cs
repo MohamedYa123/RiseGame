@@ -215,10 +215,10 @@ namespace Rise
                 a.load_resouces(gm,factorw,factorh);
             }
         }
-        int resourcesnum1=361;
-        int resourcesnum2=201;
-        int resourcesnum3=401;
-        int resourcesnum4=1;
+        int resourcesnum1=80;
+        int resourcesnum2=21;
+        int resourcesnum3=41;
+        int resourcesnum4=20;
         public int load_resource(string pic, string sound, string name, item item,float fw,float fh)
         {
             resource rsc = new resource(pic, sound, name, item,fw,fh, resourcesnum1, resourcesnum2, resourcesnum3,resourcesnum4);

@@ -12,6 +12,21 @@ namespace Rise
         public int loadframes;
         public float opacity = 0.5f;
         public float plusopacityframe;
+        public int c2 = 0;
+        public int c1 = 0;
+        public int getwalkanimation()
+        {
+            if (loadframes -c1>10)
+            {
+                c2 ++;
+                c1 = loadframes;
+            }
+            if (c2 > 1)
+            {
+                c2 = 0;
+            }
+            return c2+1;
+        }
         public void load(bool stealth)
         {
             loadframes++;
@@ -65,7 +80,29 @@ namespace Rise
         public bool stealth;
         public int orderid;
         public float silver;
-      
+        public List<int> resourcesofanimation= new List<int>();
+        public Dictionary<int,string> imagesofanimations= new Dictionary<int,string>();
+        public List<item> workersinside;
+        public int workersrequired = 0;
+        public void addworker(item worker)
+        {
+            if(workersinside == null) workersinside = new List<item>();
+            workersinside.Add(worker);
+        }
+        public void die()
+        {
+            if (workersinside != null)
+            {
+                for (int i = 0; i < workersrequired; i++)
+                {
+                    var worker = workersinside[i];
+                    worker.health = worker.maxhealth;
+                    worker.x = x + width / 2;
+                    worker.y = y + height /2;
+                    engine.additem(worker);
+                }
+            }
+        }
         public float getdistance(int mousex,int mousey)
         {
             return (float)Math.Sqrt(Math.Pow(mousex-x,2)+Math.Pow(mousey-y,2));
@@ -465,12 +502,21 @@ namespace Rise
         }
         public Bitmap resourcebitmap;
         public Bitmap resourcebitmap2;
-         void prepareresourcebitmap(game gm)
+         void prepareresourcebitmap(game gm,bool basic)
         {
-            resourcebitmap = (Bitmap)gm.map.resources[resourceid].Bitmap.Clone();
-            resourcebitmap2 = (Bitmap)gm.map.resources[resourceid].bitmap2.Clone();
+            int srcid = resourceid;
+            if (walk&&!basic&&resourcesofanimation.Count>0&&true)
+            {
+                try
+                {
+                    srcid = resourcesofanimation[loadframe.getwalkanimation()-1];
+                }
+                catch { }
+            }
+            resourcebitmap = (Bitmap)gm.map.resources[srcid].Bitmap.Clone();
+            resourcebitmap2 = (Bitmap)gm.map.resources[srcid].bitmap2.Clone();
         }
-        float anglestep = 1f;
+        float anglestep = 5f;
         float opacitystep = 3f;
         float zstep = 1f;
         public frameload loadframe =new frameload();
@@ -478,8 +524,10 @@ namespace Rise
         public static float pi = (float)Math.PI;
         public int posx = 0;
         public int posy = 0;
+        int internalframe=-1;
         public Bitmap load(game gm, bool basic = false)
         {
+            internalframe++;
             if (!available)
             {
                 loadframe.opacity = (float)(buildtime- buildtime_ms/2 +0.0)/buildtime;
@@ -535,18 +583,22 @@ namespace Rise
             directionindegrees -= (int)(directionindegrees / 360)*360;
             if (loadframe.opacity != 1)
             {
-                anglestep = 1;
+            //    anglestep = 5;
             }
             var id1 = (int)Math.Round( directionindegrees/ anglestep);
             var id2 = (int)Math.Round(z / zstep);
             var id3 = (int)((loadframe.opacity *100)/opacitystep);
             var id4 = 0;
+            if (walk&&resourcesofanimation.Count>0&&!basic&&true)
+            {
+                id4 = loadframe.getwalkanimation();
+            }
             var sr = gm.map.resources[resourceid].GetSecondresource(id1, id2, id3,id4);
             if (sr != null&&!basic)
             {
                 return sr.bitmap;
             }
-            prepareresourcebitmap( gm);
+            prepareresourcebitmap( gm,basic);
             btmp = resourcebitmap;
             if (basic)
             {

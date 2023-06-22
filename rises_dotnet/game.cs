@@ -32,6 +32,7 @@ namespace Rise
                 it.health += 0.005f;
                 if (it.health < 0 || ((it.x <= 0 || it.x > map.width + 300 || it.y <= 0 || it.y > map.height + 300) && it.timed))
                 {
+                    map.items[i].die();
                     map.items.RemoveAt(i);
                     i--;
                     continue;

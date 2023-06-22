@@ -17,7 +17,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 namespace Rise
 {
 
-    public enum type {  vehicle, builder, building, grabber, soldier, air, sea, bullet }
+    public enum type {  vehicle, builder, building, grabber, soldier,worker, air, sea, bullet }
     public enum piecemode { standground, protect, agressive }
     public enum tracktype { naive, simple, full }
     /*
@@ -68,6 +68,10 @@ namespace Rise
                 sound = $"resources/{army.name}/pieces/sound/{sound}";
             }
             resourceid = gm.map.load_resource($"resources/{army.name}/pieces/{image}", $"{army.name} - " + name, sound, this,fw,fh);
+            foreach(var a in imagesofanimations)
+            {
+                resourcesofanimation.Add(gm.map.load_resource($"resources/{army.name}/pieces/{a.Value}", $"{army.name} - " + name, sound, this, fw, fh));
+            }
         }
         //  bool previouswalk;
         float oldtargetx = -1;
