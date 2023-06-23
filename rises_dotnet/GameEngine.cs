@@ -33,10 +33,11 @@ namespace Rise
         piece createTank(player player)
         {
             piece pc = new piece();
+            pc.generaltype = generaltype.vehicle;
             pc.salary = 5;
             pc.owner = player;
             pc.workersrequired = 2;
-            pc.stealth = true;
+            pc.stealth = false;
             pc.buildtime_ms = 150;
             pc.buildtime = 150;
             pc.army = player.army;
@@ -70,9 +71,53 @@ namespace Rise
          //   pc.basicdirection = 90;
             return pc;
         }
+        piece createautomachine(player player,piece bullet)
+        {
+            piece pc = new piece();
+            pc.armedbullet = bullet;
+            pc.generaltype = generaltype.vehicle;
+            pc.salary = 2;
+            pc.owner = player;
+            pc.workersrequired = 1;
+            pc.stealth = false;
+            pc.buildtime_ms = 60;
+            pc.buildtime = 60;
+            pc.army = player.army;
+            pc.image = "auto machine.png";
+            pc.name = "auto machine";
+            pc.width = 40;
+            pc.height = 40;
+            pc.speedx = 0f;
+            pc.newspeedx = 0.0f;
+            pc.speedy = -0.01f;
+            pc.basespeed = 12f;
+            pc.emergencyspeed = 14f;
+            pc.newspeedy = 0.0001f;
+            pc.power = 0.65f;
+            pc.maxpower = 0.65f;
+            pc.basicdirection = -1;
+            pc.engine = this;
+            pc.shot_time_ms = 1;
+            pc.reloadtime_ms = 5;
+            pc.maxbullets = 10;
+            pc.health = 20;
+            pc.maxhealth = 20;
+            pc.x = 5600;
+            pc.y = 5200;
+            pc.silver = 500;
+            //    pc.z = 20;
+            pc.type = type.vehicle;
+            pc.track = tracktype.full;
+            pc.type = type.vehicle;
+            pc.rangeofattack = 300f;
+            pc.targettype = generaltype.infantry;
+         //   pc.basicdirection = 90;
+            return pc;
+        }
         piece createhumvee(player player)
         {
             piece pc = new piece();
+            pc.generaltype = generaltype.vehicle;
             pc.salary = 3;
             pc.owner = player;
             pc.workersrequired = 1;
@@ -113,6 +158,8 @@ namespace Rise
         piece createbullet(player player)
         {
             piece bullet = new piece();
+            bullet.generaltype = generaltype.bullet;
+            bullet.targettype = generaltype.vehicle;
             bullet.type = type.bullet;
             bullet.army = player.army;
             bullet.track = tracktype.simple;
@@ -136,9 +183,39 @@ namespace Rise
             bullet.power = 10;
             return bullet;
         }
+        piece createthinbullet(player player)
+        {
+            piece bullet = new piece();
+            bullet.generaltype = generaltype.bullet;
+            bullet.targettype = generaltype.infantry;
+            bullet.type = type.bullet;
+            bullet.army = player.army;
+            bullet.track = tracktype.naive;
+            bullet.timed = true;
+            bullet.type = type.bullet;
+            bullet.change = 0.16f;
+            bullet.image = "bullet1.png";
+            bullet.name = "bullet";
+            bullet.sound = "bullet.wav";
+            bullet.type = type.bullet;
+            bullet.width = 1;
+            bullet.height = 3;
+            bullet.speedx = 10;
+            bullet.speedy = 10;
+            bullet.basespeed = 90;
+            bullet.x = -400;
+            bullet.basicdirection = 7;
+            bullet.engine = this;
+            bullet.health = 0.1f;
+            bullet.maxhealth = 0.1f;
+            bullet.power = 10;
+            return bullet;
+        }
         piece createworker(player player)
         {
             piece worker = new piece();
+            worker.patience = 20;
+            worker.generaltype = generaltype.infantry;
             worker.type = type.worker;
             worker.salary = 1;
             worker.basespeed = 5;
@@ -167,9 +244,95 @@ namespace Rise
             worker.imagesofanimations.Add(1, "h3.png");
             return worker;
         }
+        piece createrbg(player player, piece bullet)
+        {
+            piece worker = new piece();
+            worker.generaltype = generaltype.infantry;
+            worker.targettype = generaltype.vehicle;
+            worker.type = type.worker;
+            worker.salary = 2;
+            worker.basespeed = 7;
+            worker.image = "rpg.png";
+            worker.width = 30;
+            worker.height = 30;
+            worker.buildtime = 50;
+            worker.buildtime_ms = 50;
+            worker.stealth = false;
+            worker.owner = player;
+            worker.army = player.army;
+            worker.engine = this;
+            worker.x = 5700;
+            worker.y = 5000;
+            worker.health = 15;
+            worker.maxhealth = 15;
+            worker.track = tracktype.full;
+            //make worker able to attack
+            worker.shot_time_ms = 5;
+            worker.reloadtime_ms = 20;
+            worker.power = 12;
+            worker.maxbullets = 4;
+            worker.rangeofattack = 250;
+            worker.silver = 250;
+            worker.workersrequired = 1;
+            worker.type = type.soldier;
+            //  worker.imagesofanimations.Add(0, "h2.png");
+            //  worker.imagesofanimations.Add(1, "h3.png");
+            worker.change = 0.9f;
+            return worker;
+        }
+        piece createsniper(player player,piece bullet)
+        {
+            piece worker = new piece();
+            worker.patience = 100;
+            worker.generaltype = generaltype.infantry;
+            worker.type = type.worker;
+            worker.targettype = generaltype.infantry;
+            worker.onlyattacktarget = true;
+            worker.salary = 3;
+            worker.basespeed = 5;
+            worker.image = "sniper.png";
+            worker.width = 30;
+            worker.height = 30;
+            worker.buildtime = 50;
+            worker.buildtime_ms = 50;
+            worker.stealth = true;
+            worker.owner = player;
+            worker.army = player.army;
+            worker.engine = this;
+            worker.x = 5700;
+            worker.y = 5000;
+            worker.health = 10;
+            worker.maxhealth = 10;
+            worker.track = tracktype.full;
+            //make worker able to attack
+            worker.shot_time_ms = 10;
+            worker.reloadtime_ms = 10;
+            worker.power = 11;
+            worker.maxbullets = 1;
+            worker.rangeofattack = 1050;
+            worker.silver = 700;
+            worker.basicdirection = 270;
+            worker.armedbullet = bullet;
+            worker.workersrequired = 1;
+            worker.type = type.soldier;
+            worker.change = 0.9f;
+            //worker.imagesofanimations.Add(0, "h2.png");
+            //worker.imagesofanimations.Add(1, "h3.png");
+            return worker;
+        }
+        piece createsniperbullet(piece thinbullet)
+        {
+            var p = (piece)thinbullet;
+            p.onlyattacktarget = true;
+            p.basespeed = 70;
+            p.width =3;
+            p.height=9;
+            return p;
+        }
         building createwarfactory(player player)
         {
             building warfactory = new building();
+            warfactory.generaltype = generaltype.building;
             warfactory.width = 300;
             warfactory.height = 300;
             warfactory.owner = player;
@@ -190,9 +353,36 @@ namespace Rise
             warfactory.salary = warfactory.workersrequired+2;
             return warfactory;
         }
+        building createbarracks(player player)
+        {
+            building warfactory = new building();
+            warfactory.generaltype = generaltype.building;
+            warfactory.width = 200;
+            warfactory.height = 200;
+            warfactory.owner = player;
+            warfactory.engine = this;
+            warfactory.health = 1500;
+            warfactory.stealth = false;
+            warfactory.maxhealth = 1500;
+            warfactory.type = type.building;
+            warfactory.available = true;
+            warfactory.army = player.army;
+            warfactory.image = "barracks.png";
+            warfactory.buildtime_ms = 250;
+            warfactory.buildtime = 250;
+            warfactory.posx = 150;
+            warfactory.posy = 70;
+            warfactory.silver = 3000;
+            warfactory.workersrequired = 3;
+            warfactory.salary = warfactory.workersrequired + 2;
+            return warfactory;
+        }
         building createhouse(player player,piece worker)
         {
             building warfactory = new building();
+            warfactory.name = "house";
+            warfactory.type = type.building;
+            warfactory.generaltype= generaltype.building;
             warfactory.width = 100;
             warfactory.height = 100;
             warfactory.owner = player;
@@ -212,11 +402,13 @@ namespace Rise
             warfactory.workersrequired = 2;
             warfactory.piecesallowed.Add(worker);
             warfactory.autobuildms = 300;
+            warfactory.salary = 4;
             return warfactory;
         }
         building createGoldmine(player player)
         {
             building warfactory = new building();
+            warfactory.generaltype = generaltype.building;
             warfactory.width = 150;
             warfactory.height = 150;
             warfactory.owner = player;
@@ -233,9 +425,10 @@ namespace Rise
             warfactory.posx = 85;
             warfactory.posy = 30;
             warfactory.silver = 1500;
-            warfactory.producesmoney = 1;
+            warfactory.producesmoney = 5;
             warfactory.owner = player;  
             warfactory.workersrequired = 10;
+            warfactory.salary = 15;
             return warfactory;
         }
         public void init(int widthresolution,int heightresolution,int realwidth,int realheight,Panel panel3)
@@ -245,7 +438,7 @@ namespace Rise
             gm = new game();
             mp.gm = gm;
             player player = new player();
-            player.silver = 30000;
+            player.silver = 90000;
             player.army = army.create_usa_army(this);
             player.army.owner = player;
             var worker = createworker(player);
@@ -253,6 +446,7 @@ namespace Rise
          
             //
             building building = new building();
+            building.generaltype = generaltype.building;
             building.producesmoney = 0;
             building.width = 400;
             building.height = 400;
@@ -282,6 +476,14 @@ namespace Rise
             gm.players.Add(player);
             var warfactory=createwarfactory(player);
             var godlmine = createGoldmine(player);
+            var thinbullet=createthinbullet(player);
+            var automachine = createautomachine(player,thinbullet);
+            var barraks=createbarracks(player);
+            var sniperbullet = createsniperbullet(thinbullet);
+            var sniper = createsniper(player,sniperbullet);
+            var rbg = createrbg(player, bullet);
+            barraks.piecesallowed.Add(rbg);
+            barraks.piecesallowed.Add(sniper);
             mp.asstes.Add(bullet);
             mp.asstes.Add(pc);
             mp.asstes.Add(building);
@@ -289,13 +491,20 @@ namespace Rise
             mp.asstes.Add(worker);
             mp.asstes.Add(humvee);
             mp.asstes.Add(godlmine);
+            mp.asstes.Add(automachine);
+            mp.asstes.Add(barraks);
+            mp.asstes.Add(sniper);
+            mp.asstes.Add(sniperbullet);
+            mp.asstes.Add(rbg);
             building house = createhouse(player, worker);
             mp.asstes.Add(house);
             var xp = pc;
-            warfactory.piecesallowed.Add(xp);
+            warfactory.piecesallowed.Add(automachine);
             warfactory.piecesallowed.Add(humvee);
+            warfactory.piecesallowed.Add(xp);
             building.buildingsallowed.Add(house);
             building.buildingsallowed.Add(godlmine);
+            building.buildingsallowed.Add(barraks);
             building.buildingsallowed.Add(warfactory);
            // building.piecesallowed.Add(worker);
             mp.load_resources(realwidth, realheight);
@@ -361,38 +570,51 @@ namespace Rise
             var newz = it.z + it.speedz * speedfactor;
             it.canceledx = true;
             it.canceledy = true;
-            if (gm.map.accept(it, newx, newy, newz,true))
-            {
-                it.canceledx = false;
-                it.canceledy = false;
-                it.x = newx;
-                it.y = newy;
+            int dv = 1;
+            if (it.basespeed > gm.map.mod) {
+                dv = 10;
             }
-            else if (gm.map.accept(it, newx, it.y, newz,true))
+            for (int i = 0; i < dv; i++)
             {
-                it.canceledy = true;
-                it.x = newx;
-                //it.speedy = 0;
+                 newx = it.x + it.speedx * speedfactor/dv;
+                 newy = it.y + it.speedy * speedfactor/dv;
+                 newz = it.z + it.speedz * speedfactor / dv;
+                int newxx = (int)Math.Round((it.x) / gm.map.mod);
+                int newyy = (int)Math.Round((it.y) /gm.map.mod);
+                
+                if (gm.map.accept(it, newx, newy, newz, true))
+                {
+                    it.canceledx = false;
+                    it.canceledy = false;
+                    it.x = newx;
+                    it.y = newy;
+                }
+                else if (gm.map.accept(it, newx, it.y, newz, true))
+                {
+                    it.canceledy = true;
+                    it.x = newx;
+                    //it.speedy = 0;
 
-            }
-            else if (gm.map.accept(it, it.x, newy, newz,true))
-            {
-                it.canceledx = true;
-                it.y = newy;
-                //it.speedx = 0;
+                }
+                else if (gm.map.accept(it, it.x, newy, newz, true))
+                {
+                    it.canceledx = true;
+                    it.y = newy;
+                    //it.speedx = 0;
 
-            }
-            if(it.canceledx&&it.speedx>0==it.newspeedx>0)
-            {
-                it.newspeedx *= -1;
-            }
+                }
+                it.firehit(newxx, newyy);
+                if (it.canceledx && it.speedx > 0 == it.newspeedx > 0)
+                {
+                    it.newspeedx *= -1;
+                }
 
-            if (it.canceledy&& it.speedy > 0 == it.newspeedy > 0)
-            {
-                it.newspeedy *= -1;
+                if (it.canceledy && it.speedy > 0 == it.newspeedy > 0)
+                {
+                    it.newspeedy *= -1;
+                }
+                it.z = newz;
             }
-            it.z = newz;
-
         }
         public float speedfactor = 1f;
         void changemode(List<item> selectedones,piecemode piecemode,player pl)
@@ -803,6 +1025,13 @@ namespace Rise
                         
                         Rectangle rect = new Rectangle((int)(sqrc.x+0) * gm.map.mod+ gm.map.mod/2 - pl.x - sz / 2, (int)(sqrc.y+0) * gm.map.mod - pl.y - sz / 2+ gm.map.mod/2, sz, sz);
                         g.FillEllipse(b, rect);
+                    }
+                    if (sqrc.thinpasses > 1)
+                    {
+                        Brush b = new SolidBrush(Color.White);
+                        Rectangle rect = new Rectangle((int)(sqrc.realxx + 0)  - pl.x , (int)(sqrc.realyy + 0)  - pl.y  , 3, 3);
+                        //g.FillEllipse(b, rect);
+
                     }
                 }
                 catch (Exception ex){ }

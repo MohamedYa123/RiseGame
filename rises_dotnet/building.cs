@@ -17,10 +17,10 @@ namespace Rise
         public float producesmoney=0;
         //    public player owner;
         // public string image;
-        public string name;
         public building()
         {
             walk = false;
+            patience = 130;
         }
         public override void load_resouces(game gm, float fw,float fh)
         {
@@ -75,7 +75,10 @@ namespace Rise
                 health+=maxhealth/buildtime;
                 return;
             }
-            owner.silver += producesmoney;
+            if (owner != null)
+            {
+                owner.silver += producesmoney;
+            }
             try
             {
                 if (autobuildms!=0&& frames % autobuildms == 0&&frames!=0)

@@ -68,15 +68,17 @@ namespace Rise
                     float fact = (float)(sqrc.Rockettail / 50.0);
                     int sz = (int)(fact * 10);
                     // sqrc.Rockettail++;
+                    bool added=false;
                     if (sz > 0)
                     {
                    //     System.Drawing.Rectangle rect = new Rectangle(i * gm.map.mod - pl.x - sz / 2, j * gm.map.mod - pl.y - sz / 2, sz, sz);
                      //   g.FillEllipse(Brushes.DarkRed, rect);
                      squaresofinterest2.Add(sqrc);
+                        added = true;
                     }
                     fact = (float)(sqrc.Explosion / 150.0);
                     sz = (int)((1 - fact) * 150);
-                    if (sz > 0 && sqrc.Explosion > 0)
+                    if ((sz > 0 && sqrc.Explosion > 0||sqrc.thinpasses>1)&&!added)
                     {
                         squaresofinterest2.Add(sqrc);
                      //   Brush b = new SolidBrush(Color.FromArgb(50, 100, 100, 0));

@@ -86,8 +86,75 @@ namespace Rise
         public int workersrequired = 0;
         public  piecemode mode = piecemode.protect;
         public float salary;
-        public int patience=20;
+        public int patience=40;
         public float netwealth;
+        public generaltype generaltype;
+        public generaltype targettype;
+        public bool onlyattacktarget=false;
+        public piece armedbullet;
+        protected piece mother;
+        public string name;
+        public float power;
+        public bool detected=false;
+        public void firehit( int newx, int newy)
+        {
+            if (type != type.bullet)
+            {
+                return;
+            }
+            var a = engine.gm.map.squares[newx, newy].piecethere;
+            engine.gm.map.squares[newx, newy].thinpasses = 30;
+            engine.gm.map.squares[newx, newy].realxx=x;
+            engine.gm.map.squares[newx, newy].realyy=y;
+            if (!(a == this || a == mother || a == null))
+            {
+                if (a != null)
+                {
+                    int ix = (int)a.x / engine.gm.map.mod;
+                    int iy = (int)a.y / engine.gm.map.mod;
+                    int nx = (int)(a.x + a.width) / engine.gm.map.mod;
+                    int ny = (int)(a.y + a.height) / engine.gm.map.mod;
+                    bool done = true;
+                    if (Math.Abs(newx - nx) <= 1 && !done)
+                    {
+                        newx = nx;
+                        done = true;
+                    }
+                    if (Math.Abs(newx - ix) <= 1 && !done)
+                    {
+                        newx = ix;
+                        done = true;
+                    }
+                    if (Math.Abs(newy - ny) <= 1 && !done)
+                    {
+                        newy = ny;
+                        done = true;
+                    }
+                    if (Math.Abs(newy - iy) <= 1 && !done)
+                    {
+                        newy = iy;
+                        done = true;
+                    }
+                }
+               
+                if (targettype != generaltype.infantry)
+                {
+                    engine.gm.map.squares[newx, newy].Explosion = 150;
+                }
+                //  engine.gm.map.squares[newx, newy].Rockettail = 80;
+                //  engine.gm.map.squares[newx, newy].dx = 8;
+                int dv = 1;
+                if (a.generaltype != targettype)
+                {
+                    dv = 3;
+                }
+                if (a.z <3||a==target)
+                {
+                    health = -10;
+                    a.health -= power / dv;
+                }
+            }
+        }
         public void addworker(item worker)
         {
             if(workersinside == null) workersinside = new List<item>();
@@ -95,7 +162,7 @@ namespace Rise
         }
         public void die()
         {
-            if (workersinside != null)
+            if (workersinside != null&&generaltype!=generaltype.infantry)
             {
                 for (int i = 0; i < workersrequired; i++)
                 {
@@ -103,6 +170,7 @@ namespace Rise
                     worker.health = worker.maxhealth;
                     worker.x = x + width / 2;
                     worker.y = y + height /2;
+                   // worker.waited = waited;
                     engine.additem(worker);
                 }
             }
@@ -421,12 +489,20 @@ namespace Rise
             {
                 return;
             }
-            if (readframe % 6 == 0&&owner!=null&&type!=type.building)
+            if (readframe % 6 == 0&&owner!=null)
             {
                 var xxg = owner.silver-salary;
                 if(xxg >= 0) {
                     owner.silver = xxg;
                     netwealth += salary;
+                    if (workersinside != null)
+                    {
+                        foreach (var w in workersinside)
+                        {
+                            w.netwealth += w.salary;
+                            netwealth -= w.salary;
+                        }
+                    }
                     waited--;
                     if(waited < 0)
                     {
@@ -440,6 +516,10 @@ namespace Rise
                 }
                 if (waited >= patience)
                 {
+                    if (type == type.building&&name=="house")
+                    {
+                        health = -10;
+                    }
                     owner = null;
                     army = new army(engine);
                     army.armycolor = Color.White;

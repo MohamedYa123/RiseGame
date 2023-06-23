@@ -20,6 +20,7 @@ namespace Rise
     public enum type {  vehicle, builder, building, grabber, soldier,worker, air, sea, bullet }
     public enum piecemode {  protect,passive, agressive,stop }
     public enum tracktype { naive, simple, full }
+    public enum generaltype { bullet,infantry,vehicle,plane,building}
     /*
      naive  : just follows targetx and targety by direction 
      simple : targetx and targety are updated by target co-ordinates then follows by direction
@@ -28,11 +29,8 @@ namespace Rise
     public class piece : item
     {
         public string picture = "";
-        
-        public bool viewed;
-        public bool detcted;
 
-        public float power;
+        public bool viewed;
         public float maxpower;
         public int bullets;
         public int maxbullets;
@@ -50,14 +48,13 @@ namespace Rise
         public int liftime;
         public int minlifetime;
         public int maxlifetime;
-        public string name;
 
         public bool justcreated = true;
         int last;
         int ticks;
         public float healthdecrease;
 
-        piece mother;
+        
         bool once = true;
         int plus;
         public override void load_resouces(game gm, float fw,float fh)
@@ -89,7 +86,7 @@ namespace Rise
             int spx = (int)(dist / engine.gm.map.mod);
             float lowest = float.MaxValue;
             item targetpc = null;
-            int distm = int.MaxValue;
+            float distm = float.MaxValue;
             for (int i = xstart - spx; i < xstart + spx; i++)
             {
                 for(int j = ystart - spx; j < ystart + spx; j++)
@@ -99,9 +96,9 @@ namespace Rise
                         continue;
                     }
                     var pc = engine.gm.map.squares[i, j].piecethere;
-                    if (pc != null&&pc!=this&&pc.army.teamid!=army.teamid)
+                    if (pc != null&&pc!=this&&pc.army.teamid!=army.teamid&&!(onlyattacktarget&&pc.generaltype!=targettype)&&!(pc.stealth&&!pc.detected&&waited<patience))
                     {
-                        var distm2=Math.Abs(i-xstart)+Math.Abs(j-ystart);
+                        float distm2=(float)Math.Sqrt(Math.Pow(i-xstart,2)+Math.Pow(j-ystart,2));
                         if (pc.health < lowest||(pc.health==lowest&&distm2<distm))
                         {
                             lowest=pc.health;
@@ -113,6 +110,7 @@ namespace Rise
             }
             return targetpc;
         }
+   
         public override void read()
         {
             base.read();
@@ -133,7 +131,11 @@ namespace Rise
                 }
                 else if (mode == piecemode.agressive)
                 {
-                    target=gettarget(rangeofattack*4);
+                    target = gettarget(rangeofattack);
+                    if (target == null)
+                    {
+                        target = gettarget(rangeofattack * 4);
+                    }
                 }
                 if (target != null)
                 {
@@ -148,7 +150,15 @@ namespace Rise
                 //   change = 0.03f;
                 var xx = (int)(x / engine.gm.map.mod);//Math.Round
                 var yy = (int)(y / engine.gm.map.mod);//Math.Round
-                engine.gm.map.squares[xx, yy].Rockettail = 50;
+                if (xx >= 0 && yy > 0 && xx < engine.gm.map.xlen && yy < engine.gm.map.ylen)
+                {
+                    engine.gm.map.squares[xx, yy].Rockettail = 50;
+                    if (targettype == generaltype.infantry)
+                    {
+                        engine.gm.map.squares[xx, yy].Rockettail = 10;
+                        engine.gm.map.squares[xx, yy].thinpasses = 30;
+                    }
+                }
 
             }
             else
@@ -407,6 +417,17 @@ namespace Rise
                 }
                 if (target==null|| dist <Math.Min( 200,target.squarewidth*3))
                 {
+                    if (targettype == generaltype.infantry&&target!=null)
+                    {
+
+                        firehit((int)target.x / engine.gm.map.mod, (int)target.y / engine.gm.map.mod);
+                        health = 0.02f;
+                        if (onlyattacktarget)
+                        {
+                            health = -1;
+                        }
+                        goto Done;
+                    }
                     z = 0;
                 }
                 if (z < 3)
@@ -414,45 +435,8 @@ namespace Rise
                     int newx = (int)Math.Round((x) / engine.gm.map.mod);
                     int newy = (int)Math.Round((y) / engine.gm.map.mod);
                     
-                    var a = engine.gm.map.squares[newx, newy].piecethere;
                    
-                    if (!(a == this || a == mother || a == null))
-                    {
-                        if (a != null)
-                        {
-                            int ix = (int)a.x / engine.gm.map.mod;
-                            int iy = (int)a.y / engine.gm.map.mod;
-                            int nx = (int)(a.x + a.width) / engine.gm.map.mod;
-                            int ny = (int)(a.y + a.height) / engine.gm.map.mod;
-                            bool done = true;
-                            if (Math.Abs(newx - nx) <= 1&&!done)
-                            {
-                                newx = nx;
-                                done= true;
-                            }
-                            if (Math.Abs(newx - ix) <= 1&&!done)
-                            {
-                                newx = ix;
-                                done= true;
-                            }
-                            if (Math.Abs(newy - ny) <= 1&&!done)
-                            {
-                                newy = ny;
-                                done= true;
-                            }
-                            if (Math.Abs(newy - iy) <= 1&&!done)
-                            {
-                                newy = iy;
-                                done= true;
-                            }
-                        }
-                        health = -10;
-                        engine.gm.map.squares[newx, newy].Explosion = 150;
-                        
-                      //  engine.gm.map.squares[newx, newy].Rockettail = 80;
-                      //  engine.gm.map.squares[newx, newy].dx = 8;
-                        a.health -= power;
-                    }
+                    firehit( newx, newy);
                     health *= healthdecrease;
                     if (health < 0.01)
                     {
@@ -460,7 +444,9 @@ namespace Rise
                     }
 
                 }
+                
             }
+        Done:
             if (type!=type.air)
             {
                 z *= 0.95f;
@@ -485,7 +471,12 @@ namespace Rise
                 var olddirecty = newspeedy;
                 engine.change_direction_direct(this, (int)xz, (int)yz);
                 bool fire = false;
-                if (1 - MathF.Abs((speedx - newspeedx) / newspeedx) > 0.3 && 1 - MathF.Abs((speedy - newspeedy) / newspeedy) > 0.3)
+                float bbs = 0.3f;
+                if (targettype == generaltype.infantry)
+                {
+                    bbs = 0.9f;
+                }
+                if (1 - MathF.Abs((speedx - newspeedx) / newspeedx) > bbs && 1 - MathF.Abs((speedy - newspeedy) / newspeedy) > bbs)
                 {
                     fire = true;
                 }
@@ -508,6 +499,10 @@ namespace Rise
                 if (fire && bullets > 0 && walk == false && (ticks - last == 0 || ticks - last > shot_time_ms))
                 {
                     var a = (piece)engine.gm.map.asstes[0].clone();
+                    if (armedbullet != null)
+                    {
+                        a = (piece)armedbullet.clone();
+                    }
                     a.justcreated = true;
                     a.x = x + width / 2;
                     a.y = y + height / 2;
@@ -563,7 +558,7 @@ namespace Rise
             }
             if (walk)
             {
-                if (type != type.bullet)
+                if (type != type.bullet||true)
                 {
                     engine.requestchangeposition(this);
                     if ((canceledx || canceledy)&&false)
@@ -610,7 +605,7 @@ namespace Rise
 
                     }
                 }
-                else
+                else if(false)
                 {
                     zz = 0;
                    // minus = -1;

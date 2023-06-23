@@ -143,13 +143,17 @@ namespace Rise
         {
             Rockettail -= dx;
             Explosion -= 40;
+            thinpasses -= 30;
             if (explosion >= 100)
             {
 
             }
         }
+        public  float realxx = 0;
+        public float realyy = 0;
         int rockettail;
         int explosion;
+        public float thinpasses;
         public int dx = 7;
         public int Rockettail
         {
@@ -218,7 +222,7 @@ namespace Rise
             //||it.orderid==piecethere.orderid
             if (piecethere == null||(piecethere.type!=type.building&&timeaway) || piecethere.health < 0 || piecethere == it || piecethere.type == type.bullet || it.type == type.bullet)
             {
-                if ((piecethere!=null&& piecethere.type != type.building)||piecethere==null)
+                if ((piecethere!=null&& piecethere.type != type.building)||piecethere==null||it.type==type.bullet)
                 {
                     piecethere = it;
                     return true;
