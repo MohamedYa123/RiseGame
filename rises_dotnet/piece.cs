@@ -87,6 +87,9 @@ namespace Rise
             int xstart = (int)(x / engine.gm.map.mod);
             int ystart = (int)(y / engine.gm.map.mod);
             int spx = (int)(dist / engine.gm.map.mod);
+            float lowest = float.MaxValue;
+            item targetpc = null;
+            int distm = int.MaxValue;
             for (int i = xstart - spx; i < xstart + spx; i++)
             {
                 for(int j = ystart - spx; j < ystart + spx; j++)
@@ -96,16 +99,29 @@ namespace Rise
                         continue;
                     }
                     var pc = engine.gm.map.squares[i, j].piecethere;
-                    if (pc != null&&pc!=this&&pc.army!=army)
+                    if (pc != null&&pc!=this&&pc.army.teamid!=army.teamid)
                     {
-                        return pc;
+                        var distm2=Math.Abs(i-xstart)+Math.Abs(j-ystart);
+                        if (pc.health < lowest||(pc.health==lowest&&distm2<distm))
+                        {
+                            lowest=pc.health;
+                            targetpc = pc;
+                            distm=distm2;
+                        }
                     }
                 }
             }
-            return null;
+            return targetpc;
         }
         public override void read()
         {
+            base.read();
+            if(waited >= patience&&target!=null&&target.army.teamid==army.teamid)
+            {
+                target = null;
+                targetx = -1;
+                targety = -1;
+            }
             frames++;
             if (target == null && targetx <0)
             {
@@ -113,10 +129,18 @@ namespace Rise
                 if (mode == piecemode.protect)
                 {
                     target = gettarget(rangeofattack);
+                    
                 }
                 else if (mode == piecemode.agressive)
                 {
-                    target=gettarget(rangeofattack*3);
+                    target=gettarget(rangeofattack*4);
+                }
+                if (target != null)
+                {
+                    targetx=target.x+target.width/2;
+                    targety=target.y+target.height/2;
+                    walk = true;
+                    resetorderid();
                 }
             }
             if(type==type.bullet)

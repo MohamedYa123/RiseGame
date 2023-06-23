@@ -147,6 +147,10 @@ namespace Rise
             this.sound = sound;
             Bitmap btmp = new Bitmap(path);
             Bitmap btmp2 = new Bitmap(path);
+            if (item!=null&&item.type == type.building)
+            {
+                btmp.RotateFlip(RotateFlipType.Rotate180FlipY);
+            }
             if (item != null)
             { btmp = ResizeImage(btmp, new Size((int)(item.width*fw), (int)(item.height*fh))); }
             bitmap = btmp;

@@ -28,7 +28,7 @@ namespace Rise
         public static army create_usa_army(GameEngine engine)
         {
             army army = new army(engine);
-
+            army.teamid = 1;
             return army;
         }
         public army(GameEngine engine)

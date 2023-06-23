@@ -33,7 +33,7 @@ namespace Rise
             get {
                 int tt = 1;
                 if(piecethere != null) {
-                    tt = 3;
+                    //tt = 3;
                 }
                 return (gcost+hcost)*timing*tt; }
         }
@@ -60,11 +60,18 @@ namespace Rise
         }
         public override string ToString()
         {
-            return $"{x}:{y} gcost:{gcost} hcost:{hcost} cost:{gcost + hcost}";
+            try
+            {
+                return $"{x}:{y} gcost:{gcost} hcost:{hcost} cost:{gcost + hcost}";
+            }
+            catch
+            {
+                return "";
+            }
         }
         public float product;
         enum Calcmode { mathematic,computeric}
-        Calcmode calcmode = Calcmode.computeric;
+        Calcmode calcmode = Calcmode.mathematic;
         public void calcg_and_f(square startpoint, square targetpoint)
         {
             if (gcost == -1 && hcost == -1)

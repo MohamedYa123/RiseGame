@@ -85,6 +85,9 @@ namespace Rise
         public List<item> workersinside;
         public int workersrequired = 0;
         public  piecemode mode = piecemode.protect;
+        public float salary;
+        public int patience=20;
+        public float netwealth;
         public void addworker(item worker)
         {
             if(workersinside == null) workersinside = new List<item>();
@@ -117,6 +120,11 @@ namespace Rise
             {
                 orderid = random.Next(int.MinValue,int.MaxValue);
             }
+        }
+        protected  void resetorderid()
+        {
+            orderid = random.Next(int.MinValue, int.MaxValue);
+
         }
         public bool sweetswap;
         public List<square> pathfinding(square startpoint, square targetpoint, float x, float y)
@@ -405,10 +413,42 @@ namespace Rise
             }
             return x;
         }
-
+        int readframe = 0;
+        protected int waited;
         public virtual void read()
         {
-
+            if (!available)
+            {
+                return;
+            }
+            if (readframe % 6 == 0&&owner!=null&&type!=type.building)
+            {
+                var xxg = owner.silver-salary;
+                if(xxg >= 0) {
+                    owner.silver = xxg;
+                    netwealth += salary;
+                    waited--;
+                    if(waited < 0)
+                    {
+                        waited = 0;
+                    }
+                }
+                else
+                {
+                    waited++;
+             
+                }
+                if (waited >= patience)
+                {
+                    owner = null;
+                    army = new army(engine);
+                    army.armycolor = Color.White;
+                    mode = piecemode.agressive;
+                    engine.stopwalk(this);
+                }
+            }
+            
+            readframe++;
         }
         private Bitmap RotateImageBasic(Bitmap bmp, double angle2)
         {
@@ -524,7 +564,7 @@ namespace Rise
             resourcebitmap2 = (Bitmap)gm.map.resources[srcid].bitmap2.Clone();
         }
         float anglestep = 5f;
-        float opacitystep = 3f;
+        float opacitystep = 5f;
         float zstep = 1f;
         public frameload loadframe =new frameload();
         public float direction;
@@ -588,9 +628,9 @@ namespace Rise
             Bitmap btmp;
             var directionindegrees = direction * 180 / pi;
             directionindegrees -= (int)(directionindegrees / 360)*360;
-            if (loadframe.opacity != 1)
+            if (stealth)
             {
-            //    anglestep = 5;
+                anglestep = 1;
             }
             var id1 = (int)Math.Round( directionindegrees/ anglestep);
             var id2 = (int)Math.Round(z / zstep);
@@ -599,6 +639,10 @@ namespace Rise
             if (walk&&resourcesofanimation.Count>0&&!basic&&true)
             {
                 id4 = loadframe.getwalkanimation();
+            }
+            if (!walk && stealth)
+            {
+           //     id4 = 3;
             }
             var sr = gm.map.resources[resourceid].GetSecondresource(id1, id2, id3,id4);
             if (sr != null&&!basic)

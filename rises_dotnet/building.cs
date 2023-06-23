@@ -59,8 +59,11 @@ namespace Rise
                 catch { }
             }
         }
+        public int autobuildms = 0;
+        int frames = 0;
         public override void read()
         {
+            base.read();
             walk = false;
             if (buildtime_ms <= 0)
             {
@@ -75,7 +78,10 @@ namespace Rise
             owner.silver += producesmoney;
             try
             {
-           //     adddpiece(piecesallowed[0]);
+                if (autobuildms!=0&& frames % autobuildms == 0&&frames!=0)
+                {
+                    adddpiece(piecesallowed[0]);
+                }
             }
             catch { return; }
             if (pieces_tobuild.Count > 0)
@@ -93,6 +99,7 @@ namespace Rise
                     pieces_tobuild[0].buildtime_ms -= 1;
                 }
             }
+            frames++;
         }
     }
 }

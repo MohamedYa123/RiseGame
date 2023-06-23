@@ -223,9 +223,9 @@ namespace Rise
                 a.load_resouces(gm,factorw,factorh);
             }
         }
-        int resourcesnum1=80;
+        int resourcesnum1=361;
         int resourcesnum2=21;
-        int resourcesnum3=41;
+        int resourcesnum3=21;
         int resourcesnum4=20;
         public int load_resource(string pic, string sound, string name, item item,float fw,float fh)
         {
@@ -233,7 +233,7 @@ namespace Rise
             resources.Add(rsc);
             return resources.Count - 1;
         }
-        public int mod = 40;//بيقسم مربعات الخريطة لمربعات أكبر علشان يوفر وقت في البروسيسنج
+        public int mod = 20;//بيقسم مربعات الخريطة لمربعات أكبر علشان يوفر وقت في البروسيسنج
         public int safzone = 0;
         public int xlen;
         public int ylen;

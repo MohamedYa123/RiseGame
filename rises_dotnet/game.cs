@@ -90,7 +90,7 @@ namespace Rise
             squaresofinterest.AddRange(squaresofinterest2);
             frame++;
         }
-        public void drawmap(int enginespeed) {
+        public void drawmap(int enginespeed,player pl) {
             hello:
             while (map.sqauresreset)
             {
@@ -132,7 +132,7 @@ namespace Rise
                         {
                             goto hello;
                         }
-                        if (sqrpiece != null&&sqrpiece.type!=type.bullet&&!drawnpieces.ContainsKey(sqrpiece))
+                        if (sqrpiece != null&& !(sqrpiece.stealth && sqrpiece.army.teamid != pl.army.teamid) && sqrpiece.type!=type.bullet&&!drawnpieces.ContainsKey(sqrpiece))
                         {
                             drawnpieces.Add(sqrpiece, sqrpiece.id);
                             squares++;
