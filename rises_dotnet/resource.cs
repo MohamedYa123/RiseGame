@@ -83,7 +83,14 @@ namespace Rise
 
             // Translate and rotate the graphics object around the rotation point
             g.TranslateTransform(newWidth / 2f, newHeight / 2f);
-            g.RotateTransform(angle);
+                try
+                {
+                    g.RotateTransform(angle);
+                }
+                catch
+                {
+
+                }
             g.TranslateTransform(-rotationPoint.X, -rotationPoint.Y);
 
             // Draw the original bitmap onto the rotated bitmap
@@ -91,9 +98,9 @@ namespace Rise
         }
 
         // Calculate the cropping rectangle
-        int cropX = (int)((newWidth - bitmap.Width) / 2f);
-        int cropY = (int)((newHeight - bitmap.Height) / 2f);
-        Rectangle cropRect = new Rectangle(cropX, cropY, (int)(bitmap.Width), (int)(bitmap.Height ));
+       // int cropX = (int)((newWidth - bitmap.Width) / 2f);
+       // int cropY = (int)((newHeight - bitmap.Height) / 2f);
+        //Rectangle cropRect = new Rectangle(cropX, cropY, (int)(bitmap.Width), (int)(bitmap.Height ));
 
         // Crop the rotated bitmap
      //   Bitmap croppedBitmap = rotatedBitmap.Clone(cropRect, bitmap.PixelFormat);

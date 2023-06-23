@@ -86,7 +86,7 @@ namespace Rise
         }
         public void swapaway(item old, item it, bool real)
         {
-            if (old == it)
+            if (old == it||old.type==type.bullet||it.type==type.bullet)
             {
                 return;
             }
@@ -104,12 +104,20 @@ namespace Rise
             //  old.newspeedx *= -1;
             //  old.newspeedy *= -1;
             ot = it.newspeedx; ot2 = it.newspeedy;
-            it.timeaway = 40;
+            it.timeaway = 5;
             engine.change_direction_direct(it, (int)old.x - (int)old.width / 2, (int)old.y - (int)old.height / 2);
             it.newspeedxtimed = it.newspeedx * -1;
             it.newspeedytimed = it.newspeedy * -1;
             it.newspeedx = ot;
             it.newspeedy = ot2;
+            if (old.newspeedxtimed > 0 == it.newspeedxtimed>0)
+            {
+                it.newspeedxtimed *= -1;
+            }
+            if (old.newspeedytimed > 0 == it.newspeedytimed>0)
+            {
+                it.newspeedytimed *= -1;
+            }
             //  it.newspeedx *= -1;
             //  it.newspeedy *= -1;
         }
@@ -225,7 +233,7 @@ namespace Rise
             resources.Add(rsc);
             return resources.Count - 1;
         }
-        public int mod = 20;//بيقسم مربعات الخريطة لمربعات أكبر علشان يوفر وقت في البروسيسنج
+        public int mod = 40;//بيقسم مربعات الخريطة لمربعات أكبر علشان يوفر وقت في البروسيسنج
         public int safzone = 0;
         public int xlen;
         public int ylen;

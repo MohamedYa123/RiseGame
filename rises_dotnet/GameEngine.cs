@@ -30,18 +30,112 @@ namespace Rise
            // init();
         }
         public game gm = new game();
-
-
-        public void init(int widthresolution,int heightresolution,int realwidth,int realheight)
+        piece createTank(player player)
         {
-            map mp = new map("desert2", 10000, 10000, "desert.jpg", widthresolution, heightresolution);
-            mp.engine = this;
-            gm = new game();
-            mp.gm = gm;
-            player player = new player();
-            player.army = army.create_usa_army(this);
-            //
-            piece worker=new piece();
+            piece pc = new piece();
+            pc.owner = player;
+            pc.workersrequired = 2;
+            pc.stealth = false;
+            pc.buildtime_ms = 150;
+            pc.buildtime = 150;
+            pc.army = player.army;
+            pc.image = "tank.png";
+            pc.name = "tank";
+            pc.width = 120;
+            pc.height = 120;
+            pc.speedx = 0f;
+            pc.newspeedx = 0.0f;
+            pc.speedy = -0.01f;
+            pc.basespeed = 4f;
+            pc.emergencyspeed = 14f;
+            pc.newspeedy = 0.0001f;
+            pc.power = 15;
+            pc.maxpower = 3;
+            pc.basicdirection = -1;
+            pc.engine = this;
+            pc.shot_time_ms = 30;
+            pc.reloadtime_ms = 100;
+            pc.maxbullets = 2;
+            pc.health = 100;
+            pc.maxhealth = 100;
+            pc.x = 5600;
+            pc.y = 5200;
+            pc.silver = 500;
+            //    pc.z = 20;
+            pc.type = type.vehicle;
+            pc.track = tracktype.full;
+            pc.type = type.vehicle;
+            pc.rangeofattack = 1000f;
+            return pc;
+        }
+        piece createhumvee(player player)
+        {
+            piece pc = new piece();
+            pc.owner = player;
+            pc.workersrequired = 2;
+            pc.stealth = false;
+            pc.buildtime_ms = 80;
+            pc.buildtime = 80;
+            pc.army = player.army;
+            pc.image = "humvee.png";
+            pc.name = "humvee";
+            pc.width = 80;
+            pc.height = 60;
+            pc.speedx = 0f;
+            pc.newspeedx = 0.0f;
+            pc.speedy = -0.01f;
+            pc.basespeed = 8f;
+            pc.emergencyspeed = 14f;
+            pc.newspeedy = 0.0001f;
+            pc.power = 5;
+            pc.maxpower = 5;
+            pc.basicdirection = -1;
+            pc.engine = this;
+            pc.shot_time_ms = 15;
+            pc.reloadtime_ms = 30;
+            pc.maxbullets = 3;
+            pc.health = 25;
+            pc.maxhealth = 25;
+            pc.x = 5600;
+            pc.y = 5200;
+            pc.silver = 500;
+            //    pc.z = 20;
+            pc.type = type.vehicle;
+            pc.track = tracktype.full;
+            pc.type = type.vehicle;
+            pc.rangeofattack = 200f;
+            pc.basicdirection = 270;
+            return pc;
+        }
+        piece createbullet(player player)
+        {
+            piece bullet = new piece();
+            bullet.type = type.bullet;
+            bullet.army = player.army;
+            bullet.track = tracktype.simple;
+            bullet.timed = true;
+            bullet.type = type.bullet;
+            bullet.change = 0.16f;
+            bullet.image = "bullet1.png";
+            bullet.name = "bullet";
+            bullet.sound = "bullet.wav";
+            bullet.type = type.bullet;
+            bullet.width = 5;
+            bullet.height = 10;
+            bullet.speedx = 10;
+            bullet.speedy = 10;
+            bullet.basespeed = 25;
+            bullet.x = -400;
+            bullet.basicdirection = 7;
+            bullet.engine = this;
+            bullet.health = 5;
+            bullet.maxhealth = 5;
+            bullet.power = 10;
+            return bullet;
+        }
+        piece createworker(player player)
+        {
+            piece worker = new piece();
             worker.type = type.worker;
             worker.basespeed = 5;
             worker.image = "h1.png";
@@ -51,8 +145,8 @@ namespace Rise
             worker.buildtime_ms = 50;
             worker.stealth = false;
             worker.owner = player;
-            worker.army=player.army;
-            worker.engine= this;
+            worker.army = player.army;
+            worker.engine = this;
             worker.x = 5400;
             worker.y = 5800;
             worker.health = 10;
@@ -66,6 +160,18 @@ namespace Rise
             worker.rangeofattack = 150;
             worker.imagesofanimations.Add(0, "h2.png");
             worker.imagesofanimations.Add(1, "h3.png");
+            return worker;
+        }
+        public void init(int widthresolution,int heightresolution,int realwidth,int realheight,Panel panel3)
+        {
+            map mp = new map("desert2", 10000, 10000, "desert.jpg", widthresolution, heightresolution);
+            mp.engine = this;
+            gm = new game();
+            mp.gm = gm;
+            player player = new player();
+            player.army = army.create_usa_army(this);
+            var worker = createworker(player);
+            //
             building warfactory=new building();
             warfactory.width = 300;
             warfactory.height = 300;
@@ -104,67 +210,12 @@ namespace Rise
             building.image = "1.png";
             building.type=type.building;
             building.army = player.army;
-            piece pc = new piece();
-            pc.owner = player;
-            pc.workersrequired = 2;
-            pc.stealth = false;
-            pc.buildtime_ms = 150;
-            pc.buildtime = 150;
-            pc.army = player.army;
-            pc.image = "tank.png";
-            pc.name = "tank";
-            pc.width = 70;
-            pc.height = 70;
-            pc.speedx = 0f;
-            pc.newspeedx = 0.0f;
-            pc.speedy = -0.01f;
-            pc.basespeed = 4f;
-            pc.emergencyspeed = 14f;
-            pc.newspeedy = 0.0001f;
-            pc.power = 15;
-            pc.maxpower = 3;
-            pc.basicdirection = -1;
-            pc.engine = this;
-            pc.shot_time_ms = 30;
-            pc.reloadtime_ms = 100;
-            pc.maxbullets = 2;
-            pc.health = 100;
-            pc.maxhealth = 100;
-            pc.x = 5600;
-            pc.y = 5200;
-            pc.silver = 500;
-        //    pc.z = 20;
-            pc.type = type.vehicle;
-            pc.track = tracktype.full;
-            pc.type = type.vehicle;
-            pc.rangeofattack = 1000f;
-
-            piece bullet = new piece();
-            bullet.type = type.bullet;
-            bullet.army = player.army;
-            bullet.track = tracktype.simple;
-            bullet.timed = true;
-            bullet.type = type.bullet;
-            bullet.change = 0.16f;
-            bullet.image = "bullet1.png";
-            bullet.name = "bullet";
-            bullet.sound = "bullet.wav";
-            bullet.type = type.bullet;
-            bullet.width = 5;
-            bullet.height = 10;
-            bullet.speedx = 10;
-            bullet.speedy = 10;
-            bullet.basespeed = 25;
-            bullet.x = -400;
-            bullet.basicdirection = 7;
-            bullet.engine = this;
-            bullet.health = 5;
-            bullet.maxhealth = 5;
-            bullet.power = 10;
+            var pc = createTank(player);
+           var bullet=createbullet(player);
             player.name = "medo";
             player.engine = this;
             player.settings.mousespeed = 1;
-
+            var humvee = createhumvee(player);
             gm.map = mp;
             gm.players.Add(player);
            
@@ -173,20 +224,39 @@ namespace Rise
             mp.asstes.Add(building);
             mp.asstes.Add(warfactory);
             mp.asstes.Add(worker);
+            mp.asstes.Add(humvee);
             var xp = pc;
-            warfactory.piecesallowed.Add((piece)xp);
-            building.buildingsallowed.Add((building)warfactory);
+            warfactory.piecesallowed.Add(xp);
+            warfactory.piecesallowed.Add(humvee);
+            building.buildingsallowed.Add(warfactory);
             building.piecesallowed.Add(worker);
             mp.load_resources(realwidth, realheight);
-            mp.items.Add(pc.clone());
+            var ppc = pc.clone();
+            ppc.army = army.create_usa_army(this);
+            mp.items.Add(ppc);
             mp.items.Add(building.clone());
-
-           
+            loadassets(panel3);
             //mp.asstes.Add(xp);
             
             gm.start();
             player.x = (int)building.x-100;
             player.y = (int)building.y-100;
+        }
+        Bitmap stop;
+        Bitmap protect;
+        Bitmap aggressive;
+        Bitmap passive;
+        void loadassets(Panel panel3)
+        {
+            stop = new Bitmap("assets/stop.png");
+            passive = new Bitmap("assets/passive.png");
+            protect = new Bitmap("assets/protect.png");
+            aggressive = new Bitmap("assets/aggressive.png");
+            Size sz=new Size(panel3.Width/3-5,panel3.Height/3-5);
+            stop = resource.ResizeImage(stop, sz);
+            passive = resource.ResizeImage(passive, sz);
+            aggressive = resource.ResizeImage(aggressive, sz);
+            protect = resource.ResizeImage(protect, sz);
         }
         public void requestchangeposition(item it)
         {
@@ -232,19 +302,122 @@ namespace Rise
 
         }
         public float speedfactor = 1f;
-        public void loadselection(item it, Panel panel3)
+        void changemode(List<item> selectedones,piecemode piecemode)
+        {
+            foreach(var item in selectedones)
+            {
+                if (piecemode != piecemode.stop)
+                {
+                    item.mode = piecemode;
+                }
+                else
+                {
+                    stopwalk(item);
+                }
+            }
+        }
+        public void loadselection(item it, Panel panel3,player pl)
         {
             building b = null;
-            if (it == null)
-            {
-                return;
-            }
+           
             try
             {
                 b = (building)it;
-
+                if (it == null||pl!=b.owner||!b.selected)
+                {
+                    throw new Exception("not building");
+                }
             }
-            catch { return; }
+            catch { 
+                List<item> selectedones = new List<item>();
+                int protected1=0;
+                int passive1 = 0;
+                int agressive1 = 0;
+                for(int i=0;i<gm.map.items.Count;i++)
+                {
+                    var item = gm.map.items[i];
+                    if(item.selected)
+                    {
+                        if(item.mode == piecemode.protect) { protected1++; }
+                        if(item.mode == piecemode.passive) { passive1++; }
+                        if(item.mode == piecemode.agressive) { agressive1++; }
+                        selectedones.Add(item);
+                    }
+                }
+                if(selectedones.Count==0) {
+                    return;
+                }
+                int x = 7;
+                int y = 7;
+                panel3.Controls.Clear();
+                for (int i = 0; i < 4; i++)
+                {
+                    
+                    PictureBox picture = new PictureBox();
+                    //a.prepareresourcebitmap(gm);
+                    Bitmap btmp =protect;
+                    piecemode piecemode=piecemode.protect;
+                    Color l = Color.Transparent;
+
+                    switch (i)
+                    {
+                        case 0:
+                            btmp = stop;
+                            piecemode = piecemode.stop;
+                            
+                            break;
+                        case 1:
+                            btmp=protect; 
+                            piecemode=piecemode.protect;
+                            if (protected1 > 0)
+                            {
+                                l = Color.Aqua;
+                            }
+                            break;
+                            case 2:
+                            piecemode=piecemode.passive;
+                            if (passive1 > 0)
+                            {
+                                l=Color.Aqua;
+                            }
+                            btmp=passive; break;
+                            case 3:
+                            piecemode=piecemode.agressive;
+                            if(agressive1 > 0)
+                            {
+                                l=Color.Aqua;
+                            }
+                            btmp = aggressive;
+                            break;
+                    }
+                    var g = Graphics.FromImage(btmp);
+
+                    g.SmoothingMode = SmoothingMode.AntiAlias;
+                    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+
+                    //     picture.Image=;
+                    picture.Height = panel3.Height / 3 - 7;
+                    picture.Left = x;
+                    picture.Top = y;
+                    picture.Width = panel3.Width / 3 - 7;
+                    picture.SizeMode = PictureBoxSizeMode.Zoom;
+                    picture.Image = btmp;
+                    panel3.Controls.Add(picture);
+                    picture.BackColor = l;
+                    x += picture.Width + 5;
+                    //   picture.BackColor = Color.Red;
+                    if (x >= panel3.Width / 3 * 3 - 7 * 3)
+                    {
+                        x = 7;
+                        y += panel3.Height / 3 - 5;
+                    }
+                    picture.Click += delegate
+                    {
+                        changemode(selectedones, piecemode);
+                    };
+                }
+                return;
+            }
             while (b.selected)
             {
 
@@ -386,7 +559,7 @@ namespace Rise
             for (int i = 0; i < gm.map.items.Count; i++)
             {
                 var a = gm.map.items[i];
-                if (a.x + a.width / 2 > absx && a.x + a.width / 2 < newx && a.y + a.height / 2 > absy && a.y + a.height / 2 < newy)
+                if (a.type!=type.building&&a.type!=type.bullet&&a.x + a.width / 2 > absx && a.x + a.width / 2 < newx && a.y + a.height / 2 > absy && a.y + a.height / 2 < newy)
                 {
                     a.selected = true;
                     lista.Add(a);
@@ -460,7 +633,7 @@ namespace Rise
 
 
                 var a = ld[i];
-                if (a.health <= 0)
+                if (a.health < 0)
                 {
                     continue;
                 }
@@ -714,6 +887,7 @@ namespace Rise
             item.targetx = -1;
             item.targety = -1;
             item.target = null;
+           // item.mode = piecemode.passive;
             item.pathsquares.Clear();
             item.orderid = item.orderid/2;
         }
@@ -928,7 +1102,7 @@ namespace Rise
                     imsleepy = true;
 
                     //  Thread.Sleep(1);
-                    if (i % 1 == 0)
+                    if (i % 3 == 0)
                     {
                         Thread.Sleep(1);
                     }
@@ -1228,9 +1402,14 @@ namespace Rise
                 xb.x = mx - xb.width / 2;
                 xb.y = my - xb.height / 2;
                 xb.health = 1;
+                int w = 0;
                 while (engineworking)
                 {
-
+                    if (w % 50==0) 
+                    {
+                        Thread.Sleep(1);
+                    }
+                    w++;
                 }
                 xb.canceledx = false;
                 xb.canceledy = false;

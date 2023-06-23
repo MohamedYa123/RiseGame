@@ -18,7 +18,7 @@ namespace Rise
 {
 
     public enum type {  vehicle, builder, building, grabber, soldier,worker, air, sea, bullet }
-    public enum piecemode { standground, protect, agressive }
+    public enum piecemode {  protect,passive, agressive,stop }
     public enum tracktype { naive, simple, full }
     /*
      naive  : just follows targetx and targety by direction 
@@ -55,7 +55,6 @@ namespace Rise
         public bool justcreated = true;
         int last;
         int ticks;
-        public piecemode mode;
         public float healthdecrease;
 
         piece mother;
@@ -83,11 +82,43 @@ namespace Rise
         float plusopacity = -1;
         [DllImport("winmm.dll")]
         static extern Int32 mciSendString(string command, StringBuilder buffer, int bufferSize, IntPtr hwndCallback);
-
+        item gettarget(float dist)
+        {
+            int xstart = (int)(x / engine.gm.map.mod);
+            int ystart = (int)(y / engine.gm.map.mod);
+            int spx = (int)(dist / engine.gm.map.mod);
+            for (int i = xstart - spx; i < xstart + spx; i++)
+            {
+                for(int j = ystart - spx; j < ystart + spx; j++)
+                {
+                    if (i < 0 || j < 0 || i >= engine.gm.map.xlen || j >= engine.gm.map.ylen)
+                    {
+                        continue;
+                    }
+                    var pc = engine.gm.map.squares[i, j].piecethere;
+                    if (pc != null&&pc!=this&&pc.army!=army)
+                    {
+                        return pc;
+                    }
+                }
+            }
+            return null;
+        }
         public override void read()
         {
             frames++;
-            
+            if (target == null && targetx <0)
+            {
+                //auto attack
+                if (mode == piecemode.protect)
+                {
+                    target = gettarget(rangeofattack);
+                }
+                else if (mode == piecemode.agressive)
+                {
+                    target=gettarget(rangeofattack*3);
+                }
+            }
             if(type==type.bullet)
             {
                 //   change = 0.03f;
@@ -162,8 +193,6 @@ namespace Rise
                 }
 
             }
-
-
             else if (track==tracktype.full)
             {
                 //pathfinding

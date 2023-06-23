@@ -16,7 +16,7 @@ namespace Rise
         public int c1 = 0;
         public int getwalkanimation()
         {
-            if (loadframes -c1>10)
+            if (loadframes -c1>40)
             {
                 c2 ++;
                 c1 = loadframes;
@@ -84,6 +84,7 @@ namespace Rise
         public Dictionary<int,string> imagesofanimations= new Dictionary<int,string>();
         public List<item> workersinside;
         public int workersrequired = 0;
+        public  piecemode mode = piecemode.protect;
         public void addworker(item worker)
         {
             if(workersinside == null) workersinside = new List<item>();
@@ -154,8 +155,9 @@ namespace Rise
             var last = curretpoint;
             x /= engine.gm.map.mod;
             y /= engine.gm.map.mod;
-
-            while (true)
+            int max = 1000;
+            int i = 0;
+            while (i<max)
             {
                 if (curretpoint == null || curretpoint.startpoint)
                 {
@@ -171,6 +173,7 @@ namespace Rise
                     path.Add(curretpoint);
                     //   break;
                 }
+                i++;
             }
             return path;
         }
@@ -365,7 +368,7 @@ namespace Rise
         }
         public float squareheight
         {
-            get { return MathF.Min(width, height); }
+            get { return MathF.Max(width, height); }
         }
         public int depth;
         public float speedx;
@@ -378,7 +381,7 @@ namespace Rise
         public float speedz;
         public float basespeed;//
         public float emergencyspeed;
-        public float basicdirection;
+        public float basicdirection=0.0001f;
         float olddirection;
         public string sound = "";
         public bool selected;
@@ -468,6 +471,10 @@ namespace Rise
         {
             float direction = 0;
             direction = MathF.Atan(MathF.Abs(speedy) / MathF.Abs(speedx));
+            if (direction.ToString() == "NaN")
+            {
+                direction = MathF.Atan(1);
+            }
             if (speedx > 0 && speedy < 0)
             {
                 direction = pi - direction;

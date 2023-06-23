@@ -27,7 +27,7 @@ namespace Rise
         private void Form1_Load(object sender, EventArgs e)
         {
             particleSystem = new ParticleSystem();
-            GameEngine.init(pictureBox1.Width, pictureBox1.Height, pictureBox1.Width, pictureBox1.Height);
+            GameEngine.init(pictureBox1.Width, pictureBox1.Height, pictureBox1.Width, pictureBox1.Height,panel3);
             player = GameEngine.gm.players[0];
             GameEngineManager = new GameEngineManager(GameEngine,player,pictureBox1.Width,pictureBox1.Height,pictureBox2.Width,pictureBox2.Height);
             GameEngineManager.runorclose(true);
@@ -312,7 +312,7 @@ namespace Rise
         {
             try
             {
-                GameEngine.loadselection(GameEngineManager.selected_b, panel3);
+                GameEngine.loadselection(GameEngineManager.selected_b, panel3,player);
             }
             catch { }
         }
