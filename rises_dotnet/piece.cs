@@ -99,7 +99,7 @@ namespace Rise
                     if (pc != null&&pc!=this&&pc.army.teamid!=army.teamid&&!(onlyattacktarget&&pc.generaltype!=targettype)&&!(pc.stealth&&!pc.detected&&waited<patience))
                     {
                         float distm2=(float)Math.Sqrt(Math.Pow(i-xstart,2)+Math.Pow(j-ystart,2));
-                        if (pc.health < lowest||(pc.health==lowest&&distm2<distm))
+                        if ((distm2<distm)|| (distm2 == distm && pc.health < lowest))
                         {
                             lowest=pc.health;
                             targetpc = pc;
