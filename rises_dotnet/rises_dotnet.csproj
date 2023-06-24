@@ -60,6 +60,7 @@
     </Compile>
     <Compile Include="game.cs" />
     <Compile Include="GameEngine.cs" />
+    <Compile Include="GameEngineManager.cs" />
     <Compile Include="item.cs" />
     <Compile Include="map.cs" />
     <Compile Include="mapzone.cs" />

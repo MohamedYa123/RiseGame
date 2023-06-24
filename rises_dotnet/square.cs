@@ -12,7 +12,7 @@ namespace Rise
         public float x;
         public float y;
         public item piecethere;
-        public mapzone mapzone = new mapzone();
+        public mapzone mapzone;//= new mapzone();
         public float Gcost;//distance from source
         public float Hcost;//distance from target
         public int issitastarget;
@@ -71,7 +71,7 @@ namespace Rise
         }
         public float product;
         enum Calcmode { mathematic,computeric}
-        Calcmode calcmode = Calcmode.mathematic;
+        Calcmode calcmode = Calcmode.computeric;
         public void calcg_and_f(square startpoint, square targetpoint)
         {
             if (gcost == -1 && hcost == -1)
@@ -149,6 +149,8 @@ namespace Rise
 
             }
         }
+
+        public int oid2 = 0;
         public  float realxx = 0;
         public float realyy = 0;
         int rockettail;
@@ -217,12 +219,29 @@ namespace Rise
             available = false;
             return false;
         }
+        public int oid;
         public bool accept(item it, map mp,bool timeaway,bool moving=false)
         {
             //||it.orderid==piecethere.orderid
-            if (piecethere == null||(piecethere.type!=type.building&&timeaway) || piecethere.health < 0 || piecethere == it || piecethere.type == type.bullet || it.type == type.bullet)
+            if (mapzone != null && mapzone.isitsolid)
             {
-                if ((piecethere!=null&& piecethere.type != type.building)||piecethere==null||it.type==type.bullet)
+                return false;
+            }
+            if (it.requiredzonename != "")
+            {
+                if (mapzone == null||mapzone.name!=it.requiredzonename)
+                {
+                    if (it.favoritemapzone!=null)
+                    {
+                        it.engine.GameEngineManager.message = it.favoritemapzone.refusemessage;
+                    }
+                    return false;
+                }
+                
+            }
+            if (piecethere == null||(piecethere.type!=type.building&&timeaway) || piecethere.health < 0 || piecethere == it || piecethere.type == type.bullet || it.type == type.bullet||piecethere==it.swapingitem)
+            {
+                if ((piecethere!=null&& piecethere.type != type.building)||piecethere==null||it.type==type.bullet || piecethere == it.swapingitem)
                 {
                     piecethere = it;
                     return true;

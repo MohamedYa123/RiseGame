@@ -18,7 +18,8 @@ namespace Rise
         public Bitmap Bitmap { get { /*bitmap = (Bitmap)bitmap.Clone();*/ return (Bitmap)bitmap.Clone(); } set { bitmap = value; } }
         public string name = "";
         public string sound;
-         secondresource[,,,] secondresources;
+       //  secondresource[,,,] secondresources;
+        Dictionary<string, secondresource> secondresources=new Dictionary<string, secondresource>();   
         public static Bitmap ResizeImage(Bitmap imgToResize, Size size)
         {
             try
@@ -142,6 +143,7 @@ namespace Rise
 
             return rotatedBitmap;
         }
+        public Bitmap minibitmap;
         public resource(string path, string sound, string name, item item,float fw,float fh,int resourceoption1, int resourceoption2, int resourceoption3,int resourceoption4)
         {
             this.sound = sound;
@@ -152,7 +154,11 @@ namespace Rise
                 btmp.RotateFlip(RotateFlipType.Rotate180FlipY);
             }
             if (item != null)
-            { btmp = ResizeImage(btmp, new Size((int)(item.width*fw), (int)(item.height*fh))); }
+            { 
+                btmp = ResizeImage(btmp, new Size((int)(item.width*fw), (int)(item.height*fh)));
+                minibitmap = ResizeImage(btmp, new Size((int)(item.width*fw/item.engine.gm.map.mod), (int)(item.height*fh/ item.engine.gm.map.mod)));
+            
+            }
             bitmap = btmp;
             if (name == "mappicture" )
             {
@@ -164,14 +170,16 @@ namespace Rise
             
             }
             this.name = name;
-            secondresources=new secondresource[resourceoption1, resourceoption2,resourceoption3,resourceoption4];
+            //secondresources=new secondresource[resourceoption1, resourceoption2,resourceoption3,resourceoption4];
         }
 
-        public secondresource GetSecondresource(int resourceoption1, int resourceoption2, int resourceoption3,int resourceoption4)
+        public secondresource GetSecondresource(int resourceoption1, int resourceoption2, int resourceoption3,int resourceoption4,string plus)
         {
             try
             {
-                var sr = secondresources[resourceoption1, resourceoption2, resourceoption3, resourceoption4];
+                string key = $"{resourceoption1.ToString("000")}{resourceoption2.ToString("000")}{resourceoption3.ToString("000")}{resourceoption4.ToString("000")}{plus}";
+               // int[] key = { resourceoption1, resourceoption2, resourceoption3, resourceoption4 };
+                var sr = secondresources[key] ;// secondresources[resourceoption1, resourceoption2, resourceoption3, resourceoption4];
                 return sr;
             }
             catch
@@ -179,12 +187,21 @@ namespace Rise
                 return null;    
             }
         }
-        public void setsecondresource(Bitmap btmp,int resourceoption1, int resourceoption2, int resourceoption3,int resourceoption4)
+        public void setsecondresource(Bitmap btmp,int resourceoption1, int resourceoption2, int resourceoption3,int resourceoption4, string plus)
         {
             try
             {
                 secondresource sr = new secondresource(btmp);
-                secondresources[resourceoption1, resourceoption2, resourceoption3, resourceoption4] = sr;
+                string key = $"{resourceoption1.ToString("000")}{resourceoption2.ToString("000")}{resourceoption3.ToString("000")}{resourceoption4.ToString("000")}{plus}";
+                if (secondresources.ContainsKey(key))
+                {
+                    secondresources[key] = sr;
+                }
+                else
+                {
+                    secondresources.Add(key, sr);
+                }
+                //secondresources[resourceoption1, resourceoption2, resourceoption3, resourceoption4] = sr;
             }
             catch(Exception e) 
             {

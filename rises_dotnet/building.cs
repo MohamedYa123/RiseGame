@@ -25,6 +25,7 @@ namespace Rise
         public override void load_resouces(game gm, float fw,float fh)
         {
             resourceid = gm.map.load_resource($"resources/{army.name}/buildings/{image}", $"{army.name} - " + name, "", this, fw,fh);
+            load(gm);
         }
 
         public void adddpiece(piece piece)
@@ -63,6 +64,10 @@ namespace Rise
         int frames = 0;
         public override void read()
         {
+            if ( dead)
+            {
+                return;
+            }
             base.read();
             walk = false;
             if (buildtime_ms <= 0)
@@ -91,6 +96,8 @@ namespace Rise
             {
                 if (pieces_tobuild[0].buildtime_ms <= 0)
                 {
+                    pieces_tobuild[0].x = x + width / 2;
+                    pieces_tobuild[0].y = y + height / 2;
                     var b= engine.additem(pieces_tobuild[0]);
                     if (b)
                     {

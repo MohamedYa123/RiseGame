@@ -76,6 +76,7 @@ namespace Rise
             piece pc = new piece();
             pc.armedbullet = bullet;
             pc.generaltype = generaltype.vehicle;
+            pc.targettype = generaltype.infantry;
             pc.salary = 2;
             pc.owner = player;
             pc.workersrequired = 1;
@@ -93,8 +94,8 @@ namespace Rise
             pc.basespeed = 12f;
             pc.emergencyspeed = 14f;
             pc.newspeedy = 0.0001f;
-            pc.power = 0.65f;
-            pc.maxpower = 0.65f;
+            pc.power = 5.5f;
+            pc.maxpower = 2.5f;
             pc.basicdirection = -1;
             pc.engine = this;
             pc.shot_time_ms = 1;
@@ -111,6 +112,8 @@ namespace Rise
             pc.type = type.vehicle;
             pc.rangeofattack = 300f;
             pc.targettype = generaltype.infantry;
+            pc.change = 0.8f;
+            //pc.onlyattacktarget = true;
          //   pc.basicdirection = 90;
             return pc;
         }
@@ -174,7 +177,7 @@ namespace Rise
             bullet.height = 10;
             bullet.speedx = 10;
             bullet.speedy = 10;
-            bullet.basespeed = 25;
+            bullet.basespeed = 15;
             bullet.x = -400;
             bullet.basicdirection = 7;
             bullet.engine = this;
@@ -188,6 +191,7 @@ namespace Rise
             piece bullet = new piece();
             bullet.generaltype = generaltype.bullet;
             bullet.targettype = generaltype.infantry;
+          //  bullet.onlyattacktarget = true;
             bullet.type = type.bullet;
             bullet.army = player.army;
             bullet.track = tracktype.naive;
@@ -240,8 +244,11 @@ namespace Rise
             worker.maxbullets = 1;
             worker.rangeofattack = 150;
             worker.silver = 100;
-            worker.imagesofanimations.Add(0, "h2.png");
-            worker.imagesofanimations.Add(1, "h3.png");
+            worker.imagesofanimations.Add(0, "animations/h2.png");
+            worker.imagesofanimations.Add(1, "animations/h3.png");
+            worker.imagesofanimations.Add(2, "animations/dead1.png");
+            worker.imagesofanimations.Add(3, "animations/dead2.png");
+            worker.imagesofanimations.Add(4, "animations/dead3.png");
             return worker;
         }
         piece createrbg(player player, piece bullet)
@@ -277,7 +284,13 @@ namespace Rise
             worker.type = type.soldier;
             //  worker.imagesofanimations.Add(0, "h2.png");
             //  worker.imagesofanimations.Add(1, "h3.png");
+            worker.imagesofanimations.Add(0, "rpg.png");
+            worker.imagesofanimations.Add(1, "rpg.png");
+            worker.imagesofanimations.Add(2, "animations/dead1.png");
+            worker.imagesofanimations.Add(3, "animations/dead2.png");
+            worker.imagesofanimations.Add(4, "animations/dead3.png");
             worker.change = 0.9f;
+            worker.onlyattacktarget = true;
             return worker;
         }
         piece createsniper(player player,piece bullet)
@@ -309,15 +322,21 @@ namespace Rise
             worker.reloadtime_ms = 10;
             worker.power = 11;
             worker.maxbullets = 1;
-            worker.rangeofattack = 1050;
+            worker.rangeofattack = 450;
             worker.silver = 700;
             worker.basicdirection = 270;
             worker.armedbullet = bullet;
             worker.workersrequired = 1;
             worker.type = type.soldier;
             worker.change = 0.9f;
+            worker.name = "sniper";
             //worker.imagesofanimations.Add(0, "h2.png");
             //worker.imagesofanimations.Add(1, "h3.png");
+            worker.imagesofanimations.Add(0, "sniper.png");
+            worker.imagesofanimations.Add(1, "sniper.png");
+            worker.imagesofanimations.Add(2, "animations/dead1.png");
+            worker.imagesofanimations.Add(3, "animations/dead2.png");
+            worker.imagesofanimations.Add(4, "animations/dead3.png");
             return worker;
         }
         piece createsniperbullet(piece thinbullet)
@@ -370,7 +389,7 @@ namespace Rise
             warfactory.image = "barracks.png";
             warfactory.buildtime_ms = 250;
             warfactory.buildtime = 250;
-            warfactory.posx = 150;
+            warfactory.posx = 70;
             warfactory.posy = 70;
             warfactory.silver = 3000;
             warfactory.workersrequired = 3;
@@ -394,20 +413,76 @@ namespace Rise
             warfactory.available = true;
             warfactory.army = player.army;
             warfactory.image = "house.png";
-            warfactory.buildtime_ms = 150;
-            warfactory.buildtime = 150;
+            warfactory.buildtime_ms = 90;
+            warfactory.buildtime = 90;
             warfactory.posx = 50;
             warfactory.posy = 70;
-            warfactory.silver = 700;
+            warfactory.silver = 200;
             warfactory.workersrequired = 2;
             warfactory.piecesallowed.Add(worker);
             warfactory.autobuildms = 300;
             warfactory.salary = 4;
             return warfactory;
         }
+        building createstoragehouse(player player)
+        {
+            building warfactory = new building();
+            warfactory.name = "storage house";
+            warfactory.type = type.building;
+            warfactory.generaltype= generaltype.building;
+            warfactory.width = 160;
+            warfactory.height = 160;
+            warfactory.owner = player;
+            warfactory.engine = this;
+            warfactory.health = 60;
+            warfactory.stealth = false;
+            warfactory.maxhealth = 60;
+            warfactory.type = type.building;
+            warfactory.available = true;
+            warfactory.army = player.army;
+            warfactory.image = "storage.png";
+            warfactory.buildtime_ms = 250;
+            warfactory.buildtime = 250;
+            warfactory.posx = 70;
+            warfactory.posy = 30;
+            warfactory.silver = 700;
+            warfactory.workersrequired = 3;
+            warfactory.autobuildms = 300;
+            warfactory.salary = 4;
+            return warfactory;
+        }
+        building createfarm(player player)
+        {
+            building warfactory = new building();//grass
+            warfactory.name = "farm";
+            warfactory.requiredzonename = "grass";
+            warfactory.type = type.building;
+            warfactory.generaltype = generaltype.building;
+            warfactory.width = 190;
+            warfactory.height = 190;
+            warfactory.owner = player;
+            warfactory.engine = this;
+            warfactory.health = 150;
+            warfactory.stealth = false;
+            warfactory.maxhealth =150;
+            warfactory.type = type.building;
+            warfactory.available = true;
+            warfactory.army = player.army;
+            warfactory.image = "farm2.png";
+            warfactory.buildtime_ms = 125;
+            warfactory.buildtime = 125;
+            warfactory.posx = 80;
+            warfactory.posy = 40;
+            warfactory.silver = 350;
+            warfactory.workersrequired = 5;
+            warfactory.autobuildms = 300;
+            warfactory.salary = 6;
+            return warfactory;
+        }
         building createGoldmine(player player)
         {
             building warfactory = new building();
+            warfactory.requiredzonename = "gold";
             warfactory.generaltype = generaltype.building;
             warfactory.width = 150;
             warfactory.height = 150;
@@ -430,6 +505,36 @@ namespace Rise
             warfactory.workersrequired = 10;
             warfactory.salary = 15;
             return warfactory;
+        }
+        mapzone creategoldzone()
+        {
+            mapzone mp = new mapzone("gold", "gold.png",gm.map.mod*4, gm.map.mod*4,this);
+            mp.x = 6000; mp.y = 5000;
+            mp.refusemessage = "Gold mine must be built on gold zone";
+            return mp;
+        }
+        mapzone creategrasszone()
+        {
+            mapzone mp = new mapzone("grass", "grass.png",gm.map.mod*4,gm.map.mod*4,this);
+            mp.x = 7000; mp.y = 5000;
+            mp.refusemessage = "farm must be built on grass zone";
+            return mp;
+        }
+        void fillzone(map mp,mapzone goldzone)
+        {
+            for (int i = 0; i < 30; i++)
+            {
+                for (int j = 0; j < 30; j++)
+                {
+                    var g2 = (mapzone)goldzone.clone();
+                    g2.x = goldzone.x + i * mp.mod;
+                    g2.y = goldzone.y + j * mp.mod;
+                    if (i%4 == 0 && j %4== 0)
+                    {
+                        mp.addmapzone(g2);
+                    }
+                }
+            }
         }
         public void init(int widthresolution,int heightresolution,int realwidth,int realheight,Panel panel3)
         {
@@ -479,9 +584,13 @@ namespace Rise
             var thinbullet=createthinbullet(player);
             var automachine = createautomachine(player,thinbullet);
             var barraks=createbarracks(player);
+            var farm = createfarm(player);
             var sniperbullet = createsniperbullet(thinbullet);
             var sniper = createsniper(player,sniperbullet);
             var rbg = createrbg(player, bullet);
+            var storagehouse = createstoragehouse(player);
+            var goldzone = creategoldzone();
+            var grasszone = creategrasszone();
             barraks.piecesallowed.Add(rbg);
             barraks.piecesallowed.Add(sniper);
             mp.asstes.Add(bullet);
@@ -496,6 +605,12 @@ namespace Rise
             mp.asstes.Add(sniper);
             mp.asstes.Add(sniperbullet);
             mp.asstes.Add(rbg);
+            mp.asstes.Add(storagehouse);
+            mp.asstes.Add(goldzone);
+            mp.asstes.Add(grasszone);
+            mp.asstes.Add(farm);
+            godlmine.favoritemapzone = goldzone;
+            farm.favoritemapzone = grasszone;
             building house = createhouse(player, worker);
             mp.asstes.Add(house);
             var xp = pc;
@@ -503,11 +618,16 @@ namespace Rise
             warfactory.piecesallowed.Add(humvee);
             warfactory.piecesallowed.Add(xp);
             building.buildingsallowed.Add(house);
+            building.buildingsallowed.Add(storagehouse);
+            building.buildingsallowed.Add(farm);
             building.buildingsallowed.Add(godlmine);
             building.buildingsallowed.Add(barraks);
             building.buildingsallowed.Add(warfactory);
            // building.piecesallowed.Add(worker);
             mp.load_resources(realwidth, realheight);
+            fillzone(mp, goldzone);
+            fillzone(mp, grasszone);
+            
             var ppc = pc.clone();
             ppc.army = army.create_usa_army(this);
             ppc.army.teamid = 0;
@@ -548,6 +668,7 @@ namespace Rise
         Bitmap protect;
         Bitmap aggressive;
         Bitmap passive;
+
         void loadassets(Panel panel3)
         {
             stop = new Bitmap("assets/stop.png");
@@ -604,6 +725,10 @@ namespace Rise
 
                 }
                 it.firehit(newxx, newyy);
+                if (it.health < 0)
+                {
+                    return;
+                }
                 if (it.canceledx && it.speedx > 0 == it.newspeedx > 0)
                 {
                     it.newspeedx *= -1;
@@ -635,6 +760,7 @@ namespace Rise
                 }
             }
         }
+        public Random random=new Random();
         public void loadselection(item it, Panel panel3,player pl)
         {
             building b = null;
@@ -642,7 +768,7 @@ namespace Rise
             try
             {
                 b = (building)it;
-                if (it == null||pl!=b.owner||!b.selected)
+                if (it == null||pl!=b.owner||!b.selected||it.army!=pl.army)
                 {
                     throw new Exception("not building");
                 }
@@ -663,12 +789,13 @@ namespace Rise
                         selectedones.Add(item);
                     }
                 }
-                if(selectedones.Count==0) {
+                panel3.Controls.Clear();
+                if (selectedones.Count==0) {
                     return;
                 }
                 int x = 7;
                 int y = 7;
-                panel3.Controls.Clear();
+               
                 for (int i = 0; i < 4; i++)
                 {
                     
@@ -788,8 +915,13 @@ namespace Rise
         public void fill_selection(Panel panel, item it, player pl)
         {
             //try if it is building
+
             try
             {
+                if (!it.selected || it.dead || it.army != pl.army)
+                {
+                    return;
+                }
                 Panel panel2 = null;
                 Panel panel3 = null;
                 foreach (Control control in panel.Controls)
@@ -894,6 +1026,9 @@ namespace Rise
         {
             selecteditems.Clear();
             x += pl.x; y += pl.y;
+            int xp = x / gm.map.mod;
+            int yp = y / gm.map.mod;
+            return gm.map.squares[xp, yp].piecethere;
             item xt = null;
             for (int i = 0; i < gm.map.items.Count; i++)
             {
@@ -921,7 +1056,8 @@ namespace Rise
         long framenum = 0;
         DateTime startmilisecs;
         DateTime lastmillisecs;
-        public  GameEngineManager GameEngineManager ;
+        public  GameEngineManager GameEngineManager;
+      
         public void fill( player pl,ref string message,int resizingframe)
         {
             var bitmap = (Bitmap)gm.map.image.Bitmap.Clone();
@@ -944,9 +1080,30 @@ namespace Rise
             System.Drawing.Rectangle main = new Rectangle(0,0,width,height);
             var g = Graphics.FromImage(bitmap);
 
-            g.SmoothingMode = SmoothingMode.AntiAlias;
-            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            //g.SmoothingMode = SmoothingMode.AntiAlias;
+          //  g.InterpolationMode = InterpolationMode.HighQualityBicubic;
             int shows=0;
+            for (int i = 0; i < gm.map.mapzones.Count; i++)
+            {
+                var a = gm.map.mapzones[i];
+                float xx = (a.x * dt - pl.x) * factow - a.width * 1 * factow * 0;// + a.width * dt * factow;
+                float yy = (a.y * dt - pl.y) * factoh - a.height * 1 * factoh * 0;// + a.height * dt * factow;
+                System.Drawing.Rectangle rect2 = new Rectangle((int)(xx)-90, (int)(yy)-90, (int)(a.width * factow)+90, (int)(a.height * factoh)+90);
+
+                if (rect2.IntersectsWith(main) && !(a.stealth && a.army.teamid != pl.army.teamid && true))//hide stealth units
+                {
+                    a.loadframe.loadframes = (int)framenum;
+                    var btmp = a.load(gm);
+                    xx -= (btmp.Width - a.width) / 2;
+                    yy -= (btmp.Height - a.height) / 2;
+                    draw(btmp, (int)(xx + a.width * Math.Tan(a.direction) * 0), (int)(yy + a.height * Math.Tan(a.direction) * 0), (int)a.z, g);
+                  
+                    shows++;
+
+                }
+            }
+            GFGBuildings GFGBuildings = new GFGBuildings();
+            ld.Sort(GFGBuildings);
             for (int i = 0; i < ld.Count; i++)
             {
 
@@ -954,7 +1111,7 @@ namespace Rise
                 var a = ld[i];
                 if (a.health < 0)
                 {
-                    continue;
+                    //continue;
                 }
                 float xx = (a.x * dt  - pl.x ) * factow-a.width*1*factow*0;// + a.width * dt * factow;
                 float yy = (a.y * dt  - pl.y ) * factoh-a.height*1*factoh*0;// + a.height * dt * factow;
@@ -983,7 +1140,7 @@ namespace Rise
                         drawhealth(1-(a.buildtime_ms+0.0 )/ a.buildtime, (int)((a.x - 15 - pl.x + (int)a.width / 2) * factow), (int)((a.y - pl.y + (int)a.height / 2 - 15) * factoh), 0, (int)(50 * factow * a.width / 150), g,true);
 
                     }
-                    if (a.selected)
+                    if (a.selected&&!a.dead)
                     {
                         drawhealth( a.health / a.maxhealth, (int)((a.x - 15 - pl.x + (int)a.width / 2)*factow), (int)((a.y - pl.y + (int)a.height / 2 - 15)*factoh), 0, (int)(50* factow*a.width/150),g);
                     }
@@ -997,8 +1154,6 @@ namespace Rise
                
                
             }
-            
-            //sp.Stop();
             //explosions and fire
             for(int i=0;i<gm.squaresofinterest.Count;i++)
             {
@@ -1023,7 +1178,7 @@ namespace Rise
 
                         Brush b = new SolidBrush(Color.FromArgb(120-(int)(sz/50.0*100), 250, 50, 0));
                         
-                        Rectangle rect = new Rectangle((int)(sqrc.x+0) * gm.map.mod+ gm.map.mod/2 - pl.x - sz / 2, (int)(sqrc.y+0) * gm.map.mod - pl.y - sz / 2+ gm.map.mod/2, sz, sz);
+                        Rectangle rect = new Rectangle((int)(sqrc.realxx+0)+ gm.map.mod/2 - pl.x - sz / 2, (int)(sqrc.realyy+0)  - pl.y - sz / 2+ gm.map.mod/2, sz, sz);
                         g.FillEllipse(b, rect);
                     }
                     if (sqrc.thinpasses > 1)
@@ -1187,18 +1342,7 @@ namespace Rise
         }
         public void draw( Bitmap bitmp2, int x, int y, int z,Graphics g)
         {
-            //  int width = 800, height = 600;
-
-            // var g = Graphics.FromImage(bitmp1);
-
-            //  g.SmoothingMode = SmoothingMode.AntiAlias;
-            //    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-
-            //  var area = new Rectangle(0, 0, bitmp2.Width/2, bitmp2.Height/2);
-            //  g.FillRectangle(new LinearGradientBrush(area, Color.PaleGoldenrod, Color.OrangeRed, 45), area);
-          //  bitmp2 = resource.SetOpacity(bitmp2, 0.8f);
-            g.DrawImage(bitmp2, new Point(x, y));
-       //     g.Dispose();
+               g.DrawImage(bitmp2, new Point(x, y));
         }
         public void makeorder(int orderid, double ordervalue, int tag)
         {
@@ -1241,12 +1385,22 @@ namespace Rise
             item.orderid=gm.map.items.Count+1;
             item.id=gm.map.items.Count+1;
               var i=countworkers(item.army);
+            int workersadded = 0;
             if (i >= item.workersrequired)
             {
-                for(int j = 0; j < item.workersrequired&&item.workersrequired>0; j++)
+                for(int j = 0; j < workers.Count && item.workersrequired>0; j++)
                 {
-                    item.addworker(workers[j]);
-                    workers[j].health = -1;
+                    if (workers[j].health >= 0)
+                    {
+                        item.addworker(workers[j]);
+                        workers[j].health = -1;
+                        workers[j].deathcount = -1;
+                        workersadded++;
+                    }
+                    if (workersadded >= item.workersrequired)
+                    {
+                        break;
+                    }
                 }
 
                 gm.map.items.Add(item);
@@ -1280,658 +1434,37 @@ namespace Rise
             var xx = item.x + item.width / 2;
             var yy = item.y + item.height / 2;
             var xy = item.basespeed;// MathF.Sqrt(item.speedx *item.speedx + item.speedy * item.speedy);
-            var xy2 = MathF.Sqrt((x - xx) * (x - xx) + (y - yy) * (y - yy));
+            var xminusxx = x - xx;
+            var yminusyy = y - yy;
+            if (Math.Abs(xminusxx) < 1)
+            {
+                if (xminusxx >= 0)
+                {
+                    xminusxx = 1;
+                }
+                else
+                {
+                    xminusxx = -1;
+                }
+            }
+            if (Math.Abs(yminusyy) < 0.1)
+            {
+                if (yminusyy >= 0)
+                {
+                    yminusyy = 1;
+                }
+                else
+                {
+                    yminusyy = -1;
+                }
+            }
+            
+            var xy2 = MathF.Sqrt(xminusxx * xminusxx + yminusyy * yminusyy);
             xy2 = MathF.Max(0.0001f, xy2);
-            item.newspeedx = xy * (x - xx) / xy2;
-            item.newspeedy = xy * (y - yy) / xy2;
+            item.newspeedx = xy * xminusxx / xy2;
+            item.newspeedy = xy * yminusyy / xy2;
         }
     }
  
-
-    public enum building_type { commandcenter, supply, silvergate, goldgate, warfactory, airport, seaport, barracks, defense, power, stockmarket, diplomatic_center, hospital, bank, other }
-    //stock market is an intelligent market where the stock learns by time and increases its winning chances by experience and by safety level and people satsification
-    //diplomatic center is for makong agreements and sending money to alies
-    //bank is responsible for printing money and controling inflation
-    public class GFG : IComparer<square>
-    {
-        public int Compare(square x, square y)
-        {
-            var fg1 = (x.hcost + x.gcost);
-            var fg2 = (y.hcost + y.gcost);
-            
-            
-            
-            if (fg1 == fg2)
-            {
-                fg1 = x.hcost;
-                fg2 = y.hcost;
-            }
-            if (fg1 == fg2)
-            {
-        //        fg1 = x.gcost;
-         //       fg2 = y.gcost;
-            }
-            // CompareTo() method
-            return fg1.CompareTo(fg2);
-        } 
-    
-    }
-    public class GameEngineManager
-    {
-        public GameEngineManager(GameEngine engine, player player, int realwidth, int realheight, int mappicwidth, int mappicheight)
-        {
-            GameEngine = engine;
-            this.player = player;
-            this.realwidth = realwidth;
-            this.realheight = realheight;
-            this.mappicwidth = mappicwidth;
-            this.mappicheight = mappicheight;
-        }
-        int mappicwidth;
-        int mappicheight;
-        GameEngine GameEngine;
-        bool run = true;
-        public int plusx;
-        public int plusy;
-        public int mousex;
-        public int mousey;
-        public int plusz;
-        public int mousemode;
-        public System.Drawing.Bitmap imagetoshowready;
-        Thread thr;
-        Thread thr2;
-        Thread thr3;
-        Thread thr4;
-        Thread thr5;
-        player player;
-        int mapframe = 0;
-        public System.Drawing.Bitmap mappic;
-        int lastcleanup;
-        bool mapreading = false;
-        void readmap()
-        {
-            //  return;
-            while (true)
-            {
-                try
-                {
-                    //  Stopwatch sw = Stopwatch.StartNew();
-                    if (imsleepy || true)
-                    {
-                        mapreading = true;
-                        GameEngine.gm.drawmap(enginespeed,player);
-                        mappic = resource.ResizeImage(GameEngine.gm.mappic, new Size(mappicwidth, mappicheight));
-                        mapreading = false;
-                        if (enginespeed < 64)
-                        {
-                            Thread.Sleep(enginespeed);
-                        }
-                        else
-                        {
-                            Thread.Sleep(30);
-                        }
-                    }
-                    else
-                    {
-                        //   Thread.Sleep(1);
-                    }
-
-                    //  sw.Stop();
-                    //var x = sw.ElapsedMilliseconds;
-                    // GameEngine.gm.drawmap();
-                    //  Thread.Sleep(5);
-                    //  break;
-                    mapframe++;
-                }
-                catch (Exception ex)
-                {
-                    if (mapframe > 5)
-                    {
-                        message = $"(%)Map read error : ' {ex.Message} '";
-                    }
-                    if (ex.Source == "System.Private.CoreLib")
-                    {
-                        break;
-                    }
-                    Thread.Sleep(3);
-                }
-            }
-        }
-        bool imsleepy = false;
-        string msg;
-        public string message {
-            get
-            {
-                return msg;
-            }
-            set { msg = value; GameEngine.fullmessage = 0; }
-        }
-        int restnum = 200;
-        void readimage()
-        {
-            int i = 0;
-            while (true)
-            {
-                try
-                {
-                    imsleepy = false;
-                    player.mousex = mousex; player.mousey = mousey;
-                    try
-                    {
-                        GC.TryStartNoGCRegion(1);
-                    }
-                    catch { }
-
-                    GameEngine.fill(player, ref msg, resizingframe);
-                    imsleepy = true;
-
-                    //  Thread.Sleep(1);
-                    if (i % 3 == 0)
-                    {
-                        Thread.Sleep(1);
-                    }
-                    if (false)
-                    {
-
-                        Thread.Sleep(50);
-                    }
-
-                    if (i % restnum == 0)
-                    {
-
-
-                        Thread.Sleep(20);
-                    }
-                    i++;
-                }
-                catch (Exception ex)
-                {
-
-                    if (ex.Source == "System.Private.CoreLib")
-                    {
-                        break;
-                    }
-                    if (ex.Message == "Out of memory.")
-                    {
-                        GC.Collect();
-                        GC.WaitForPendingFinalizers();
-                        Thread.Sleep(15);
-                    }
-                    message = $"(*)Frame read error : ' {ex.Message} '";
-                    Thread.Sleep(3);
-                }
-            }
-        }
-        int enginespeed;
-        public void setenginespeednext()
-        {
-            switch (enginespeed)
-            {
-                case 0:
-                    enginespeed = 64; break;
-                case 2:
-                    enginespeed = 1;
-                    break;
-                case 1:
-                    enginespeed = 200000000;
-                    break;
-                case 200000000:
-                    thr3.Abort();
-                    thrr = new ThreadStart(runme);
-                    thr3 = new Thread(thrr);
-                    thr3.Start();
-                    enginespeed = 256;
-                    break;
-                case 256:
-                    enginespeed = 128;
-                    break;
-                case 128:
-                    enginespeed = 64;
-                    break;
-                case 64:
-                    enginespeed = 32;
-                    break;
-                case 32:
-                    enginespeed = 16;
-                    break;
-                case 16:
-                    enginespeed = 8;
-                    break;
-                case 8:
-                    enginespeed = 4;
-                    break;
-                case 4:
-                    enginespeed = 2;
-                    break;
-            }
-            message = $"Engine speed set to {Math.Round(64.0 / enginespeed, 3)}x";
-        }
-        int engineframe = 0;
-        bool engineworking;
-        void runme()
-        {
-            GameEngine.GameEngineManager = this;
-            if (run)
-            {
-                //   return;
-                ThreadStart thrr = new ThreadStart(readimage);
-                thr = new Thread(thrr);
-                thr.Start();
-                thr2 = new Thread(() => readmap());
-                thr2.Start();
-            }
-            while (true)
-            {
-                run = false;
-
-                //   try
-                {
-                    engineworking = true;
-                    GameEngine.update(player);
-
-                    engineworking = false;
-                    Thread.Sleep(enginespeed);
-                    engineframe++;
-                }
-                //   catch (Exception ex)
-                {
-                    //     message = $"($)Engine error {ex.Message}";
-                    //   Thread.Sleep(100);
-                }
-
-
-            }
-        }
-        int realwidth;
-        int realheight;
-        void clean()
-        {
-            while (true)
-            {
-                Thread.Sleep(1);
-            }
-        }
-        bool imresizing = false;
-        int resizingframe = 0;
-        int lastresizingframe = 0;
-        void collect()
-        {
-            Thread.Sleep(50);
-            if (notcollecting)
-            {
-                notcollecting = false;
-                GC.Collect(int.MaxValue, GCCollectionMode.Optimized);
-                GC.WaitForPendingFinalizers();
-                notcollecting= true;
-            }
-        }
-        bool notcollecting = true;
-        void resizeandshow()
-        {
-            while (true)
-            {
-                try
-                {
-                    if (imsleepy || true)
-                    {
-                        imresizing = true;
-                        imagetoshowready = resource.ResizeImage(GameEngine.todraw, new Size(realwidth, realheight));
-                        imresizing = false;
-                        if (imsleepy && !imresizing && resizingframe - lastresizingframe > 500 && !engineworking)
-                        {//&&resizingframe==0
-                            Stopwatch sp = new Stopwatch();
-                            sp.Start();
-                        //    GC.Collect();
-                        Task.Run(()=>collect());
-                            if (resizingframe == 0)
-                            { 
-                                //GC.WaitForPendingFinalizers();
-                                }
-                            sp.Stop();
-                            lastresizingframe = resizingframe;
-                            message = $"Cleanup took time {sp.ElapsedMilliseconds} ms";
-                            //    Thread.Sleep(25);
-                        }
-                        else
-                        {
-                            Thread.Sleep(10);
-                        }
-                        resizingframe++;
-
-                    }
-                    else
-                    {
-                        //   Thread.Sleep(3);
-                    }
-                }
-                catch (Exception e)
-                {
-                    if (e.Source == "System.Private.CoreLib")
-                    {
-                        break;
-                    }
-                    Thread.Sleep(5);
-                }
-
-            }
-        }
-        ThreadStart thrr;
-        public void runorclose(bool ifpossible)
-        {
-            if (run)
-            {
-                setenginespeednext();
-                thrr = new ThreadStart(runme);
-                thr3 = new Thread(thrr);
-                thr3.Start();
-                thrr = new ThreadStart(resizeandshow);
-                thr4 = new Thread(thrr);
-                thr4.Start();
-                thrr = new ThreadStart(clean);
-                thr5 = new Thread(thrr);
-             //   thr5.Start();
-                //Task.Run(() => { runme(); });
-            }
-            else if (!ifpossible)
-            {
-                shutdown();
-            }
-        }
-        List<order> orders = new List<order>();
-        public int fx;
-        public int fy;
-        public item selected;
-        public building selected_b;
-        item a;
-        public void cancelselection()
-        {
-            foreach (var it in GameEngine.gm.map.items)
-            {
-                it.selected = false;
-            }
-        }
-        square getnextsquare(int x, int y, item it, int orderid, int plusorminusx,int plusorminusy)
-        {
-            square square = null;// = new square();
-            int modx = ((int)it.squarewidth) / GameEngine.gm.map.mod + 2;
-            x = x / GameEngine.gm.map.mod;
-            y = y / GameEngine.gm.map.mod;
-            var xlen = GameEngine.gm.map.xlen;
-            var ylen = GameEngine.gm.map.ylen;
-            //for (  i += modx * plusorminusx)
-            {
-                for (int j = 0, i = 0; j + y < ylen && j + y >= 0&& i + x < xlen && x + i >= 0; j += modx * plusorminusy, i += modx * plusorminusx)
-                {
-                    var square2 = GameEngine.gm.map.squares[x + i, y + j];
-                    if (square2.issitastarget != orderid&&square2.isavailable(it,null)&&it.checksurroundings(square2,x+i,y+j,null,null))
-                    {
-                        if(square2.piecethere!=null && square2.piecethere.type == type.building)
-                        {
-
-                        }
-                        square2.issitastarget = orderid;
-                        square2.x = x + i;
-                        square2.y = y + j;
-                        return square2;
-                    }
-
-                }
-            }
-            return square;
-        }
-        internal class comparesquares : IComparer<square>
-        {
-            public int targetx;
-            public int targety;
-            public comparesquares(int mousex,int mousey,int mod)
-            {
-                targetx=mousex/mod;
-                targety=mousey/mod;
-            }
-            public int Compare(square x, square y)
-            {
-                float dist1=(float)Math.Abs(Math.Abs(x.x - targetx)+Math.Abs(x.y-targety));
-                float dist2=(float)Math.Abs(Math.Abs(y.x - targetx) + Math.Abs(y.y - targety));
-                return -dist1.CompareTo(dist2);
-            }
-        }
-
-        public void sendorder()
-        {
-            
-            order order = new order();
-          //  GameEngine.selectitems(player, fx, fy, mousex, mousey);
-            item fv = GameEngine.match(mousex, mousey, player);
-            if (selected == null)
-            {
-                //a = GameEngine.match(mousex, mousey, player);
-            }
-            int ise = 0;
-            //x += pl.x; y += pl.y;
-            int nextx = mousex+player.x;
-            int nexty = mousey+player.y;
-            int mx=mousex+player.x;
-            int my=mousey+player.y;
-            if (GameEngine.tobuild != null)
-            {
-                var xxg = player.silver - GameEngine.tobuild.silver;
-                if (xxg < 0)
-                {
-                    message = "Insuffcient funds ";
-                    return;
-                }
-
-                var xb=GameEngine.tobuild.clone();
-                xb.available = false;
-                xb.x = mx - xb.width / 2;
-                xb.y = my - xb.height / 2;
-                xb.health = 1;
-                int w = 0;
-                while (engineworking)
-                {
-                    if (w % 50==0) 
-                    {
-                        Thread.Sleep(1);
-                    }
-                    w++;
-                }
-                xb.canceledx = false;
-                xb.canceledy = false;
-                GameEngine.requestchangeposition(xb);
-                if (xb.canceledx||xb.canceledy)
-                {
-                    message = "Inavailable place to build";
-                    return;
-                }
-                
-               var b=  GameEngine.additem(xb);
-                if (b)
-                {
-                    player.silver = xxg;
-                    GameEngine.tobuild = null;
-                }
-            }
-            int plusorminusx = 1;
-            int plusorminusy = 1;
-            int time=0;
-            void getnext()
-            {
-                switch (time)
-                {
-                    case 0:
-                        plusorminusx=1;
-                        plusorminusy=1;
-                        break;
-                    case 1:
-                        plusorminusx=1;
-                        plusorminusy=-1;
-                        break;
-                    case 2:
-                        plusorminusx=-1;
-                        plusorminusy=1;
-                        break;
-                    case 3:
-                        plusorminusx=1;
-                        plusorminusy=0;
-                        break;
-                    case 4:
-                        plusorminusx=0;
-                        plusorminusy=1;
-                        break;
-                    case 5:
-                        plusorminusx=-1;
-                        plusorminusy=-1;
-                        break;
-                    case 6:
-                        plusorminusx=-1;
-                        plusorminusy=0;
-                        break;
-                    case 7:
-                        plusorminusx=0;
-                        plusorminusy=-1;
-                        break;
-                }
-                if (time == 7)
-                {
-                    time = -1;
-                }
-                time++;
-                
-            }
-            List<item> selecteditems = new List<item>();
-            List<square> selectedsquares = new List<square>();
-            int found = 7;
-            int iss = 0;
-            int cx = mx;int cy= my;
-            void getnextsq()
-            {
-                if(selectedsquares.Count > iss) {
-                    cx = (int)selectedsquares[iss].x * GameEngine.gm.map.mod;
-                    cy = (int)selectedsquares[iss].y * GameEngine.gm.map.mod;
-                }
-                if (iss < selectedsquares.Count)
-                {
-                    iss++;
-                }
-            }
-            for (int i = 0; i < GameEngine.gm.map.items.Count; i++)
-            {
-                var it = GameEngine.gm.map.items[i];
-                if (it.selected&&it.army.owner==player&&it!=fv&&it.type!=type.building)
-                {
-                    if (fv == null)
-                    {
-
-                        square s = null;// getnextsquare(mx, my, it, order.orderid,plusorminus);
-                        int counts = 0;
-                        
-                        while (counts<8)
-                        {
-                            if (found >= 7)
-                            {
-                                getnextsq();
-                                found = 0;
-                            }
-                            found++;
-                            getnext();
-                            if (s == null)
-                            {
-
-                                s = getnextsquare(cx, cy, it, order.orderid, plusorminusx,plusorminusy);
-                                if (s != null)
-                                {
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                break;
-                            }
-                            counts++;
-                        }
-                        if (s != null)
-                        {
-                            
-                            selectedsquares.Add(s);
-                            nextx = (int)s.x * GameEngine.gm.map.mod;
-                            nexty = (int)s.y * GameEngine.gm.map.mod;
-                            //GameEngine.change_direction(it, nextx, nexty, player);
-                            selecteditems.Add(it);
-                        }
-                    }
-                    it.walk = true;
-                    it.target = fv;
-                    it.orderid = order.orderid;
-                    ise++;
-                }
-            }
-            float centerx = 0;
-            float centery = 0;
-            for(int i = 0; i < selecteditems.Count; i++)
-            {
-                centerx += selecteditems[i].x;
-                centery += selecteditems[i].y;
-            }
-            centerx/=selecteditems.Count;
-            centery/=selecteditems.Count;
-            comparesquares comp=new comparesquares((int)centerx, (int)centery,GameEngine.gm.map.mod);
-            selectedsquares.Sort(comp);
-            int pointt = 0;
-            
-            while (selecteditems.Count > 0)
-            {
-                item topcloses = null;
-                float topdist=float.MaxValue;
-                int dx = (int)selectedsquares[pointt].x*GameEngine.gm.map.mod;
-                int dy = (int)selectedsquares[pointt].y*GameEngine.gm.map.mod;
-                for(int i=0;i<selecteditems.Count;i++)
-                {
-                    var dist = selecteditems[i].getdistance(dx,dy);
-                    if (dist < topdist)
-                    {
-                        topdist = dist;
-                        topcloses = selecteditems[i];
-                    }
-                }
-                selecteditems.Remove(topcloses);
-                GameEngine.change_direction(topcloses, dx, dy, player);
-                pointt++;
-            }
-            if (ise == 0)
-            {
-                selected = fv;
-                selected.selected = true;
-              
-            }
-            else
-            {
-                if (selected != null)
-                {
-                    selected.selected = false;
-                    selected = null;
-                }
-            }
-            fx = -1;
-            fy = -1;
-            orders.Add(order);
-            if (selected!=null&& selected.type == type.building)
-            {
-                selected_b = (building)selected;
-               // selected = null;
-            }
-            else
-            {
-                selected_b=null;
-            }
-        }
-        public void shutdown()
-        {
-            thr.Abort();
-            thr2.Abort();
-            thr3.Abort();
-            thr4.Abort();
-            thr5.Abort();
-        }
-    }
 
 }

@@ -33,8 +33,11 @@ namespace Rise
                 if (it.health < 0 || ((it.x <= 0 || it.x > map.width + 300 || it.y <= 0 || it.y > map.height + 300) && it.timed))
                 {
                     map.items[i].die();
-                    map.items.RemoveAt(i);
-                    i--;
+                    if (it.deathcount < 0)
+                    {
+                        map.items.RemoveAt(i);
+                        i--;
+                    }
                     continue;
                 }
                 it.read();
@@ -123,6 +126,27 @@ namespace Rise
             int squares = 0;
             if (true)
             {
+                var gm = this;
+                var dt = 1;
+                var factow = 1;
+                var factoh = 1;
+                var g = Graphics.FromImage(mappic);
+                  for (int i = 0; i < gm.map.mapzones.Count; i++)
+            {
+                var a = gm.map.mapzones[i];
+                float xx = (a.x * dt) * factow - a.width * 1 * factow * 0;// + a.width * dt * factow;
+                float yy = (a.y * dt) * factoh - a.height * 1 * factoh * 0;// + a.height * dt * factow;
+                Rectangle rect2 = new Rectangle((int)(xx)-90, (int)(yy)-90, (int)(a.width * factow)+90, (int)(a.height * factoh)+90);
+                if (!(a.stealth && a.army.teamid != pl.army.teamid && true))//hide stealth units
+                {
+                    var btmp = a.load(gm,true);
+                    xx -= (btmp.Width - a.width) / 2;
+                    yy -= (btmp.Height - a.height) / 2;
+                        g.DrawImage(btmp, (int)(xx + a.width * Math.Tan(a.direction) * 0)/map.mod, (int)(yy + a.height * Math.Tan(a.direction) * 0)/map.mod);//, (int)a.z);
+                }
+            }
+                  g.Dispose();
+                g=null;
                 int skipfactor = dx2;
                 Dictionary<item, int> drawnpieces=new Dictionary<item,int>();
                 for (int i = 0; i < map.xlen; i += skipfactor)

@@ -96,7 +96,7 @@ namespace Rise
                         continue;
                     }
                     var pc = engine.gm.map.squares[i, j].piecethere;
-                    if (pc != null&&pc!=this&&pc.army.teamid!=army.teamid&&!(onlyattacktarget&&pc.generaltype!=targettype)&&!(pc.stealth&&!pc.detected&&waited<patience))
+                    if (pc != null&&pc!=this&&(pc.army.teamid!=army.teamid||name=="sniper")&&!(onlyattacktarget&&pc.generaltype!=targettype)&&!(pc.stealth&&!pc.detected&&waited<patience))
                     {
                         float distm2=(float)Math.Sqrt(Math.Pow(i-xstart,2)+Math.Pow(j-ystart,2));
                         if ((distm2<distm)|| (distm2 == distm && pc.health < lowest))
@@ -114,7 +114,11 @@ namespace Rise
         public override void read()
         {
             base.read();
-            if(waited >= patience&&target!=null&&target.army.teamid==army.teamid)
+            if (!available || dead)
+            {
+                return;
+            }
+            if (waited >= patience&&target!=null&&target.army.teamid==army.teamid)
             {
                 target = null;
                 targetx = -1;
@@ -181,6 +185,10 @@ namespace Rise
                 speedx = newspeedxtimed * change + speedx * (1 - change);
                 speedy = newspeedytimed * change + speedy * (1 - change);
                 goto g;
+            }
+            else
+            {
+                swapingitem = null;
             }
             if (track == tracktype.simple)
             {

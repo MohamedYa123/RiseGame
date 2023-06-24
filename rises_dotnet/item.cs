@@ -14,7 +14,8 @@ namespace Rise
         public float plusopacityframe;
         public int c2 = 0;
         public int c1 = 0;
-        public int getwalkanimation()
+        int deadanimation=-1;
+        public int getwalkanimation(item it)
         {
             if (loadframes -c1>40)
             {
@@ -25,6 +26,16 @@ namespace Rise
             {
                 c2 = 0;
             }
+            if (it.dead)
+            {
+                if (deadanimation != -1)
+                {
+                    return deadanimation ;
+                }
+                int xxg = it.engine.random.Next(2, 5);
+                deadanimation = xxg+1;
+                return xxg+1;
+            }
             return c2+1;
         }
         public void load(bool stealth)
@@ -33,6 +44,7 @@ namespace Rise
             if (!stealth)
             {
                 opacity= 1.0f;
+                return;
             }
             if (loadframes % 1 == 0 && stealth)
             {
@@ -50,6 +62,7 @@ namespace Rise
     }
     public class item
     {
+        
         public List<square> pathsquares = new List<square>();
         public float change = 0.15f;
         public int pointer;
@@ -96,6 +109,8 @@ namespace Rise
         public string name;
         public float power;
         public bool detected=false;
+        public string requiredzonename="";
+        public mapzone favoritemapzone;
         public void firehit( int newx, int newy)
         {
             if (type != type.bullet)
@@ -146,7 +161,7 @@ namespace Rise
                 int dv = 1;
                 if (a.generaltype != targettype)
                 {
-                    dv = 3;
+                    dv = 10;
                 }
                 if (a.z <3||a==target)
                 {
@@ -160,9 +175,17 @@ namespace Rise
             if(workersinside == null) workersinside = new List<item>();
             workersinside.Add(worker);
         }
+        public int deathcount=10;
+        public bool dead = false;
         public void die()
         {
-            if (workersinside != null&&generaltype!=generaltype.infantry)
+            if (type == type.bullet)
+            {
+                deathcount = -1;
+                dead = true;
+                return;
+            }
+            if (deathcount<=0&& workersinside != null&&generaltype!=generaltype.infantry)
             {
                 for (int i = 0; i < workersrequired; i++)
                 {
@@ -170,10 +193,14 @@ namespace Rise
                     worker.health = worker.maxhealth;
                     worker.x = x + width / 2;
                     worker.y = y + height /2;
+                    worker.deathcount = 10;
+                    worker.dead = false;
                    // worker.waited = waited;
                     engine.additem(worker);
                 }
             }
+            dead = true;
+            deathcount--;
         }
         public float getdistance(int mousex,int mousey)
         {
@@ -267,7 +294,7 @@ namespace Rise
         {
             best = startpoint;
             int step = 0;
-            while (step < 300 && !(best == null && step > 0))
+            while (step < 1500 && !(best == null && step > 0))
             {
                 var b = search(best, startpoint, targetpoint);
                 if (b||best!=null&&best.targetpoint)
@@ -440,11 +467,34 @@ namespace Rise
         }
         public float squarewidth
         {
-            get { return MathF.Max(width, height); }
+            get {
+                int dplus = 0;
+                if (type != type.building)
+                {
+                    dplus = 1;
+                }
+                var gg = MathF.Max(width, height);
+                if (gg % engine.gm.map.mod == 0)
+                {
+                    gg++;
+                }
+                return gg+ dplus * engine.gm.map.mod; }
         }
+        public item swapingitem;
         public float squareheight
         {
-            get { return MathF.Max(width, height); }
+            get {
+                int dplus = 0;
+                if (type != type.building)
+                {
+                    dplus = 1;
+                }
+                var gg = MathF.Max(width, height);
+                if(gg% engine.gm.map.mod == 0)
+                {
+                    gg++;
+                }
+                return gg+dplus*engine.gm.map.mod; }
         }
         public int depth;
         public float speedx;
@@ -473,6 +523,7 @@ namespace Rise
         public item clone()
         {
             var x = (item)MemberwiseClone();
+            x.loadframe = new frameload();
             if (x.type == type.building)
             {
                 var b = (building)x;
@@ -485,7 +536,11 @@ namespace Rise
         protected int waited;
         public virtual void read()
         {
-            if (!available)
+            if (timeaway <= 0)
+            {
+                swapingitem = null;
+            }
+            if (!available||dead)
             {
                 return;
             }
@@ -627,21 +682,50 @@ namespace Rise
            // lastbitmap = (Bitmap)it.lastbitmap.Clone();
             it.olddirection = olddirection;
         }
+        public List<Point> gettransparentpoints(Bitmap image)
+        {
+            List<Point> transparentPixels = new List<Point>();
+
+            // Iterate through each pixel in the image
+            for (int y = 0; y < image.Height; y++)
+            {
+                for (int x = 0; x < image.Width; x++)
+                {
+                    Color pixelColor = image.GetPixel(x, y);
+
+                    // Check if the pixel is transparent
+                    if (pixelColor.A == 0)
+                    {
+                        // Add the pixel point to the list
+                        transparentPixels.Add(new Point(x, y));
+                    }
+                }
+            }
+            return transparentPixels;
+        }
         public Bitmap resourcebitmap;
         public Bitmap resourcebitmap2;
-         void prepareresourcebitmap(game gm,bool basic)
+        protected void prepareresourcebitmap(game gm,bool basic,int id4,bool iszone=false)
         {
             int srcid = resourceid;
-            if (walk&&!basic&&resourcesofanimation.Count>0&&true)
+            if (iszone)
+            {
+                resourcebitmap= gm.map.resources[srcid].Bitmap;
+            }
+            
+            if ((walk||dead)&&!basic&&resourcesofanimation.Count>0&&true)
             {
                 try
                 {
-                    srcid = resourcesofanimation[loadframe.getwalkanimation()-1];
+                    srcid = resourcesofanimation[id4-1];
                 }
                 catch { }
             }
             resourcebitmap = (Bitmap)gm.map.resources[srcid].Bitmap.Clone();
-            resourcebitmap2 = (Bitmap)gm.map.resources[srcid].bitmap2.Clone();
+            if (basic)
+            {
+                resourcebitmap2 = (Bitmap)gm.map.resources[srcid].bitmap2.Clone();
+            }
         }
         float anglestep = 5f;
         float opacitystep = 5f;
@@ -652,9 +736,13 @@ namespace Rise
         public int posx = 0;
         public int posy = 0;
         int internalframe=-1;
-        public Bitmap load(game gm, bool basic = false)
+        public bool first=true;
+        public virtual Bitmap load(game gm, bool basic = false)
         {
+            
             internalframe++;
+            string plus = "";
+            
             if (!available)
             {
                 loadframe.opacity = (float)(buildtime- buildtime_ms/2 +0.0)/buildtime;
@@ -673,7 +761,12 @@ namespace Rise
             }
             else
             {
-                loadframe.load(stealth);
+                loadframe.load(stealth||dead);
+            }
+            if (dead)
+            {
+                plus = "dead";
+                loadframe.opacity = deathcount / 10.0f;
             }
             float trx = 1;
             float tryy = 1;
@@ -716,20 +809,30 @@ namespace Rise
             var id2 = (int)Math.Round(z / zstep);
             var id3 = (int)((loadframe.opacity *100)/opacitystep);
             var id4 = 0;
+            if (dead)
+            {
+          //      id3 = 0;
+            }
             if (walk&&resourcesofanimation.Count>0&&!basic&&true)
             {
-                id4 = loadframe.getwalkanimation();
+                id4 = loadframe.getwalkanimation(this);
+            }
+            if (dead)
+            {
+                id4 = loadframe.getwalkanimation(this);
+                plus += id4;
             }
             if (!walk && stealth)
             {
            //     id4 = 3;
             }
-            var sr = gm.map.resources[resourceid].GetSecondresource(id1, id2, id3,id4);
+            var sr = gm.map.resources[resourceid].GetSecondresource(id1, id2, id3,id4,plus);
             if (sr != null&&!basic)
             {
+                first = false;
                 return sr.bitmap;
             }
-            prepareresourcebitmap( gm,basic);
+            prepareresourcebitmap( gm,basic,id4);
             btmp = resourcebitmap;
             if (basic)
             {
@@ -776,11 +879,19 @@ namespace Rise
             }
             if (!basic)
             {
-                gm.map.resources[resourceid].setsecondresource(btmp, id1, id2, id3,id4);
+                gm.map.resources[resourceid].setsecondresource(btmp, id1, id2, id3,id4, plus);
             }
-
+            if (first&&type==type.building)
+            {
+                int w = (int)width / engine.gm.map.mod;
+                int h = (int)height / engine.gm.map.mod;
+                Bitmap btmptimed = resource.ResizeImage(btmp, new Size(w, h));
+                emptypixels = gettransparentpoints(btmptimed);
+            }
+            first = false;
             return btmp;
         }
+        public List<Point> emptypixels= new List<Point>();
         public virtual void load_resouces(game gm,float fw,float fh)
         {
             throw new Exception("");

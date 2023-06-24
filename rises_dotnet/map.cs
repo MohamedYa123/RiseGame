@@ -20,16 +20,32 @@ namespace Rise
         public List<resource> resources = new List<resource>();
         public game gm;
         public List<item> items = new List<item>();
+        public List<mapzone> mapzones = new List<mapzone>();
         public List<item> asstes = new List<item>();
         public square[,] squares;
          public List<item> itemsclonned=new List<item>();
+        public void addmapzone(mapzone zone)
+        {
+            mapzones.Add(zone);
+            var x = (int)zone.x / mod;
+            var y = (int)zone.y / mod;
+            for (int i = x-1; i < x+zone.width/mod+1; i++)
+            {
+                for (int j = y-1; j < y+zone.height / mod+1; j++)
+                {
+                    squares[i, j].mapzone = zone;
+                }
+            }
+        }
         public void cloneitems()
         {
             List<item> itemsclonned2 = new List<item>();
            // itemsclonned.Clear();
             for(int i=0;i<items.Count; i++)
             {
-                itemsclonned2.Add(items[i].clone());
+                var g = items[i].clone();
+                g.loadframe = items[i].loadframe;
+                itemsclonned2.Add(g);
             }
             itemsclonned = itemsclonned2;
         }
@@ -78,6 +94,7 @@ namespace Rise
                 it.timeaway = 2;
             }
             it.sweetswap = sweet;
+            it.swapingitem = null;
             engine.change_direction_direct(it, x, y);
             it.newspeedxtimed = it.newspeedx * -1;
             it.newspeedytimed = it.newspeedy * -1;
@@ -95,8 +112,13 @@ namespace Rise
             var ot = old.newspeedx; var ot2 = old.newspeedy;
             //   it.x -= 1;
             //   it.y -= 1;
+            old.swapingitem= it;
             engine.change_direction_direct(old, (int)it.x + (int)it.width / 2, (int)it.y + (int)it.height / 2);
             old.timeaway = 5;//زمن التباعد
+            if (it.type == type.building)
+            {
+                old.timeaway += 5;
+            }
             old.newspeedxtimed = old.newspeedx * -1;
             old.newspeedytimed = old.newspeedy * -1;
             old.newspeedx = ot;
@@ -121,14 +143,26 @@ namespace Rise
             //  it.newspeedx *= -1;
             //  it.newspeedy *= -1;
         }
+        int tx = 2;
         public void putpieceinsquares(item it)
         {
-
-            for (int i = (int)it.x / mod; i <= (it.x + it.squarewidth) / mod; i++)
+            tx++;
+            int ax = (int)it.x / mod;
+            int ay = (int)it.y / mod;
+            for (int i = 0; i < it.emptypixels.Count; i++)
             {
-                for (int j = (int)it.y / mod; j <= (it.y + it.squareheight) / mod; j++)
+                var point = it.emptypixels[i];
+                squares[ax + point.X, ay + point.Y].oid = tx;//removing building from empty squares
+            }
+            for (int i = (int)it.x / mod; i < (int)(it.x + it.squarewidth) / mod; i++)
+            {
+                for (int j = (int)it.y / mod; j < (int)(it.y + it.squareheight) / mod; j++)
                 {
                     if (i >= xlen || j >= ylen)
+                    {
+                        continue;
+                    }
+                    if(squares[i, j].oid == tx)
                     {
                         continue;
                     }
@@ -142,12 +176,14 @@ namespace Rise
                     if (old != null &&old.leader!=it&& true && old.type != type.bullet && it.type != type.bullet)
                     {
                         swapaway(old, it, true);
-
                     }
                     squares[i, j].piecethere = it;
                 }
             }
+           
+           
         }
+        int test = 11;
         public bool accept(item it, float newx, float newy, float newz,bool moving=false)
         {
             
@@ -184,15 +220,27 @@ namespace Rise
             int tt = 0;
             int tf = 0;
             bool minimum;
-            for (int i = nx - safzone / mod; i < (newx + it.squarewidth) / mod + safzone / mod; i++)
+            int ax = nx - safzone / mod;
+            int ay = ny - safzone / mod;
+            for (int i = 0; i < it.emptypixels.Count; i++)
             {
-                for (int j = ny - safzone; j < (newy + it.squareheight) / mod + safzone / mod; j++)
+                var point = it.emptypixels[i];
+                squares[ax + point.X, ay + point.Y].oid2 = test;//removing building from empty squares
+            }
+
+            for (int i = ax; i < (int)(it.squarewidth) / mod + nx + safzone / mod; i++)
+            {
+                for (int j = ay; j < (int)(it.squareheight) / mod+ ny + safzone / mod; j++)
                 {
+                   
                     if (i < 0 || j < 0 || i >= xlen || j >= ylen)
                     {
                         return false;
                     }
-
+                    if (squares[i, j].oid2 == test)
+                    {
+                        continue;
+                    }
                     if (!squares[i, j].accept(it, this,timeaway,moving))
                     {
                         tf++;
@@ -201,10 +249,13 @@ namespace Rise
                     tt++;
                 }
             }
+            
+            
             if (tf > tt * 0.1)
             {
                 return false;
             }
+            test++;
             return true;
         }
         public float factorw;
