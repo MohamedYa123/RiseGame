@@ -15,14 +15,14 @@ namespace Rise
         public int c2 = 0;
         public int c1 = 0;
         int deadanimation=-1;
-        public int getwalkanimation(item it)
+        public int getwalkanimation(item it,int walklengthanimation,int walknum)
         {
-            if (loadframes -c1>40)
+            if (loadframes -c1> walklengthanimation)
             {
                 c2 ++;
                 c1 = loadframes;
             }
-            if (c2 > 1)
+            if (c2 > walknum-1)
             {
                 c2 = 0;
             }
@@ -111,6 +111,23 @@ namespace Rise
         public bool detected=false;
         public string requiredzonename="";
         public mapzone favoritemapzone;
+        public string comment = "";
+        public bool working;
+        public bool alwayswalk;
+        public float centerx
+        {
+            get
+            {
+                return x+width/2;
+            }
+        }
+        public float centery
+        {
+            get
+            {
+                return y+height/2;
+            }
+        }
         public void firehit( int newx, int newy)
         {
             if (type != type.bullet)
@@ -151,7 +168,16 @@ namespace Rise
                         done = true;
                     }
                 }
-               
+                if(a != null)
+                {
+                    if(comment=="sniper bullet")
+                    {
+                        if (a.generaltype != generaltype.infantry)
+                        {
+                            return;
+                        }
+                    }
+                }
                 if (targettype != generaltype.infantry)
                 {
                     engine.gm.map.squares[newx, newy].Explosion = 150;
@@ -170,13 +196,27 @@ namespace Rise
                 }
             }
         }
-        public void addworker(item worker)
+        public void addworker(item worker,bool assign=true)
         {
             if(workersinside == null) workersinside = new List<item>();
-            workersinside.Add(worker);
+            if (assign)
+            {
+                worker.target = this;
+            }
+            worker.rangeofattack = 0;// width / 18;
+            worker.working= true;
+            if (generaltype != generaltype.building)
+            {
+                worker.disapear();
+            }
+            if (!assign)
+            {
+                workersinside.Add(worker);
+            }
         }
         public int deathcount=10;
         public bool dead = false;
+        public int walkanimationnums=2;
         public void die()
         {
             if (type == type.bullet)
@@ -195,6 +235,7 @@ namespace Rise
                     worker.y = y + height /2;
                     worker.deathcount = 10;
                     worker.dead = false;
+                    worker.working = false;
                    // worker.waited = waited;
                     engine.additem(worker);
                 }
@@ -338,6 +379,10 @@ namespace Rise
                 // product = 5;
                 // return true;
             } }
+            if (doubleme)
+            {
+                return true;
+            }
             var xlen = engine.gm.map.xlen - 1;
             var ylen = engine.gm.map.ylen - 1;
             if (engine.gm.map.squares[x, y].startpoint|| engine.gm.map.squares[x, y].targetpoint)
@@ -511,14 +556,96 @@ namespace Rise
         float olddirection;
         public string sound = "";
         public bool selected;
-        public float health;
+        float Health;
+        public float health
+        {
+            get
+            {
+                return Health;
+            }
+            set
+            {
+                if (value < 0)
+                {
+
+                }
+                Health = value;
+                if (Health >= 0)
+                {
+                    buildin = false;
+                }
+            }
+        }
         public float maxhealth;
         public bool timed = false;
         public int buildtime_ms = 1000;
         public int buildtime;
         public bool available=true;
-        public bool walk = true;
-        public item target = null;
+        bool Walk=true;
+        public bool walk {
+            get
+            {
+                return Walk;
+            }
+            set
+            {
+                Walk= value;
+                if (!value&&comment=="worker"&&target!=null&&rangeofattack==0&&working)
+                {
+                    if (target.workersinside != null && target.workersinside.Contains(this))
+                    {
+                        disapear();
+                    }
+                }
+            }
+        }
+        item Target = null;
+        public item target
+        {
+            get { return Target; }
+            set {
+                
+                
+                if (value != null)
+                {
+                    if (comment == "worker")
+                    {
+                        if (value.owner == owner&&value.workersinside!=null)
+                        {
+                            for(int i = 0; i < value.workersinside.Count; i++)
+                            {
+                                if(value.workersinside.Count == value.workersrequired)
+                                {
+                                    var worker = value.workersinside[i];
+                                    if (!worker.buildin)
+                                    {
+                                        value.workersinside.Remove(worker);
+                                        engine.stopwalk(worker);
+                                        worker.free();
+                                        break;
+                                    }
+                                }
+                             
+                            }
+                            value.addworker(this,false);
+                        }
+                    }
+                }
+                else if(target != null) 
+                {
+                    if(target.workersinside != null)
+                    {
+                        target.workersinside.Remove(this);
+                    }
+                }
+                Target = value;
+
+            }
+        }
+        void free()
+        {
+            working = false;
+        }
         public float rangeofattack;
         public item clone()
         {
@@ -534,11 +661,43 @@ namespace Rise
         }
         int readframe = 0;
         protected int waited;
+        bool doneworking;
+        public bool buildin;
+        public void disapear()
+        {
+            buildin = true;
+            health = -1;
+            deathcount = -1;
+        }
         public virtual void read()
         {
+            if (type == type.bullet)
+            {
+
+            }
+            if(!walk&&target!=null)
+            {
+                if (target.owner == owner)
+                {
+                    if (!target.available)
+                    {
+                    //    target.buildtime_ms-=1;
+                    //    target.health += maxhealth / buildtime;
+                    }
+                }
+            }
             if (timeaway <= 0)
             {
                 swapingitem = null;
+            }
+            if (available&&!doneworking&&workersinside!=null)
+            {
+                foreach(var worker in workersinside)
+                {
+                    // worker.health = -1;
+                   //  worker.deathcount = -1;
+                }
+                doneworking = true;
             }
             if (!available||dead)
             {
@@ -579,6 +738,19 @@ namespace Rise
                     army = new army(engine);
                     army.armycolor = Color.White;
                     mode = piecemode.agressive;
+                    if (comment=="worker") {
+                        //if (rangeofattack == 0)
+                        {
+                            rangeofattack = 150;
+                            power = 10;
+                        }
+                        var pc=(piece)this;
+                       // if (pc.maxbullets == 0)
+                        {
+                            pc.maxbullets = 1;
+                        }
+                        power = 10;
+                    }
                     engine.stopwalk(this);
                 }
             }
@@ -713,7 +885,7 @@ namespace Rise
                 resourcebitmap= gm.map.resources[srcid].Bitmap;
             }
             
-            if ((walk||dead)&&!basic&&resourcesofanimation.Count>0&&true)
+            if ((walk||dead||alwayswalk)&&!basic&&resourcesofanimation.Count>0&&id4!=0)
             {
                 try
                 {
@@ -735,9 +907,12 @@ namespace Rise
         public static float pi = (float)Math.PI;
         public int posx = 0;
         public int posy = 0;
+        public int poswidth=-1;
+        public int posheight=-1;
         int internalframe=-1;
         public bool first=true;
-        public virtual Bitmap load(game gm, bool basic = false)
+        public int walklengthanimation=120;
+        public virtual Bitmap load(game gm, bool basic = false,int lastms=1)
         {
             
             internalframe++;
@@ -805,6 +980,10 @@ namespace Rise
             {
                 anglestep = 1;
             }
+            if (type == type.air)
+            {
+                anglestep = 1;
+            }
             var id1 = (int)Math.Round( directionindegrees/ anglestep);
             var id2 = (int)Math.Round(z / zstep);
             var id3 = (int)((loadframe.opacity *100)/opacitystep);
@@ -813,13 +992,13 @@ namespace Rise
             {
           //      id3 = 0;
             }
-            if (walk&&resourcesofanimation.Count>0&&!basic&&true)
+            if ((walk||alwayswalk)&&resourcesofanimation.Count>0&&!basic&&true)
             {
-                id4 = loadframe.getwalkanimation(this);
+                id4 = loadframe.getwalkanimation(this, walklengthanimation/lastms,walkanimationnums);
             }
             if (dead)
             {
-                id4 = loadframe.getwalkanimation(this);
+                id4 = loadframe.getwalkanimation(this, walklengthanimation/lastms, walkanimationnums);
                 plus += id4;
             }
             if (!walk && stealth)
@@ -830,6 +1009,7 @@ namespace Rise
             if (sr != null&&!basic)
             {
                 first = false;
+                shadowbitmap = sr.shadowbitmap;
                 return sr.bitmap;
             }
             prepareresourcebitmap( gm,basic,id4);
@@ -841,14 +1021,21 @@ namespace Rise
             if (!basic && type != type.bullet)
             {
                 int tz = 1;
+                if (poswidth == -1)
+                {
+                    poswidth = btmp.Width / 10;
+                }
+                if (posheight == -1)
+                {
+                    posheight = btmp.Height / 10;
+                }
                 if (type == type.building)
                 {
-                    tz = 0;
-                    gm.drawsquare(btmp, posx, posy, army.armycolor, btmp.Width / 10);
+                    gm.drawsquare(btmp, posx, posy, army.armycolor,poswidth,false,posheight);
                 }
                 else
                 {
-                    gm.drawsquare(btmp, 0 + (btmp.Width / 2 - btmp.Width / 20) * tz, 0 + btmp.Height / 2 * tz, army.armycolor, btmp.Width / 10);
+                    gm.drawsquare(btmp, 0 + (btmp.Width / 2 - btmp.Width / 20) * tz, 0 + btmp.Height / 2 * tz, army.armycolor, poswidth,false,posheight);
                 }
             }
             if (true)
@@ -877,11 +1064,17 @@ namespace Rise
                     btmp = resource.SetOpacity(btmp, loadframe.opacity);
                 }
             }
+            Bitmap shadow=null;
+            if(type==type.air||true)
+            {
+                shadow=resource.GenerateShadowImage(btmp,loadframe.opacity);
+            }
             if (!basic)
             {
-                gm.map.resources[resourceid].setsecondresource(btmp, id1, id2, id3,id4, plus);
+                
+                gm.map.resources[resourceid].setsecondresource(btmp,shadow, id1, id2, id3,id4, plus);
             }
-            if (first&&type==type.building)
+            if (first&&(type==type.building||true))
             {
                 int w = (int)width / engine.gm.map.mod;
                 int h = (int)height / engine.gm.map.mod;
@@ -889,8 +1082,10 @@ namespace Rise
                 emptypixels = gettransparentpoints(btmptimed);
             }
             first = false;
+            shadowbitmap = shadow;
             return btmp;
         }
+        public Bitmap shadowbitmap;
         public List<Point> emptypixels= new List<Point>();
         public virtual void load_resouces(game gm,float fw,float fh)
         {

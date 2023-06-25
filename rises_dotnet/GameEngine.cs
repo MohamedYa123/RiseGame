@@ -218,6 +218,8 @@ namespace Rise
         piece createworker(player player)
         {
             piece worker = new piece();
+            worker.comment = "worker";
+            worker.name = "worker";
             worker.patience = 20;
             worker.generaltype = generaltype.infantry;
             worker.type = type.worker;
@@ -240,15 +242,70 @@ namespace Rise
             //make worker able to attack
             worker.shot_time_ms = 30;
             worker.reloadtime_ms = 20;
-            worker.power = 5;
-            worker.maxbullets = 1;
-            worker.rangeofattack = 150;
+            worker.power = 0;
+            worker.maxbullets = 0;
+            worker.rangeofattack = 0;
             worker.silver = 100;
             worker.imagesofanimations.Add(0, "animations/h2.png");
             worker.imagesofanimations.Add(1, "animations/h3.png");
             worker.imagesofanimations.Add(2, "animations/dead1.png");
             worker.imagesofanimations.Add(3, "animations/dead2.png");
             worker.imagesofanimations.Add(4, "animations/dead3.png");
+            return worker;
+        }
+        piece createhelicopter(player player)
+        {
+            piece worker = new piece();
+            worker.type = type.air;
+            worker.comment = "helicopter";
+            worker.name = "helicopter";
+            worker.patience = 140;
+            worker.generaltype = generaltype.plane;
+           // worker.type = type.worker;
+            worker.salary = 6;
+            worker.basespeed = 16;
+            worker.image = "helicopterx2.png";
+            worker.width = 100;
+            worker.height = 150;
+            worker.walklengthanimation = 17;
+            worker.buildtime = 150;
+            worker.buildtime_ms = 150;
+            worker.stealth = true;
+            worker.owner = player;
+            worker.army = player.army;
+            worker.engine = this;
+            worker.x = 5700;
+            worker.y = 5000;
+            worker.health = 10;
+            worker.maxhealth = 10;
+            worker.track = tracktype.full;
+            //make worker able to attack
+            worker.shot_time_ms = 5;
+            worker.reloadtime_ms = 50;
+            worker.power = 20;
+            worker.maxbullets = 3;
+            worker.rangeofattack = 350;
+            worker.silver = 900;
+            worker.workersrequired = 3;
+            worker.alwayswalk = true;
+            worker.targettype = generaltype.vehicle;
+            worker.walkanimationnums = 2;
+         //   worker.change = 0.95f;
+            worker.imagesofanimations.Add(0, "animations/helicopterx1.png");
+            worker.imagesofanimations.Add(1, "animations/helicopterx2.png");
+            // worker.imagesofanimations.Add(2, "animations/helicopter3.png");
+            // worker.imagesofanimations.Add(3, "animations/helicopter4.png");
+            //  worker.imagesofanimations.Add(4, "animations/helicopter5.png");
+            //  worker.imagesofanimations.Add(5, "animations/helicopter6.png");
+            //  worker.imagesofanimations.Add(6, "animations/helicopter7.png");
+            //  worker.imagesofanimations.Add(7, "animations/helicopter8.png");
+            //   worker.imagesofanimations.Add(2, "animations/helicopter3.png");
+            //  worker.imagesofanimations.Add(2, "animations/dead1.png");
+            //  worker.imagesofanimations.Add(3, "animations/dead2.png");
+            //  worker.imagesofanimations.Add(4, "animations/dead3.png");
+            worker.change = 0.25f;
+            worker.poswidth = 5;
+            worker.posheight = 10;
             return worker;
         }
         piece createrbg(player player, piece bullet)
@@ -259,6 +316,7 @@ namespace Rise
             worker.type = type.worker;
             worker.salary = 2;
             worker.basespeed = 7;
+            worker.name = "rbg man";
             worker.image = "rpg.png";
             worker.width = 30;
             worker.height = 30;
@@ -322,7 +380,7 @@ namespace Rise
             worker.reloadtime_ms = 10;
             worker.power = 11;
             worker.maxbullets = 1;
-            worker.rangeofattack = 450;
+            worker.rangeofattack = 750;
             worker.silver = 700;
             worker.basicdirection = 270;
             worker.armedbullet = bullet;
@@ -342,8 +400,9 @@ namespace Rise
         piece createsniperbullet(piece thinbullet)
         {
             var p = (piece)thinbullet;
+            p.comment = "sniper bullet";
             p.onlyattacktarget = true;
-            p.basespeed = 70;
+            p.basespeed = 120;
             p.width =3;
             p.height=9;
             return p;
@@ -363,8 +422,9 @@ namespace Rise
             warfactory.available = true;
             warfactory.army = player.army;
             warfactory.image = "war factory.png";
-            warfactory.buildtime_ms = 500;
-            warfactory.buildtime = 500;
+            warfactory.name = "war factory";
+            warfactory.buildtime_ms = 500*5;
+            warfactory.buildtime = 500*5;
             warfactory.posx = 150;
             warfactory.posy = 70;
             warfactory.silver = 3000;
@@ -387,8 +447,9 @@ namespace Rise
             warfactory.available = true;
             warfactory.army = player.army;
             warfactory.image = "barracks.png";
-            warfactory.buildtime_ms = 250;
-            warfactory.buildtime = 250;
+            warfactory.name = "barracks";
+            warfactory.buildtime_ms = 250 * 3;
+            warfactory.buildtime = 250 * 3;
             warfactory.posx = 70;
             warfactory.posy = 70;
             warfactory.silver = 3000;
@@ -413,8 +474,8 @@ namespace Rise
             warfactory.available = true;
             warfactory.army = player.army;
             warfactory.image = "house.png";
-            warfactory.buildtime_ms = 90;
-            warfactory.buildtime = 90;
+            warfactory.buildtime_ms = 90*2;
+            warfactory.buildtime = 90*2;
             warfactory.posx = 50;
             warfactory.posy = 70;
             warfactory.silver = 200;
@@ -441,8 +502,8 @@ namespace Rise
             warfactory.available = true;
             warfactory.army = player.army;
             warfactory.image = "storage.png";
-            warfactory.buildtime_ms = 250;
-            warfactory.buildtime = 250;
+            warfactory.buildtime_ms = 250*3;
+            warfactory.buildtime = 250*3;
             warfactory.posx = 70;
             warfactory.posy = 30;
             warfactory.silver = 700;
@@ -455,11 +516,12 @@ namespace Rise
         {
             building warfactory = new building();//grass
             warfactory.name = "farm";
+            warfactory.comment = "farm";
             warfactory.requiredzonename = "grass";
             warfactory.type = type.building;
             warfactory.generaltype = generaltype.building;
-            warfactory.width = 190;
-            warfactory.height = 190;
+            warfactory.width = 290;
+            warfactory.height = 290;
             warfactory.owner = player;
             warfactory.engine = this;
             warfactory.health = 150;
@@ -469,20 +531,22 @@ namespace Rise
             warfactory.available = true;
             warfactory.army = player.army;
             warfactory.image = "farm2.png";
-            warfactory.buildtime_ms = 125;
-            warfactory.buildtime = 125;
-            warfactory.posx = 80;
-            warfactory.posy = 40;
+            warfactory.buildtime_ms = 125*5;
+            warfactory.buildtime = 125*5;
+            warfactory.posx = (int)(147*290/190.0);
+            warfactory.posy = (int)(60*290/190.0);
             warfactory.silver = 350;
             warfactory.workersrequired = 5;
             warfactory.autobuildms = 300;
             warfactory.salary = 6;
+            warfactory.foodproduction = 1000;
             return warfactory;
         }
         building createGoldmine(player player)
         {
             building warfactory = new building();
             warfactory.requiredzonename = "gold";
+            warfactory.name = "gold mine";
             warfactory.generaltype = generaltype.building;
             warfactory.width = 150;
             warfactory.height = 150;
@@ -495,8 +559,8 @@ namespace Rise
             warfactory.available = true;
             warfactory.army = player.army;
             warfactory.image = "gold mine.png";
-            warfactory.buildtime_ms = 200;
-            warfactory.buildtime = 200;
+            warfactory.buildtime_ms = 2000;
+            warfactory.buildtime = 2000;
             warfactory.posx = 85;
             warfactory.posy = 30;
             warfactory.silver = 1500;
@@ -509,19 +573,22 @@ namespace Rise
         mapzone creategoldzone()
         {
             mapzone mp = new mapzone("gold", "gold.png",gm.map.mod*4, gm.map.mod*4,this);
-            mp.x = 6000; mp.y = 5000;
+            mp.x = 6000; mp.y = 5500;
             mp.refusemessage = "Gold mine must be built on gold zone";
             return mp;
         }
         mapzone creategrasszone()
         {
             mapzone mp = new mapzone("grass", "grass.png",gm.map.mod*4,gm.map.mod*4,this);
-            mp.x = 7000; mp.y = 5000;
+            mp.x = 7000; mp.y = 5500;
             mp.refusemessage = "farm must be built on grass zone";
+            mp.imagesofanimations.Add(1, "grass_short.png");
+            mp.imagesofanimations.Add(2, "grass_full.png");
             return mp;
         }
         void fillzone(map mp,mapzone goldzone)
         {
+            var gz = goldzone.width/gm.map.mod;
             for (int i = 0; i < 30; i++)
             {
                 for (int j = 0; j < 30; j++)
@@ -529,7 +596,7 @@ namespace Rise
                     var g2 = (mapzone)goldzone.clone();
                     g2.x = goldzone.x + i * mp.mod;
                     g2.y = goldzone.y + j * mp.mod;
-                    if (i%4 == 0 && j %4== 0)
+                    if (i%gz == 0 && j %gz== 0)
                     {
                         mp.addmapzone(g2);
                     }
@@ -548,7 +615,6 @@ namespace Rise
             player.army.owner = player;
             var worker = createworker(player);
             //
-         
             //
             building building = new building();
             building.generaltype = generaltype.building;
@@ -571,6 +637,7 @@ namespace Rise
             building.army = player.army;
             building.posx = 190;
             building.posy = 150;
+            building.comment = "cmd";
             var pc = createTank(player);
            var bullet=createbullet(player);
             player.name = "medo";
@@ -591,6 +658,11 @@ namespace Rise
             var storagehouse = createstoragehouse(player);
             var goldzone = creategoldzone();
             var grasszone = creategrasszone();
+            var helicopterstealth=createhelicopter(player);
+            helicopterstealth.silver = 1300;
+            helicopterstealth.name = "Stealth helicopter";
+            var helicopter=createhelicopter(player);
+            helicopter.stealth = false;
             barraks.piecesallowed.Add(rbg);
             barraks.piecesallowed.Add(sniper);
             mp.asstes.Add(bullet);
@@ -609,6 +681,8 @@ namespace Rise
             mp.asstes.Add(goldzone);
             mp.asstes.Add(grasszone);
             mp.asstes.Add(farm);
+            mp.asstes.Add(helicopter);
+            mp.asstes.Add(helicopterstealth);
             godlmine.favoritemapzone = goldzone;
             farm.favoritemapzone = grasszone;
             building house = createhouse(player, worker);
@@ -617,6 +691,8 @@ namespace Rise
             warfactory.piecesallowed.Add(automachine);
             warfactory.piecesallowed.Add(humvee);
             warfactory.piecesallowed.Add(xp);
+            warfactory.piecesallowed.Add(helicopter);
+            warfactory.piecesallowed.Add(helicopterstealth);
             building.buildingsallowed.Add(house);
             building.buildingsallowed.Add(storagehouse);
             building.buildingsallowed.Add(farm);
@@ -768,7 +844,7 @@ namespace Rise
             try
             {
                 b = (building)it;
-                if (it == null||pl!=b.owner||!b.selected||it.army!=pl.army)
+                if (it == null||pl!=b.owner||it.army!=pl.army)
                 {
                     throw new Exception("not building");
                 }
@@ -891,7 +967,7 @@ namespace Rise
                     picture.Top = y;
                     picture.Width = panel3.Width / 3 - 7;
                     picture.SizeMode = PictureBoxSizeMode.Zoom;
-                    drawhealth( 1 - (float)a.buildtime_ms / a.buildtime, picture.Width / 2 - 25, picture.Height / 2, 0, (int)(50*(a.width/80)),g);
+                    drawhealth( 1 - (float)a.buildtime_ms / a.buildtime, picture.Width / 2 - 25, picture.Height / 2, 0, (int)(50*(100/80)),g);
                     picture.Image = btmp;
                     panel3.Controls.Add(picture);
                     x += picture.Width + 5;
@@ -912,13 +988,18 @@ namespace Rise
 
         }
        public  building tobuild;
+        public Panel ppanel;
         public void fill_selection(Panel panel, item it, player pl)
         {
             //try if it is building
-
+            ppanel = panel;
             try
             {
-                if (!it.selected || it.dead || it.army != pl.army)
+                if (it != null)
+                {
+                    fill_selection(panel, null, pl);
+                }
+                if ((!it.selected&&it.comment!="cmd") || it.dead || it.army != pl.army)
                 {
                     return;
                 }
@@ -939,29 +1020,67 @@ namespace Rise
                     return;
                 }
                 int left = panel2.Left + panel2.Width + 80;
+                //panel.Controls.Clear();
+                //panel.Controls.Clear();
                 foreach (var a in b.piecesallowed)
                 {
                     PictureBox pic = new PictureBox();
                     pic.SizeMode = PictureBoxSizeMode.Zoom;
                    // a.prepareresourcebitmap(gm);
-                    pic.Image = (Bitmap)a.load(gm, true).Clone();
+                    var btmp = (Bitmap)a.load(gm, true).Clone();
+                    
                     pic.Height = panel.Height;
                     pic.Left = left;
                     left += pic.Width + 10;
-                  //  pic.BackColor = Color.Red;
+                    //  pic.BackColor = Color.Red;
+                    //  btmp = resource.ResizeImage(btmp, new Size(pic.Width, pic.Height));
+                    string s = "";
+                    if (a.workersrequired > 1)
+                    {
+                        s = "s";
+                    }
+                    using (Graphics g = Graphics.FromImage(btmp))
+                    {
+                        g.InterpolationMode=InterpolationMode.HighQualityBicubic;
+                        g.DrawString($"{char.ToUpper(a.name[0]) + a.name.Substring(1)}", new Font("tahoma",10,FontStyle.Bold), Brushes.Gold, 0, 0);
+                        g.DrawString($"{a.silver}$", new Font("tahoma",14,FontStyle.Bold), Brushes.Gold, 0, 15);
+                        if (a.workersrequired > 1)
+                        {
+                            g.DrawString($"{a.workersrequired} worker{s}", new Font("tahoma", 14, FontStyle.Bold), Brushes.Yellow, 0, 35);
+                        }
+                    }
+                    pic.Image = btmp;
                     pic.Click += delegate
                     {
                         b.adddpiece((piece)a.clone());
                         //    this.additem(a.clone());
                     };
+                    
                     panel.Controls.Add(pic);
                 }
                 foreach (var a in b.buildingsallowed)
                 {
                     PictureBox pic = new PictureBox();
                     pic.SizeMode = PictureBoxSizeMode.Zoom;
-                   // a.prepareresourcebitmap(gm);
-                    pic.Image = (Bitmap)a.load(gm, true).Clone();
+                    // a.prepareresourcebitmap(gm);
+                    var btmp = (Bitmap)a.load(gm, true).Clone();
+                    string s = "";
+                    if (a.workersrequired > 1)
+                    {
+                        s = "s";
+                    }
+                    using (Graphics g = Graphics.FromImage(btmp))
+                    {
+                        g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                        g.DrawString($"{char.ToUpper(a.name[0]) + a.name.Substring(1)}", new Font("tahoma", 10, FontStyle.Bold), Brushes.Gold, 0, 0);
+                        g.DrawString($"{a.silver}$", new Font("tahoma", 14, FontStyle.Bold), Brushes.Gold, 0, 15);
+                        if (a.workersrequired > 1)
+                        {
+                            g.DrawString($"{a.workersrequired} worker{s}", new Font("tahoma", 14, FontStyle.Bold), Brushes.Yellow, 0, 35);
+                        }
+                    }
+                    pic.Image = btmp;
+
                     pic.Height = panel.Height;
                     pic.Left = left;
                     left += pic.Width + 10;
@@ -1020,6 +1139,12 @@ namespace Rise
                     a.selected = false;
                 }
             }
+          //  GameEngineManager.selected = null;
+           // GameEngineManager.selected_b = null;
+            if (ppanel != null)
+            {
+                fill_selection(ppanel, null, player);
+            }
             return lista;
         }
         public item match(int x, int y, player pl)
@@ -1058,7 +1183,7 @@ namespace Rise
         DateTime lastmillisecs;
         public  GameEngineManager GameEngineManager;
       
-        public void fill( player pl,ref string message,int resizingframe)
+        public void fill( player pl,ref string message,int resizingframe,int lastms)
         {
             var bitmap = (Bitmap)gm.map.image.Bitmap.Clone();
             lastmillisecs =DateTime.Now;
@@ -1097,7 +1222,6 @@ namespace Rise
                     xx -= (btmp.Width - a.width) / 2;
                     yy -= (btmp.Height - a.height) / 2;
                     draw(btmp, (int)(xx + a.width * Math.Tan(a.direction) * 0), (int)(yy + a.height * Math.Tan(a.direction) * 0), (int)a.z, g);
-                  
                     shows++;
 
                 }
@@ -1116,20 +1240,43 @@ namespace Rise
                 float xx = (a.x * dt  - pl.x ) * factow-a.width*1*factow*0;// + a.width * dt * factow;
                 float yy = (a.y * dt  - pl.y ) * factoh-a.height*1*factoh*0;// + a.height * dt * factow;
                 System.Drawing.Rectangle rect2=new Rectangle((int)(xx),(int)(yy),(int)(a.width*factow),(int)(a.height*factoh));
-                
+               
                 if (rect2.IntersectsWith(main)&&!(a.stealth&&a.army.teamid!=pl.army.teamid&&true))//hide stealth units
                 {
                     a.loadframe.loadframes = (int)framenum;
-                    var btmp= a.load(gm);
+                    var btmp= a.load(gm,false,lastms);
                     xx -= (btmp.Width - a.width) / 2;
                     yy -= (btmp.Height - a.height) / 2;
-                    int negx = (int)(a.width * a.z / 20 / 2 * 3*factow);//بيغير موضع الرسمة علشان الطيران
-                    int negy = (int)(a.height * a.z / 20 / 2 * 3*factoh);
                     if (a.type != type.building)
                     {
                         xx -= 5;
                         yy -= 5;
                     }
+                    if (a.type == type.air||true)
+                    {
+                        var btmpshadow = a.shadowbitmap;// resource.GenerateShadowImage(btmp);
+                        if(btmpshadow == null)
+                        {
+
+                        }
+                        int psx = 120;
+                        int psy = 120;
+                        if (a.type != type.air)
+                        {
+                            psx = (int)(a.width/5.0);
+                            psy =  (int)(a.width / 10.0);
+                            psx=Math.Min(10, psx);
+                            psy=Math.Min(10, psy);
+                        }
+                        if (!a.stealth||a.type==type.air)
+                        {
+                            draw(btmpshadow, (int)(xx + a.width * Math.Tan(a.direction) * 0 + psx), (int)(yy + a.height * Math.Tan(a.direction) * 0 + psy), (int)a.z, g);
+                        }
+                    }
+                   
+                    int negx = (int)(a.width * a.z / 20 / 2 * 3*factow);//بيغير موضع الرسمة علشان الطيران
+                    int negy = (int)(a.height * a.z / 20 / 2 * 3*factoh);
+                  
                //     g.TranslateTransform(xx+a.width/2 - negx, yy+a.height/2 - negy);
                //     g.TranslateTransform(-a.width/2,-a.height/2);
                     draw( btmp, (int)(xx +a.width* Math.Tan(a.direction)*0) , (int)(yy+a.height*Math.Tan(a.direction)*0) , (int)a.z,g);
@@ -1260,7 +1407,7 @@ namespace Rise
                 var btmp = b.load(gm);
                 draw(btmp, (int)(GameEngineManager.mousex-b.width/2), (int)(GameEngineManager.mousey-b.height/2), (int)b.z, g);
             }
-            // drawnight(g, bitmap, 0);
+          //   drawnight(g, bitmap, 1f);
             if ((lastmillisecs - onesecdate).TotalMilliseconds >= 1000)
             {
                 onesecdate = lastmillisecs;
@@ -1271,8 +1418,7 @@ namespace Rise
             //   makenormallight(g, 400, 200, 400, 400);
             //   drawnight(g, bitmap, 1.9f);
             gm.drawstring(bitmap, $"{Math.Round(shotframe+0.0, 2)} fps objects on screen : {shows} out of {ld.Count}", 0, 0, Color.Aqua, 10);
-            gm.drawstring(bitmap, $"silver : {pl.silver}", 400, 0, Color.LightGreen, 10);
-            gm.drawstring(bitmap, $"gold : {pl.gold}", 750, 0, Color.Gold, 10);
+            gm.drawstring(bitmap, $"Silver : {pl.silver,6}        Gold :{pl.gold,6}        Food :{pl.food,6} ", 400, 0, Color.LightGreen, 15);
             if (message != ""&& fullmessage < 6)
             {
                 gm.drawstring(bitmap, $"{message}", 0, 20, Color.Red, 10);
@@ -1307,7 +1453,7 @@ namespace Rise
         void drawnight(Graphics g,Bitmap bitmap,float nightfactor)
         {
             Rectangle rectangle = new Rectangle(0, 0, bitmap.Width, bitmap.Height);
-            Color ccl = Color.FromArgb((int)(125*nightfactor), 0, 0, 0);
+            Color ccl = Color.FromArgb((int)(225*nightfactor), 0, 0, 0);
         //    ccl = Color.FromArgb((int)(200), 250, 250, 150);//bomb effect
             g.FillRectangle(new SolidBrush(ccl), rectangle);
         }
@@ -1386,15 +1532,19 @@ namespace Rise
             item.id=gm.map.items.Count+1;
               var i=countworkers(item.army);
             int workersadded = 0;
+            GFGworkers gFGworkers = new GFGworkers();
+            gFGworkers.xi = item.centerx;
+            gFGworkers.yi = item.centery;
+            workers.Sort(gFGworkers);
             if (i >= item.workersrequired)
             {
                 for(int j = 0; j < workers.Count && item.workersrequired>0; j++)
                 {
-                    if (workers[j].health >= 0)
+                    if (workers[j].health >= 0 && !workers[j].working)
                     {
                         item.addworker(workers[j]);
-                        workers[j].health = -1;
-                        workers[j].deathcount = -1;
+                      //  workers[j].health = -1;
+                      //  workers[j].deathcount = -1;
                         workersadded++;
                     }
                     if (workersadded >= item.workersrequired)
@@ -1402,7 +1552,11 @@ namespace Rise
                         break;
                     }
                 }
-
+                if (workersadded < item.workersrequired)
+                {
+                    GameEngineManager.message = "workers needed !";
+                    return false;
+                }
                 gm.map.items.Add(item);
                 return true;
             }

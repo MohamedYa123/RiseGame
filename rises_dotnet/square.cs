@@ -206,6 +206,11 @@ namespace Rise
         }
         public bool isavailable(item it, item target)
         {
+            if (it.type == type.air)
+            {
+                available= true;
+                return true;
+            }
             if (piecethere == null || piecethere.health < 0 || piecethere == it || piecethere == target || piecethere.type == type.bullet || it.type == type.bullet ||(piecethere.type!=type.building&&it.army==piecethere.army))
             {
                 if (piecethere != null)
@@ -222,7 +227,19 @@ namespace Rise
         public int oid;
         public bool accept(item it, map mp,bool timeaway,bool moving=false)
         {
+            if (it.type == type.air)
+            {
+                return true;
+            }
             //||it.orderid==piecethere.orderid
+            if (piecethere == it.target && piecethere != null && it.comment == "worker")
+            {
+                //it.disapear();
+            }
+            if (piecethere!=null&& piecethere.workersinside != null && piecethere.workersinside.Count > 0 && piecethere.workersinside.Contains(it))
+            {
+                return true;
+            }
             if (mapzone != null && mapzone.isitsolid)
             {
                 return false;

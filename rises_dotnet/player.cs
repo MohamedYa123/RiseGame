@@ -15,15 +15,18 @@ namespace Rise
         public int fy = -1;
         public string name = "";
         public int id;
+        //resources //
         public float silver;
         public float gold;
+        public float iron;
+        public float rock;
+        public float food;
+        public float wood;
+        //
         public double debt_gold;
         public double debt_silver;
         public double inflationlevel;
-        public int iron;
-        public int rock;
-        public int food;
-        public int wood;
+        
         public int team;
         public List<debt> debts = new List<debt>();
         public army army;

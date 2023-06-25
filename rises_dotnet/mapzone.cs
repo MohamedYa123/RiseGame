@@ -29,15 +29,34 @@ namespace Rise
             it.height = height + 5;
             it.engine = engine;
             resourceid= gm.map.load_resource("assets/mapzones/" + image, "", name, it, 1, 1);
+            foreach(var item in imagesofanimations)
+            {
+               var srcid=  gm.map.load_resource("assets/mapzones/" + item.Value, "", name, it, 1, 1);
+                resourcesofanimation.Add(srcid);
+            }
             type = type.air;
         }
-        public override Bitmap load(game gm, bool basic = false)
+        public float length;
+        public override Bitmap load(game gm, bool basic = false, int lastms = 1)
         {
             if(basic)
             {
                 return gm.map.resources[resourceid].minibitmap;
             }
-             prepareresourcebitmap(gm, false, 0,true);
+            int id4 = 0;
+            if (length < 100)
+            {
+                id4 = 1;
+            }
+            else if (length < 300)
+            {
+                id4 = 0;
+            }
+            else if(length < 700)
+            {
+                id4=2;
+            }
+             prepareresourcebitmap(gm, false, id4,true);
             return resourcebitmap;
         }
     }

@@ -62,6 +62,8 @@ namespace Rise
         }
         public int autobuildms = 0;
         int frames = 0;
+        public float farmmode=-1;
+        public float foodproduction;
         public override void read()
         {
             if ( dead)
@@ -69,6 +71,22 @@ namespace Rise
                 return;
             }
             base.read();
+            if (name == "farm"&&available)
+            {
+                farmmode++;
+                if (farmmode > 700)
+                {
+                    farmmode = 0;
+                   
+                }
+                if (farmmode > 300&& farmmode % 25==0)
+                {
+                    if (owner != null)
+                    {
+                        owner.food +=(float)Math.Round( foodproduction/(700-300)*25);
+                    }
+                }
+            }
             walk = false;
             if (buildtime_ms <= 0)
             {
@@ -76,8 +94,30 @@ namespace Rise
             }
             if (!available)
             {
-                buildtime_ms -= 1;
-                health+=maxhealth/buildtime;
+                int wi = workersinside.Count;
+                int cc = 0;
+                foreach(var worker in workersinside)
+                {
+                    if (worker.buildin)
+                    {
+                        cc++;
+                    }
+                }
+                buildtime_ms -= 1*cc;
+                health+=maxhealth/buildtime*cc;
+                if (cc < workersrequired)
+                {
+                    buildtime_ms = Math.Max(1, buildtime_ms);
+                    health = Math.Min(maxhealth-1, health);
+                }
+                if (health > maxhealth)
+                {
+                    health = maxhealth;
+                }
+                if (buildtime_ms <0)
+                {
+                    buildtime_ms = 0;
+                }
                 return;
             }
             if (owner != null)

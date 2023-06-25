@@ -127,6 +127,7 @@ namespace Rise
             //  old.newspeedy *= -1;
             ot = it.newspeedx; ot2 = it.newspeedy;
             it.timeaway = 5;
+            it.swapingitem = old;
             engine.change_direction_direct(it, (int)old.x - (int)old.width / 2, (int)old.y - (int)old.height / 2);
             it.newspeedxtimed = it.newspeedx * -1;
             it.newspeedytimed = it.newspeedy * -1;
@@ -146,6 +147,10 @@ namespace Rise
         int tx = 2;
         public void putpieceinsquares(item it)
         {
+            if (it.type == type.air)
+            {
+                return;
+            }
             tx++;
             int ax = (int)it.x / mod;
             int ay = (int)it.y / mod;
@@ -153,6 +158,12 @@ namespace Rise
             {
                 var point = it.emptypixels[i];
                 squares[ax + point.X, ay + point.Y].oid = tx;//removing building from empty squares
+            }
+            bool timeaway = false;
+            if (it.timeaway > 0)
+            {
+                timeaway = true;
+                // return true;
             }
             for (int i = (int)it.x / mod; i < (int)(it.x + it.squarewidth) / mod; i++)
             {
@@ -162,8 +173,13 @@ namespace Rise
                     {
                         continue;
                     }
-                    if(squares[i, j].oid == tx)
+                    if (squares[i, j].mapzone != null && it.available && it.type == type.building)
                     {
+                        squares[i, j].mapzone.length = ((building)it).farmmode;
+                    }
+                    if (squares[i, j].oid == tx)
+                    {
+                        
                         continue;
                     }
                     var old = squares[i, j].piecethere;
@@ -173,7 +189,7 @@ namespace Rise
                         continue;
                     }
                     //&&old.orderid!=it.orderid
-                    if (old != null &&old.leader!=it&& true && old.type != type.bullet && it.type != type.bullet)
+                    if (!squares[i, j].accept(it,this,timeaway))//old != null &&old.leader!=it&& true && old.type != type.bullet && it.type != type.bullet)
                     {
                         swapaway(old, it, true);
                     }
@@ -284,7 +300,7 @@ namespace Rise
             resources.Add(rsc);
             return resources.Count - 1;
         }
-        public int mod = 20;//بيقسم مربعات الخريطة لمربعات أكبر علشان يوفر وقت في البروسيسنج
+        public int mod = 30;//بيقسم مربعات الخريطة لمربعات أكبر علشان يوفر وقت في البروسيسنج
         public int safzone = 0;
         public int xlen;
         public int ylen;

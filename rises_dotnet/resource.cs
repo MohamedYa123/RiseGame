@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,6 +27,7 @@ namespace Rise
             {
                 if(imgToResize.Size == size)
                 {
+                    //return imgToResize;
                     return (Bitmap)imgToResize.Clone();
                 }
                 Bitmap b = new Bitmap(size.Width, size.Height);
@@ -54,8 +56,35 @@ namespace Rise
                 return null;
             }
         }
+      
+        public static Bitmap GenerateShadowImage(Image image,float opacity)
+        {
+            //  int shadowSize = 10; // Adjust the shadow size as needed
+            Bitmap bitmap = (Bitmap)image.Clone(); //new Bitmap(image.Width, image.Height);
+            if (opacity >=1.0f)
+            {
+                opacity = 2.0f;
+            }
+            for (int y = 0; y < bitmap.Height; y++)
+            {
+                for (int x = 0; x < bitmap.Width; x++)
+                {
+                    Color pixelColor = bitmap.GetPixel(x, y);
+                    if (pixelColor.A > 0)
+                    {
+                     
+                        bitmap.SetPixel(x, y, Color.FromArgb((int)(50*opacity), 0, 0, 0));
+                    }
+                }
+            }
 
-    public static Bitmap RotateAndCropBitmap(Bitmap bitmap, float angle,type type)
+
+            //   ApplyShadowEffect(shadowImage, shadowSize);
+
+            return bitmap;
+        }
+
+        public static Bitmap RotateAndCropBitmap(Bitmap bitmap, float angle,type type)
     {
             if (type == type.building)
             {
@@ -187,11 +216,11 @@ namespace Rise
                 return null;    
             }
         }
-        public void setsecondresource(Bitmap btmp,int resourceoption1, int resourceoption2, int resourceoption3,int resourceoption4, string plus)
+        public void setsecondresource(Bitmap btmp,Bitmap shadow,int resourceoption1, int resourceoption2, int resourceoption3,int resourceoption4, string plus)
         {
             try
             {
-                secondresource sr = new secondresource(btmp);
+                secondresource sr = new secondresource(btmp,shadow);
                 string key = $"{resourceoption1.ToString("000")}{resourceoption2.ToString("000")}{resourceoption3.ToString("000")}{resourceoption4.ToString("000")}{plus}";
                 if (secondresources.ContainsKey(key))
                 {
@@ -237,9 +266,11 @@ namespace Rise
     public class secondresource
     {
         public Bitmap bitmap;
-        public secondresource(Bitmap bitmap)
+        public Bitmap shadowbitmap;
+        public secondresource(Bitmap bitmap, Bitmap shadowbitmap)
         {
             this.bitmap = (Bitmap)bitmap.Clone();
+            this.shadowbitmap = shadowbitmap;
         }
     }
 }

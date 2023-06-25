@@ -87,6 +87,7 @@ namespace Rise
             float lowest = float.MaxValue;
             item targetpc = null;
             float distm = float.MaxValue;
+            //owner.silver = 500000;
             for (int i = xstart - spx; i < xstart + spx; i++)
             {
                 for(int j = ystart - spx; j < ystart + spx; j++)
@@ -96,7 +97,7 @@ namespace Rise
                         continue;
                     }
                     var pc = engine.gm.map.squares[i, j].piecethere;
-                    if (pc != null&&pc!=this&&(pc.army.teamid!=army.teamid||name=="sniper")&&!(onlyattacktarget&&pc.generaltype!=targettype)&&!(pc.stealth&&!pc.detected&&waited<patience))
+                    if (pc != null&&pc!=this&&(pc.army.teamid!=army.teamid||name=="sniper2")&&!(onlyattacktarget&&pc.generaltype!=targettype)&&!(pc.stealth&&!pc.detected&&waited<patience))
                     {
                         float distm2=(float)Math.Sqrt(Math.Pow(i-xstart,2)+Math.Pow(j-ystart,2));
                         if ((distm2<distm)|| (distm2 == distm && pc.health < lowest))
@@ -495,6 +496,7 @@ namespace Rise
                     pathsquares.Clear();
                     pointer = -1;
                     walk = false;
+                    
 
                 }
                 else

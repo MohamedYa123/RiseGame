@@ -28,8 +28,8 @@ namespace Rise
             for (int i = 0; i < map.items.Count; i++)
             {
                 var it = map.items[i];
-                it.health -= 0.005f;
-                it.health += 0.005f;
+                //it.health -= 0.005f;
+               // it.health += 0.005f;
                 if (it.health < 0 || ((it.x <= 0 || it.x > map.width + 300 || it.y <= 0 || it.y > map.height + 300) && it.timed))
                 {
                     map.items[i].die();
@@ -280,21 +280,25 @@ namespace Rise
             g.DrawString(s, f, b, x, y);
             //sp.Stop();
         }
-        public void drawsquare(Bitmap bitmp1, int x, int y, Color cl, int size = 1, bool circle = false)
+        public void drawsquare(Bitmap bitmp1, int x, int y, Color cl, int size = 1, bool circle = false,int size2=-1)
         {
             var g = Graphics.FromImage(bitmp1);
 
             g.SmoothingMode = SmoothingMode.AntiAlias;
             g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            if (size2 == -1)
+            {
+                size2 = size;
+            }
           //  g.DrawRectangle(Pens.LightCyan, x, y, 1, 1);
             var b = new SolidBrush(cl);
             if (circle)
             {
-                g.FillEllipse(b, x - 5, y - 5, size, size);
+                g.FillEllipse(b, x - 5, y - 5, size, size2);
             }
             else
             {
-                g.FillRectangle(b, x, y, size, size);
+                g.FillRectangle(b, x, y, size, size2);
             }
             //  g.DrawRectangle(Pens.White, x, y, (int)size, (float)size / 50 * 8 + 1);
             // var b = new SolidBrush(Color.FromArgb(20, (byte)(255 * (1 - width / 100)), (byte)(155 * (width / 100)), 0));

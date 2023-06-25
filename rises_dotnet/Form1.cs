@@ -143,10 +143,14 @@ namespace Rise
             {
                 lista.Clear();
                 selcted = null;
-                selected_b = null;
-                GameEngine.fill_selection(panel2, selcted, player);
+                selected_b = GameEngine.gm.map.items[0];
+               
+               // selected_b.selected= true;
+                
                 GameEngine.tobuild = null;
                 GameEngine.selectitems(player, -1, -1, -1, -1);
+                GameEngineManager.selected = (building)selected_b;
+                GameEngine.fill_selection(panel2, GameEngineManager.selected, player);
                 return;
             }
             if (rightclick)
@@ -156,7 +160,7 @@ namespace Rise
             }
             item a = null;
 
-            item fv = GameEngine.match(GameEngineManager.mousex, GameEngineManager.mousey, player);
+         //   item fv = GameEngine.match(GameEngineManager.mousex, GameEngineManager.mousey, player);
            
             try
             {

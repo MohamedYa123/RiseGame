@@ -57,6 +57,14 @@ namespace Rise
         {
             var fg1 = (0);
             var fg2 = (0);
+            if(x.type== type.air)
+            {
+                fg1 = 700;
+            }
+            if(y.type== type.air)
+            {
+                fg2 = 700;
+            }
             if (x.type == type.building)
             {
                 fg1 = 500;
@@ -65,6 +73,19 @@ namespace Rise
             {
                 fg2 = 500;
             }
+
+            return fg1.CompareTo(fg2);
+        }
+
+    }
+    public class GFGworkers : IComparer<item>
+    {
+        public  float xi; public float yi;
+        public int Compare(item x, item y)
+        {
+            var fg1 = Math.Sqrt(Math.Pow(x.centerx-xi,2)+Math.Pow(x.centery-yi,2));
+            var fg2 = Math.Sqrt(Math.Pow(y.centerx-xi,2)+Math.Pow(y.centery-yi,2));
+            
 
             return fg1.CompareTo(fg2);
         }
@@ -80,6 +101,7 @@ namespace Rise
             this.realheight = realheight;
             this.mappicwidth = mappicwidth;
             this.mappicheight = mappicheight;
+            selected = null;
         }
         int mappicwidth;
         int mappicheight;
@@ -165,6 +187,7 @@ namespace Rise
         void readimage()
         {
             int i = 0;
+            int lastms = 0;
             while (true)
             {
                 try
@@ -176,15 +199,24 @@ namespace Rise
                         GC.TryStartNoGCRegion(1);
                     }
                     catch { }
+                    Stopwatch sp = new Stopwatch();
+                    sp.Start();
+                    GameEngine.fill(player, ref msg, resizingframe,lastms);
 
-                    GameEngine.fill(player, ref msg, resizingframe);
+                    imresizing = true;
+                   // imagetoshowready = resource.ResizeImage(GameEngine.todraw, new Size(realwidth, realheight));
+                    imresizing = false;
                     imsleepy = true;
 
+                    sp.Stop();
+                    lastms = (int)sp.ElapsedMilliseconds+1;
+                  //  message = $"lastms : {lastms}";
                     //  Thread.Sleep(1);
-                    if (i % 5 == 0)
+                    if (i % 1 == 0&&lastms<12)
                     {
-                        Thread.Sleep(1);
+                        Thread.Sleep(2);
                     }
+                 
                     if (false)
                     {
 
@@ -195,7 +227,7 @@ namespace Rise
                     {
 
 
-                        Thread.Sleep(20);
+                       // Thread.Sleep(20);
                     }
                     i++;
                 }
@@ -349,7 +381,7 @@ namespace Rise
                         }
                         else
                         {
-                            Thread.Sleep(10);
+                            Thread.Sleep(1);
                         }
                         resizingframe++;
 
@@ -395,7 +427,26 @@ namespace Rise
         List<order> orders = new List<order>();
         public int fx;
         public int fy;
-        public item selected;
+        item sc;
+        public item selected
+        {
+            get
+            {
+                return sc;
+            }
+            set
+            {
+                sc = value;
+                if (value == null)
+                {
+                    sc = GameEngine.gm.map.items[0];
+                    if (GameEngine.ppanel != null)
+                    {
+                      //  GameEngine.fill_selection(GameEngine.ppanel, sc, player);
+                    }
+                }
+            }
+        } 
         public building selected_b;
         item a;
         public void cancelselection()
@@ -667,8 +718,9 @@ namespace Rise
             {
                 if (selected != null)
                 {
-                    selected.selected = false;
-                    selected = null;
+              //      selected.selected = false;
+                  //  selected = null;
+                    sc = null;
                 }
             }
             fx = -1;
