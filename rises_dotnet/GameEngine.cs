@@ -234,8 +234,8 @@ namespace Rise
             worker.owner = player;
             worker.army = player.army;
             worker.engine = this;
-            worker.x = 5700;
-            worker.y = 5000;
+            worker.x = 1700;
+            worker.y = 500;
             worker.health = 10;
             worker.maxhealth = 10;
             worker.track = tracktype.full;
@@ -378,7 +378,7 @@ namespace Rise
             //make worker able to attack
             worker.shot_time_ms = 10;
             worker.reloadtime_ms = 10;
-            worker.power = 11;
+            worker.power = 20;
             worker.maxbullets = 1;
             worker.rangeofattack = 750;
             worker.silver = 700;
@@ -564,7 +564,7 @@ namespace Rise
             warfactory.posx = 85;
             warfactory.posy = 30;
             warfactory.silver = 1500;
-            warfactory.producesmoney = 5;
+            warfactory.producesmoney = 25;
             warfactory.owner = player;  
             warfactory.workersrequired = 10;
             warfactory.salary = 15;
@@ -573,14 +573,14 @@ namespace Rise
         mapzone creategoldzone()
         {
             mapzone mp = new mapzone("gold", "gold.png",gm.map.mod*4, gm.map.mod*4,this);
-            mp.x = 6000; mp.y = 5500;
+            mp.x = 1500; mp.y = 1000;
             mp.refusemessage = "Gold mine must be built on gold zone";
             return mp;
         }
         mapzone creategrasszone()
         {
             mapzone mp = new mapzone("grass", "grass.png",gm.map.mod*4,gm.map.mod*4,this);
-            mp.x = 7000; mp.y = 5500;
+            mp.x = 2500; mp.y = 1000;
             mp.refusemessage = "farm must be built on grass zone";
             mp.imagesofanimations.Add(1, "grass_short.png");
             mp.imagesofanimations.Add(2, "grass_full.png");
@@ -622,8 +622,8 @@ namespace Rise
             building.width = 400;
             building.height = 400;
             building.owner = player;
-            building.x = 5000;
-            building.y = 5000;
+            building.x = 500;
+            building.y = 500;
          //   building.stealth = true;
             building.engine = this;
             building.stealth = false;

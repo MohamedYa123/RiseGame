@@ -87,11 +87,15 @@ namespace Rise
             {
              //   return;
             }
-            it.timeaway = 4;
+            it.timeaway = Math.Max(4,it.timeaway);
+            if (!it.walk)
+            {
+                it.timeaway = 15;
+            }
             if (sweet)
             {
                // return;
-                it.timeaway = 2;
+              //  it.timeaway = Math.Max(2,it.timeaway);
             }
             it.sweetswap = sweet;
             it.swapingitem = null;

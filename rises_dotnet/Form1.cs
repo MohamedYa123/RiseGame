@@ -24,6 +24,7 @@ namespace Rise
         GameEngine GameEngine=new GameEngine();
         GameEngineManager GameEngineManager;
         player player;
+        PictureBox pic = new PictureBox();
         private void Form1_Load(object sender, EventArgs e)
         {
             particleSystem = new ParticleSystem();
@@ -31,6 +32,12 @@ namespace Rise
             player = GameEngine.gm.players[0];
             GameEngineManager = new GameEngineManager(GameEngine,player,pictureBox1.Width,pictureBox1.Height,pictureBox2.Width,pictureBox2.Height);
             GameEngineManager.runorclose(true);
+            pic.Image = new Bitmap("loading.png");
+            pic.BackColor = Color.Black;
+            pic.SizeMode=PictureBoxSizeMode.Zoom;
+            pic.Dock = DockStyle.Fill;
+          //  Controls.Add(pic);
+          //  pic.BringToFront();
         }
         int timx = 3;
         int timy = 3;
