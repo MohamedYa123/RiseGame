@@ -112,7 +112,7 @@ namespace Rise
             pc.type = type.vehicle;
             pc.rangeofattack = 300f;
             pc.targettype = generaltype.infantry;
-            pc.change = 0.8f;
+            pc.change = 0.3f;
             //pc.onlyattacktarget = true;
          //   pc.basicdirection = 90;
             return pc;
@@ -944,11 +944,11 @@ namespace Rise
             while (b.selected)
             {
 
-                panel3.Controls.Clear();
+                
                 //let's fill panel3
                 int x = 7;
                 int y = 7;
-
+                List<Control> cls = new List<Control>();
                 for (int i = 0; i < b.pieces_tobuild.Count; i++)
                 {
                     var ass= b.pieces_tobuild[i];
@@ -971,7 +971,7 @@ namespace Rise
                     picture.SizeMode = PictureBoxSizeMode.Zoom;
                     drawhealth( 1 - (float)a.buildtime_ms / a.buildtime, picture.Width / 2 - 25, picture.Height / 2, 0, (int)(50*(100/80)),g);
                     picture.Image = btmp;
-                    panel3.Controls.Add(picture);
+                    
                     x += picture.Width + 5;
                  //   picture.BackColor = Color.Red;
                     if (x >= panel3.Width / 3 * 3 - 7 * 3)
@@ -983,7 +983,10 @@ namespace Rise
                     {
                         b.removepiece(ass);
                     };
+                    cls.Add(picture);
                 }
+                panel3.Controls.Clear();
+                panel3.Controls.AddRange(cls.ToArray());
                 break;
                 Thread.Sleep(100);
             }
@@ -1024,11 +1027,7 @@ namespace Rise
             ppanel = panel;
             try
             {
-                if (it != null)
-                {
-                    clear(pl);
-                    
-                }
+               
                 if ((!it.selected&&it.comment!="cmd") || it.dead || it.army != pl.army)
                 {
                     return;
@@ -1052,6 +1051,7 @@ namespace Rise
                 int left = panel2.Left + panel2.Width + 30;
                 //panel.Controls.Clear();
                 //panel.Controls.Clear();
+                List<Control> cls = new List<Control>();
                 foreach (var a in b.piecesallowed)
                 {
                     PictureBox pic = new PictureBox();
@@ -1075,7 +1075,7 @@ namespace Rise
                     };
                     btmp = a.load2(btmp, pic.Width, pic.Height);
                     pic.Image = btmp;
-                    panel.Controls.Add(pic);
+                    cls.Add(pic);
                 }
                 foreach (var a in b.buildingsallowed)
                 {
@@ -1099,8 +1099,14 @@ namespace Rise
                     };
                     btmp = a.load2(btmp, pic.Width, pic.Height);
                     pic.Image = btmp;
-                    panel.Controls.Add(pic);
+                    cls.Add(pic);
                 }
+                if (it != null)
+                {
+                    clear(pl);
+
+                }
+                panel.Controls.AddRange(cls.ToArray());
                 //  Task.Run(() => {
 
                 //}//);
@@ -1150,10 +1156,14 @@ namespace Rise
                     a.selected = false;
                 }
             }
-            GameEngineManager.selected_b = null;
+            
             if (tt == null)
             {
                 tt = lastitem;
+            }
+            else
+            {
+                GameEngineManager.selected_b = null;
             }
           //  GameEngineManager.selected = null;
            // GameEngineManager.selected_b = null;
@@ -1161,7 +1171,7 @@ namespace Rise
             {
                 if (fx != -1)
                 {
-                    clear(player);
+             //       clear(player);
                 }
                
                 fill_selection(ppanel, tt, player);
