@@ -927,6 +927,7 @@ namespace Rise
                     panel3.Controls.Add(picture);
                     picture.BackColor = l;
                     x += picture.Width + 5;
+                    picture.BorderStyle= BorderStyle.Fixed3D;
                     //   picture.BackColor = Color.Red;
                     if (x >= panel3.Width / 3 * 3 - 7 * 3)
                     {
@@ -966,6 +967,7 @@ namespace Rise
                     picture.Left = x;
                     picture.Top = y;
                     picture.Width = panel3.Width / 3 - 7;
+                    picture.BorderStyle= BorderStyle.FixedSingle;
                     picture.SizeMode = PictureBoxSizeMode.Zoom;
                     drawhealth( 1 - (float)a.buildtime_ms / a.buildtime, picture.Width / 2 - 25, picture.Height / 2, 0, (int)(50*(100/80)),g);
                     picture.Image = btmp;
@@ -989,15 +991,43 @@ namespace Rise
         }
        public  building tobuild;
         public Panel ppanel;
+        public item lastitem;
+        void clear(player pl)
+        {
+            var panel = ppanel;
+            List<Control> controls = new List<Control>();
+            foreach (Control c in panel.Controls)
+            {
+                if (!c.Name.Contains("panel"))
+                {
+                    controls.Add(c);
+                }
+            }
+            foreach (Control c in controls)
+            {
+                panel.Controls.Remove(c);
+            }
+            fill_selection(panel, null,pl );
+        }
         public void fill_selection(Panel panel, item it, player pl)
         {
+            if (it == null) 
+            {
+                return;
+            }
+            if (it == lastitem)
+            {
+                return;
+            }
+            lastitem = it;
             //try if it is building
             ppanel = panel;
             try
             {
                 if (it != null)
                 {
-                    fill_selection(panel, null, pl);
+                    clear(pl);
+                    
                 }
                 if ((!it.selected&&it.comment!="cmd") || it.dead || it.army != pl.army)
                 {
@@ -1019,7 +1049,7 @@ namespace Rise
                 {
                     return;
                 }
-                int left = panel2.Left + panel2.Width + 80;
+                int left = panel2.Left + panel2.Width + 30;
                 //panel.Controls.Clear();
                 //panel.Controls.Clear();
                 foreach (var a in b.piecesallowed)
@@ -1028,34 +1058,23 @@ namespace Rise
                     pic.SizeMode = PictureBoxSizeMode.Zoom;
                    // a.prepareresourcebitmap(gm);
                     var btmp = (Bitmap)a.load(gm, true).Clone();
-                    
-                    pic.Height = panel.Height;
+
+                    pic.Width = 150;
+                    pic.Top = 7;
+                    pic.Height = panel.Height - 15;
                     pic.Left = left;
                     left += pic.Width + 10;
-                    //  pic.BackColor = Color.Red;
-                    //  btmp = resource.ResizeImage(btmp, new Size(pic.Width, pic.Height));
-                    string s = "";
-                    if (a.workersrequired > 1)
-                    {
-                        s = "s";
-                    }
-                    using (Graphics g = Graphics.FromImage(btmp))
-                    {
-                        g.InterpolationMode=InterpolationMode.HighQualityBicubic;
-                        g.DrawString($"{char.ToUpper(a.name[0]) + a.name.Substring(1)}", new Font("tahoma",10,FontStyle.Bold), Brushes.Gold, 0, 0);
-                        g.DrawString($"{a.silver}$", new Font("tahoma",14,FontStyle.Bold), Brushes.Gold, 0, 15);
-                        if (a.workersrequired > 1)
-                        {
-                            g.DrawString($"{a.workersrequired} worker{s}", new Font("tahoma", 14, FontStyle.Bold), Brushes.Yellow, 0, 35);
-                        }
-                    }
-                    pic.Image = btmp;
+                    pic.BackColor = Color.Wheat;
+                    pic.BorderStyle = BorderStyle.FixedSingle;
+                   
+             
                     pic.Click += delegate
                     {
                         b.adddpiece((piece)a.clone());
                         //    this.additem(a.clone());
                     };
-                    
+                    btmp = a.load2(btmp, pic.Width, pic.Height);
+                    pic.Image = btmp;
                     panel.Controls.Add(pic);
                 }
                 foreach (var a in b.buildingsallowed)
@@ -1064,32 +1083,22 @@ namespace Rise
                     pic.SizeMode = PictureBoxSizeMode.Zoom;
                     // a.prepareresourcebitmap(gm);
                     var btmp = (Bitmap)a.load(gm, true).Clone();
-                    string s = "";
-                    if (a.workersrequired > 1)
-                    {
-                        s = "s";
-                    }
-                    using (Graphics g = Graphics.FromImage(btmp))
-                    {
-                        g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                        g.DrawString($"{char.ToUpper(a.name[0]) + a.name.Substring(1)}", new Font("tahoma", 10, FontStyle.Bold), Brushes.Gold, 0, 0);
-                        g.DrawString($"{a.silver}$", new Font("tahoma", 14, FontStyle.Bold), Brushes.Gold, 0, 15);
-                        if (a.workersrequired > 1)
-                        {
-                            g.DrawString($"{a.workersrequired} worker{s}", new Font("tahoma", 14, FontStyle.Bold), Brushes.Yellow, 0, 35);
-                        }
-                    }
-                    pic.Image = btmp;
 
-                    pic.Height = panel.Height;
+                    pic.Width = 150;
+                    pic.Top = 7;
+                    pic.Height = panel.Height-15;
                     pic.Left = left;
-                    left += pic.Width + 10;
-                  //  pic.BackColor = Color.Red;
+                    left += pic.Width+10 ;
+                    pic.BackColor = Color.Wheat;
+                    pic.BorderStyle = BorderStyle.FixedSingle;
+                    //  pic.BackColor = Color.Red;
                     pic.Click += delegate
                     {
                         tobuild = (building)a;
                         //    this.additem(a.clone());
                     };
+                    btmp = a.load2(btmp, pic.Width, pic.Height);
+                    pic.Image = btmp;
                     panel.Controls.Add(pic);
                 }
                 //  Task.Run(() => {
@@ -1126,12 +1135,14 @@ namespace Rise
             int absx = Math.Min(fx + player.x, mousex + player.x);
             int absy = Math.Min(fy + player.y, mousey + player.y);
             var lista = new List<item>();
+            item tt=null;
             for (int i = 0; i < gm.map.items.Count; i++)
             {
                 var a = gm.map.items[i];
                 if (a.type!=type.building&&a.type!=type.bullet&&a.x + a.width / 2 > absx && a.x + a.width / 2 < newx && a.y + a.height / 2 > absy && a.y + a.height / 2 < newy)
                 {
                     a.selected = true;
+                    tt = a;
                     lista.Add(a);
                 }
                 else
@@ -1139,11 +1150,25 @@ namespace Rise
                     a.selected = false;
                 }
             }
+            GameEngineManager.selected_b = null;
+            if (tt == null)
+            {
+                tt = lastitem;
+            }
           //  GameEngineManager.selected = null;
            // GameEngineManager.selected_b = null;
             if (ppanel != null)
             {
-                fill_selection(ppanel, null, player);
+                if (fx != -1)
+                {
+                    clear(player);
+                }
+               
+                fill_selection(ppanel, tt, player);
+                if (fx != -1)
+                {
+                 //   lastitem = null;
+                }
             }
             return lista;
         }

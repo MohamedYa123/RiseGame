@@ -311,14 +311,25 @@ namespace Rise
             GameEngineManager.fy = fy;
             lista = GameEngine.selectitems(player, fx, fy, GameEngineManager.mousex, GameEngineManager.mousey);
         }
-
+        int tttx = 0;
         private void selectionloader_Tick(object sender, EventArgs e)
         {
             try
             {
+               //if (fx == -1)
+                {
+                    var xt = GameEngine.lastitem;
+                    if (GameEngine.lastitem== null&&tttx==0)
+                    {
+                        xt = GameEngineManager.selected;
+                    }
+                    GameEngine.fill_selection(panel2, xt, player);
+                }
                 GameEngine.loadselection(GameEngineManager.selected_b, panel3,player);
+                tttx++;
             }
             catch { }
+           
         }
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)

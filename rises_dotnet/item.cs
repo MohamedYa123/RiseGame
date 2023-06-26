@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -874,6 +875,30 @@ namespace Rise
                 }
             }
             return transparentPixels;
+        }
+        public Bitmap load2(Bitmap btmp,int w,int h)
+        {
+            Bitmap btmp2 = new Bitmap(w, h);
+            string s = "";
+            var a = this;
+            if (a.workersrequired > 1)
+            {
+                s = "s";
+            }
+            using (Graphics g = Graphics.FromImage(btmp2))
+            {
+                g.DrawImage(btmp, 25, h / 3+10);
+                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                g.DrawString($"{char.ToUpper(a.name[0]) + a.name.Substring(1)}", new Font("tahoma", 12, FontStyle.Bold), Brushes.Gray, 2, 2);
+                g.DrawString($"{char.ToUpper(a.name[0]) + a.name.Substring(1)}", new Font("tahoma", 12, FontStyle.Bold), Brushes.Gold, 0, 0);
+                g.DrawString($"{a.silver}$", new Font("tahoma", 14, FontStyle.Bold), Brushes.Gold, 5, 25);
+                if (a.workersrequired > 1)
+                {
+                    g.DrawString($"{a.workersrequired} worker{s}", new Font("tahoma", 14, FontStyle.Bold), Brushes.Yellow, 5, 45);
+                }
+                
+            }
+            return btmp2;
         }
         public Bitmap resourcebitmap;
         public Bitmap resourcebitmap2;
