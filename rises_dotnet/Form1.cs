@@ -6,7 +6,6 @@ using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using System.Reflection.Emit;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -25,19 +24,32 @@ namespace Rise
         GameEngineManager GameEngineManager;
         player player;
         PictureBox pic = new PictureBox();
-        private void Form1_Load(object sender, EventArgs e)
+        bool imdone=false;
+        Bitmap bitmapll;
+        System.Windows.Forms.Label label1;
+        private async void Form1_Load(object sender, EventArgs e)
         {
             particleSystem = new ParticleSystem();
-            GameEngine.init(pictureBox1.Width, pictureBox1.Height, pictureBox1.Width, pictureBox1.Height,panel3);
-            player = GameEngine.gm.players[0];
-            GameEngineManager = new GameEngineManager(GameEngine,player,pictureBox1.Width,pictureBox1.Height,pictureBox2.Width,pictureBox2.Height);
-            GameEngineManager.runorclose(true);
-            pic.Image = new Bitmap("loading.png");
+            bitmapll = new Bitmap("loading.png");
+            label1 =new Label();
+
+            Task.Run(() => {
+                GameEngine.init(pictureBox1.Width, pictureBox1.Height, pictureBox1.Width, pictureBox1.Height, panel3);
+             player = GameEngine.gm.players[0];
+                GameEngineManager = new GameEngineManager(GameEngine, player, pictureBox1.Width, pictureBox1.Height, pictureBox2.Width, pictureBox2.Height);
+                GameEngineManager.runorclose(true);
+               imdone = true;
+            });
+            
+            pic.Image = (Bitmap)bitmapll.Clone();
             pic.BackColor = Color.Black;
             pic.SizeMode=PictureBoxSizeMode.Zoom;
             pic.Dock = DockStyle.Fill;
-          //  Controls.Add(pic);
-          //  pic.BringToFront();
+            Controls.Add(pic);
+            Controls.Add(label1);
+            pic.BringToFront();
+            //label1.BringToFront();
+            label1.Hide();
         }
         int timx = 3;
         int timy = 3;
@@ -49,6 +61,26 @@ namespace Rise
 
         private void timer1_Tick(object sender, EventArgs e)
         {
+            label1.BringToFront();
+            if (!imdone)
+            {
+                var btmp = bitmapll;
+                var bitmap2 = new Bitmap(btmp.Width, btmp.Height);
+                using (Graphics g = Graphics.FromImage(bitmap2))
+                {
+                    g.DrawImage(btmp, 0, 0);
+                  //  g.FillRectangle(Brushes.Red, 48, 148, 204, 14);
+                    g.FillRectangle(Brushes.LightGreen, 35, 150, (int)(GameEngine.progress* 200/200), 2);
+                    
+                }
+                pic.Image = bitmap2;
+                
+            }
+            label1.Text = GameEngine.progress + "";
+            if (imdone)
+            {
+                pic.Hide();
+            }
             
             // await Task.Run(() =>
        //     Width;
@@ -103,19 +135,33 @@ namespace Rise
                             GameEngineManager.plusy = -(int)(10 / GameEngine.gm.map.factorh*timy);
                         }
                     }
-                    player.x += Convert.ToInt32(GameEngineManager.plusx * player.settings.mousespeed);
-                    player.y += Convert.ToInt32(GameEngineManager.plusy * player.settings.mousespeed);
-                    player.z += Convert.ToInt32(GameEngineManager.plusz * player.settings.mousespeed);
-                    if (player.x > GameEngine.gm.map.width)
+                    Task.Run(() =>
                     {
-                        player.x = (int)GameEngine.gm.map.width;
-                    }
-                    if (player.y > GameEngine.gm.map.height - pictureBox1.Height / 2 - 150)
-                    {
-                        player.y = (int)GameEngine.gm.map.gm.map.height - pictureBox1.Height / 2 - 150;
-                    }
-                    //  label1.Text = $"{player.x}:{player.y}:{player.z}";
-                    //  pictureBox2.Image = (Bitmap)GameEngine.gm.mappic.Clone();
+                        if(GameEngineManager.plusx==0&& GameEngineManager.plusy==0&& GameEngineManager.plusz == 0)
+                        {
+                            return;
+                        }
+                            while (!GameEngineManager.imsleepy)
+                        {
+
+                        }
+                        try
+                        {
+                            player.x += Convert.ToInt32(GameEngineManager.plusx * player.settings.mousespeed);
+                            player.y += Convert.ToInt32(GameEngineManager.plusy * player.settings.mousespeed);
+                            player.z += Convert.ToInt32(GameEngineManager.plusz * player.settings.mousespeed);
+                            if (player.x > GameEngine.gm.map.width)
+                            {
+                                player.x = (int)GameEngine.gm.map.width;
+                            }
+                            if (player.y > GameEngine.gm.map.height - pictureBox1.Height / 2 - 150)
+                            {
+                                player.y = (int)GameEngine.gm.map.gm.map.height - pictureBox1.Height / 2 - 150;
+                            }
+                        }catch { }
+                        //  label1.Text = $"{player.x}:{player.y}:{player.z}";
+                        //  pictureBox2.Image = (Bitmap)GameEngine.gm.mappic.Clone();
+                    });
                    hh:
                     pictureBox2.Image = (Bitmap)GameEngine.gm.mappic.Clone();
                     pictureBox2.Image = (Bitmap)GameEngineManager.mappic.Clone();
@@ -129,6 +175,7 @@ namespace Rise
 
         private void Rise_FormClosing(object sender, FormClosingEventArgs e)
         {
+            if(GameEngineManager!=null)
             GameEngineManager.shutdown();
         }
         //control staff
@@ -224,6 +271,26 @@ namespace Rise
 
         private void Rise_KeyPress(object sender, KeyPressEventArgs e)
         {
+            if(!imdone)
+            {
+                return;
+            }
+            if (e.KeyChar == 't')
+            {
+                GameEngineManager.message = $"Engine took time : {GameEngineManager.enginetime} ms";
+            }
+            if (e.KeyChar == 'd')
+            {
+                GameEngine.showsquares = !GameEngine.showsquares;
+            }
+            if (e.KeyChar == 'h')
+            {
+                GameEngine.showshadow = !GameEngine.showshadow;
+            }
+            if (e.KeyChar == 'z')
+            {
+                GameEngine.reverse *=-1;
+            }
             if (e.KeyChar == 's')
             {
                 try
@@ -321,6 +388,7 @@ namespace Rise
         int tttx = 0;
         private void selectionloader_Tick(object sender, EventArgs e)
         {
+           
             try
             {
                //if (fx == -1)

@@ -38,8 +38,8 @@ namespace Rise
             pc.owner = player;
             pc.workersrequired = 2;
             pc.stealth = false;
-            pc.buildtime_ms = 150;
-            pc.buildtime = 150;
+            pc.buildtime_ms = 170;
+            pc.buildtime = 170;
             pc.army = player.army;
             pc.image = "tank.png";
             pc.name = "tank";
@@ -48,21 +48,21 @@ namespace Rise
             pc.speedx = 0f;
             pc.newspeedx = 0.0f;
             pc.speedy = -0.01f;
-            pc.basespeed = 4f;
+            pc.basespeed = 3.5f;
             pc.emergencyspeed = 14f;
             pc.newspeedy = 0.0001f;
-            pc.power = 15;
+            pc.power = 20;
             pc.maxpower = 3;
             pc.basicdirection = -1;
             pc.engine = this;
             pc.shot_time_ms = 30;
             pc.reloadtime_ms = 100;
-            pc.maxbullets = 2;
-            pc.health = 100;
-            pc.maxhealth = 100;
+            pc.maxbullets = 3;
+            pc.health = 120;
+            pc.maxhealth = 120;
             pc.x = 5600;
             pc.y = 5200;
-            pc.silver = 500;
+            pc.silver = 650f;
             //    pc.z = 20;
             pc.type = type.vehicle;
             pc.track = tracktype.full;
@@ -105,7 +105,7 @@ namespace Rise
             pc.maxhealth = 20;
             pc.x = 5600;
             pc.y = 5200;
-            pc.silver = 500;
+            pc.silver = 400;
             //    pc.z = 20;
             pc.type = type.vehicle;
             pc.track = tracktype.full;
@@ -149,7 +149,7 @@ namespace Rise
             pc.maxhealth = 25;
             pc.x = 5600;
             pc.y = 5200;
-            pc.silver = 500;
+            pc.silver = 400;
             //    pc.z = 20;
             pc.type = type.vehicle;
             pc.track = tracktype.full;
@@ -268,8 +268,8 @@ namespace Rise
             worker.width = 100;
             worker.height = 150;
             worker.walklengthanimation = 17;
-            worker.buildtime = 150;
-            worker.buildtime_ms = 150;
+            worker.buildtime = 200;
+            worker.buildtime_ms = 200;
             worker.stealth = true;
             worker.owner = player;
             worker.army = player.army;
@@ -304,6 +304,61 @@ namespace Rise
             //  worker.imagesofanimations.Add(3, "animations/dead2.png");
             //  worker.imagesofanimations.Add(4, "animations/dead3.png");
             worker.change = 0.25f;
+            worker.poswidth = 5;
+            worker.posheight = 10;
+            return worker;
+        } 
+        piece createhelicopter2(player player)
+        {
+            piece worker = new piece();
+            worker.type = type.air;
+            worker.comment = "helicopter";
+            worker.name = "sting helicopter";
+            worker.patience = 140;
+            worker.generaltype = generaltype.plane;
+           // worker.type = type.worker;
+            worker.salary = 6;
+            worker.basespeed = 24;
+            worker.image = "helicopter1.png";
+            worker.width = 200;
+            worker.height = 200;
+            worker.walklengthanimation = 3;
+            worker.buildtime = 150;
+            worker.buildtime_ms = 150;
+            worker.stealth = false;
+            worker.owner = player;
+            worker.army = player.army;
+            worker.engine = this;
+            worker.x = 5700;
+            worker.y = 5000;
+            worker.health = 13;
+            worker.maxhealth = 13;
+            worker.track = tracktype.full;
+            //make worker able to attack
+            worker.shot_time_ms = 5;
+            worker.reloadtime_ms = 50;
+            worker.power = 26;
+            worker.maxbullets = 3;
+            worker.rangeofattack = 350;
+            worker.silver = 1100;
+            worker.workersrequired = 3;
+            worker.alwayswalk = true;
+            worker.targettype = generaltype.vehicle;
+            worker.walkanimationnums = 8;
+         //   worker.change = 0.95f;
+            worker.imagesofanimations.Add(0, "animations/helicopter1.png");
+            worker.imagesofanimations.Add(1, "animations/helicopter2.png");
+            worker.imagesofanimations.Add(2, "animations/helicopter3.png");
+            worker.imagesofanimations.Add(3, "animations/helicopter4.png");
+            worker.imagesofanimations.Add(4, "animations/helicopter5.png");
+            worker.imagesofanimations.Add(5, "animations/helicopter6.png");
+            worker.imagesofanimations.Add(6, "animations/helicopter7.png");
+            worker.imagesofanimations.Add(7, "animations/helicopter8.png");
+            //worker.imagesofanimations.Add(2, "animations/helicopter3.png");
+        //    worker.imagesofanimations.Add(2, "animations/dead1.png");
+          //  worker.imagesofanimations.Add(3, "animations/dead2.png");
+          //  worker.imagesofanimations.Add(4, "animations/dead3.png");
+            worker.change = 0.45f;
             worker.poswidth = 5;
             worker.posheight = 10;
             return worker;
@@ -402,7 +457,7 @@ namespace Rise
             var p = (piece)thinbullet;
             p.comment = "sniper bullet";
             p.onlyattacktarget = true;
-            p.basespeed = 120;
+            p.basespeed = 150f;
             p.width =3;
             p.height=9;
             return p;
@@ -463,8 +518,8 @@ namespace Rise
             warfactory.name = "house";
             warfactory.type = type.building;
             warfactory.generaltype= generaltype.building;
-            warfactory.width = 100;
-            warfactory.height = 100;
+            warfactory.width = 150;
+            warfactory.height = 150;
             warfactory.owner = player;
             warfactory.engine = this;
             warfactory.health = 60;
@@ -572,7 +627,7 @@ namespace Rise
         }
         mapzone creategoldzone()
         {
-            mapzone mp = new mapzone("gold", "gold.png",gm.map.mod*4, gm.map.mod*4,this);
+            mapzone mp = new mapzone("gold", "gold.png",gm.map.mod *4, gm.map.mod *4,this);
             mp.x = 1500; mp.y = 1000;
             mp.refusemessage = "Gold mine must be built on gold zone";
             return mp;
@@ -589,7 +644,7 @@ namespace Rise
         void fillzone(map mp,mapzone goldzone)
         {
             var gz = goldzone.width/gm.map.mod;
-            for (int i = 0; i < 30; i++)
+            for (int i = 0; i < 60; i++)
             {
                 for (int j = 0; j < 30; j++)
                 {
@@ -603,9 +658,10 @@ namespace Rise
                 }
             }
         }
+        public float progress;
         public void init(int widthresolution,int heightresolution,int realwidth,int realheight,Panel panel3)
         {
-            map mp = new map("desert2", 10000, 10000, "desert.jpg", widthresolution, heightresolution);
+            map mp = new map("desert2", 15000, 15000, "desert.jpg", widthresolution, heightresolution,this);
             mp.engine = this;
             gm = new game();
             mp.gm = gm;
@@ -662,7 +718,10 @@ namespace Rise
             helicopterstealth.silver = 1300;
             helicopterstealth.name = "Stealth helicopter";
             var helicopter=createhelicopter(player);
+            var helicopter2=createhelicopter2(player);
             helicopter.stealth = false;
+            helicopter.buildtime_ms = 150;
+            helicopter.buildtime = 150;
             barraks.piecesallowed.Add(rbg);
             barraks.piecesallowed.Add(sniper);
             mp.asstes.Add(bullet);
@@ -682,6 +741,7 @@ namespace Rise
             mp.asstes.Add(grasszone);
             mp.asstes.Add(farm);
             mp.asstes.Add(helicopter);
+            mp.asstes.Add(helicopter2);
             mp.asstes.Add(helicopterstealth);
             godlmine.favoritemapzone = goldzone;
             farm.favoritemapzone = grasszone;
@@ -693,6 +753,7 @@ namespace Rise
             warfactory.piecesallowed.Add(xp);
             warfactory.piecesallowed.Add(helicopter);
             warfactory.piecesallowed.Add(helicopterstealth);
+            warfactory.piecesallowed.Add(helicopter2);
             building.buildingsallowed.Add(house);
             building.buildingsallowed.Add(storagehouse);
             building.buildingsallowed.Add(farm);
@@ -748,18 +809,28 @@ namespace Rise
         void loadassets(Panel panel3)
         {
             stop = new Bitmap("assets/stop.png");
+            progress += 1f;
             passive = new Bitmap("assets/passive.png");
+            progress += 1f;
             protect = new Bitmap("assets/protect.png");
+            progress += 1f;
             aggressive = new Bitmap("assets/aggressive.png");
+            progress += 1f;
             Size sz=new Size(panel3.Width/3-5,panel3.Height/3-5);
             stop = resource.ResizeImage(stop, sz);
+            progress += 1f;
             passive = resource.ResizeImage(passive, sz);
+            progress += 1f;
             aggressive = resource.ResizeImage(aggressive, sz);
+            progress += 1f;
             protect = resource.ResizeImage(protect, sz);
+            progress += 1f;
+            progress += 2f;
         }
         public void requestchangeposition(item it)
         {
             //  return;
+         
             var hh = it.timeaway;
             var hh2 = it.pathfindingorder;
             var newx = it.x + it.speedx*speedfactor;
@@ -800,7 +871,11 @@ namespace Rise
                     //it.speedx = 0;
 
                 }
-                it.firehit(newxx, newyy);
+                if (it.health > 0)
+                {
+                    it.firehit(newxx, newyy);
+                }
+                
                 if (it.health < 0)
                 {
                     return;
@@ -927,7 +1002,7 @@ namespace Rise
                     panel3.Controls.Add(picture);
                     picture.BackColor = l;
                     x += picture.Width + 5;
-                    picture.BorderStyle= BorderStyle.Fixed3D;
+                    picture.BorderStyle= BorderStyle.FixedSingle;
                     //   picture.BackColor = Color.Red;
                     if (x >= panel3.Width / 3 * 3 - 7 * 3)
                     {
@@ -969,7 +1044,7 @@ namespace Rise
                     picture.Width = panel3.Width / 3 - 7;
                     picture.BorderStyle= BorderStyle.FixedSingle;
                     picture.SizeMode = PictureBoxSizeMode.Zoom;
-                    drawhealth( 1 - (float)a.buildtime_ms / a.buildtime, picture.Width / 2 - 25, picture.Height / 2, 0, (int)(50*(100/80)),g);
+                    drawhealth( 1 - (float)a.buildtime_ms / a.buildtime, picture.Width / 2 - 25, picture.Height / 2, 0, (int)(50*(172.0/80)),g);
                     picture.Image = btmp;
                     
                     x += picture.Width + 5;
@@ -1217,7 +1292,9 @@ namespace Rise
         DateTime startmilisecs;
         DateTime lastmillisecs;
         public  GameEngineManager GameEngineManager;
-      
+        public bool showsquares;
+        public bool showshadow=true;
+        public int reverse=-1;
         public void fill( player pl,ref string message,int resizingframe,int lastms)
         {
             var bitmap = (Bitmap)gm.map.image.Bitmap.Clone();
@@ -1239,15 +1316,19 @@ namespace Rise
             float factoh = gm.map.factorh;
             System.Drawing.Rectangle main = new Rectangle(0,0,width,height);
             var g = Graphics.FromImage(bitmap);
-
+            Color clr=Color.FromArgb(170,255,255,255);
+            Color clr2=Color.FromArgb(170,0,0,0);
+            Brush b1=new SolidBrush(clr);
+            Brush b2=new SolidBrush(clr2);
+           
             //g.SmoothingMode = SmoothingMode.AntiAlias;
           //  g.InterpolationMode = InterpolationMode.HighQualityBicubic;
             int shows=0;
             for (int i = 0; i < gm.map.mapzones.Count; i++)
             {
                 var a = gm.map.mapzones[i];
-                float xx = (a.x * dt - pl.x) * factow - a.width * 1 * factow * 0;// + a.width * dt * factow;
-                float yy = (a.y * dt - pl.y) * factoh - a.height * 1 * factoh * 0;// + a.height * dt * factow;
+                float xx = (a.x * dt - pl.x) * factow - a.width * 0 * factow * 0;// + a.width * dt * factow;
+                float yy = (a.y * dt - pl.y) * factoh - a.height * 0 * factoh * 0;// + a.height * dt * factow;
                 System.Drawing.Rectangle rect2 = new Rectangle((int)(xx)-90, (int)(yy)-90, (int)(a.width * factow)+90, (int)(a.height * factoh)+90);
 
                 if (rect2.IntersectsWith(main) && !(a.stealth && a.army.teamid != pl.army.teamid && true))//hide stealth units
@@ -1265,17 +1346,10 @@ namespace Rise
             ld.Sort(GFGBuildings);
             for (int i = 0; i < ld.Count; i++)
             {
-
-
                 var a = ld[i];
-                if (a.health < 0)
-                {
-                    //continue;
-                }
-                float xx = (a.x * dt  - pl.x ) * factow-a.width*1*factow*0;// + a.width * dt * factow;
-                float yy = (a.y * dt  - pl.y ) * factoh-a.height*1*factoh*0;// + a.height * dt * factow;
+                float xx = (a.x * dt  - pl.x ) * factow-a.width*0*factow*0;// + a.width * dt * factow;
+                float yy = (a.y * dt  - pl.y ) * factoh-a.height*0*factoh*0;// + a.height * dt * factow;
                 System.Drawing.Rectangle rect2=new Rectangle((int)(xx),(int)(yy),(int)(a.width*factow),(int)(a.height*factoh));
-               
                 if (rect2.IntersectsWith(main)&&!(a.stealth&&a.army.teamid!=pl.army.teamid&&true))//hide stealth units
                 {
                     a.loadframe.loadframes = (int)framenum;
@@ -1284,28 +1358,33 @@ namespace Rise
                     yy -= (btmp.Height - a.height) / 2;
                     if (a.type != type.building)
                     {
-                        xx -= 5;
-                        yy -= 5;
+                     //   xx -= 5;
+                     //   yy -= 5;
                     }
-                    if (a.type == type.air||true)
+                    if (showshadow)
                     {
                         var btmpshadow = a.shadowbitmap;// resource.GenerateShadowImage(btmp);
                         if(btmpshadow == null)
                         {
 
                         }
-                        int psx = 120;
-                        int psy = 120;
+                        int psx = -120;
+                        int psy = -120;
                         if (a.type != type.air)
                         {
-                            psx = (int)(a.width/5.0);
-                            psy =  (int)(a.width / 10.0);
-                            psx=Math.Min(10, psx);
-                            psy=Math.Min(10, psy);
+                            psx = -(int)(a.width/10.0);
+                            psy =  -(int)(a.height / 10.0);
+                            psx=Math.Max(-30, psx);
+                            psy=Math.Max(-30, psy);
+                        }
+                        if (a.type == type.building)
+                        {
+                            psx = -5;
+                            psy = -5;
                         }
                         if (!a.stealth||a.type==type.air)
                         {
-                            draw(btmpshadow, (int)(xx + a.width * Math.Tan(a.direction) * 0 + psx), (int)(yy + a.height * Math.Tan(a.direction) * 0 + psy), (int)a.z, g);
+                            draw(btmpshadow, (int)(xx + a.width * Math.Tan(a.direction) * 0 + psx*reverse), (int)(yy + a.height * Math.Tan(a.direction) * 0 + psy*reverse), (int)a.z, g);
                         }
                     }
                    
@@ -1329,12 +1408,6 @@ namespace Rise
                     shows++;
                     
                 }
-                else
-                {
-
-                }
-               
-               
             }
             //explosions and fire
             for(int i=0;i<gm.squaresofinterest.Count;i++)
@@ -1363,7 +1436,7 @@ namespace Rise
                         Rectangle rect = new Rectangle((int)(sqrc.realxx+0)+ gm.map.mod/2 - pl.x - sz / 2, (int)(sqrc.realyy+0)  - pl.y - sz / 2+ gm.map.mod/2, sz, sz);
                         g.FillEllipse(b, rect);
                     }
-                    if (sqrc.thinpasses > 1)
+                    if (sqrc.Thinpasses > 1)
                     {
                         Brush b = new SolidBrush(Color.White);
                         Rectangle rect = new Rectangle((int)(sqrc.realxx + 0)  - pl.x , (int)(sqrc.realyy + 0)  - pl.y  , 3, 3);
@@ -1373,15 +1446,27 @@ namespace Rise
                 }
                 catch (Exception ex){ }
             }
+            if (showsquares)
+            {
+                for (int i = (pl.x / gm.map.mod); i <= bitmap.Width / gm.map.mod + (pl.x / gm.map.mod); i++)
+                {
+                    for (int j = (pl.y / gm.map.mod); j <= bitmap.Height / gm.map.mod + (pl.y / gm.map.mod); j++)
+                    {
+                        var b = b1;
+                        if (gm.map.squares[i, j].piecethere != null)
+                        {
+                            b = b2;
+                        }
+                        g.FillRectangle(b, i * gm.map.mod - pl.x, j * gm.map.mod - pl.y, gm.map.mod, gm.map.mod);
+
+                    }
+                }
+            }
             for (int i = 0; i < ld.Count; i++)
             {
                 var a = ld[i];
                 double xx = (a.targetx * dt - pl.x)*factow ;
                 double yy = (a.targety * dt - pl.y)*factoh ;
-                if (a.image == "tank.png")
-                {
-                    //   pic.Image = a.load(gm);
-                }
                 if (xx > -0 && xx < width && yy > -0 && yy < height)
                 {
                     
@@ -1536,6 +1621,7 @@ namespace Rise
             item.targetx = -1;
             item.targety = -1;
             item.target = null;
+            item.timeaway = -1;
            // item.mode = piecemode.passive;
             item.pathsquares.Clear();
             item.orderid = item.orderid/2;

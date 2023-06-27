@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
+using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +16,7 @@ namespace Rise
         public int id = 0;
          Bitmap bitmap;
         public  Bitmap bitmap2;
+        public  Bitmap shadowbitmap;
        // public Bitmap Bitmap { get { return bitmap; }set { bitmap = value; } }
         public Bitmap Bitmap { get { /*bitmap = (Bitmap)bitmap.Clone();*/ return (Bitmap)bitmap.Clone(); } set { bitmap = value; } }
         public string name = "";
@@ -56,7 +58,28 @@ namespace Rise
                 return null;
             }
         }
-      
+        public static Bitmap fillwitharmycolor(Image image,Color amrycolor)
+        {
+            Bitmap bitmap = (Bitmap)image.Clone(); //new Bitmap(image.Width, image.Height);
+            const int refre = 250;
+            for (int y = 0; y < bitmap.Height; y++)
+            {
+                for (int x = 0; x < bitmap.Width; x++)
+                {
+                    Color pixelColor = bitmap.GetPixel(x, y);
+                    if (pixelColor.A==255&&pixelColor.R>=refre&&pixelColor.G>=refre&&pixelColor.B>=refre)
+                    {
+
+                        bitmap.SetPixel(x, y, amrycolor);
+                    }
+                }
+            }
+
+
+            //   ApplyShadowEffect(shadowImage, shadowSize);
+
+            return bitmap;
+        }
         public static Bitmap GenerateShadowImage(Image image,float opacity)
         {
             //  int shadowSize = 10; // Adjust the shadow size as needed
@@ -177,7 +200,19 @@ namespace Rise
         {
             this.sound = sound;
             Bitmap btmp = new Bitmap(path);
-            Bitmap btmp2 = new Bitmap(path);
+            if (item != null)
+            {
+                try
+                {
+                    if(item.army!=null) 
+                    btmp = fillwitharmycolor(btmp, item.army.armycolor);
+                }
+                catch(Exception ex)
+                { 
+                
+                }
+            }
+            Bitmap btmp2 = (Bitmap)btmp.Clone();// new Bitmap(path);
             if (item!=null&&item.type == type.building)
             {
                 btmp.RotateFlip(RotateFlipType.Rotate180FlipY);
@@ -189,6 +224,10 @@ namespace Rise
             
             }
             bitmap = btmp;
+            if (item!=null)
+            {
+                shadowbitmap = GenerateShadowImage(bitmap, 0.5f);
+            }
             if (name == "mappicture" )
             {
                 bitmap2 = (Bitmap)btmp.Clone();
@@ -198,6 +237,7 @@ namespace Rise
                 bitmap2 = ResizeImage(btmp2, new Size((int)(100), (int)(100)));
             
             }
+         
             this.name = name;
             //secondresources=new secondresource[resourceoption1, resourceoption2,resourceoption3,resourceoption4];
         }

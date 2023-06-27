@@ -129,14 +129,16 @@ namespace Rise
                 return y+height/2;
             }
         }
+        protected bool hitright;
         public void firehit( int newx, int newy)
         {
+            hitright = false;
             if (type != type.bullet)
             {
                 return;
             }
             var a = engine.gm.map.squares[newx, newy].piecethere;
-            engine.gm.map.squares[newx, newy].thinpasses = 30;
+            engine.gm.map.squares[newx, newy].Thinpasses = 30;
             engine.gm.map.squares[newx, newy].realxx=x;
             engine.gm.map.squares[newx, newy].realyy=y;
             if (!(a == this || a == mother || a == null))
@@ -194,6 +196,7 @@ namespace Rise
                 {
                     health = -10;
                     a.health -= power / dv;
+                    hitright = true;
                 }
             }
         }
@@ -252,8 +255,8 @@ namespace Rise
         Random random=new Random();
         public int id;
         public item() { 
-            id=random.Next();
-           // public item()
+            id = random.Next(int.MaxValue/2, int.MaxValue);
+            // public item()
             {
                 orderid = random.Next(int.MinValue,int.MaxValue);
             }
@@ -514,33 +517,18 @@ namespace Rise
         public float squarewidth
         {
             get {
-                int dplus = 0;
-                if (type != type.building)
-                {
-                    dplus = 1;
-                }
                 var gg = MathF.Max(width, height);
-                if (gg % engine.gm.map.mod == 0)
-                {
-                    gg++;
-                }
-                return gg+ dplus * engine.gm.map.mod; }
+        
+                return gg; }
         }
         public item swapingitem;
         public float squareheight
         {
             get {
-                int dplus = 0;
-                if (type != type.building)
-                {
-                    dplus = 1;
-                }
+             
                 var gg = MathF.Max(width, height);
-                if(gg% engine.gm.map.mod == 0)
-                {
-                    gg++;
-                }
-                return gg+dplus*engine.gm.map.mod; }
+      
+                return gg; }
         }
         public int depth;
         public float speedx;
@@ -887,6 +875,7 @@ namespace Rise
             }
             using (Graphics g = Graphics.FromImage(btmp2))
             {
+                g.FillRectangle(new SolidBrush(Color.Wheat),0, 0, w, h);
                 g.DrawImage(btmp, 25, h / 3+10);
                 g.InterpolationMode = InterpolationMode.HighQualityBicubic;
                 g.DrawString($"{char.ToUpper(a.name[0]) + a.name.Substring(1)}", new Font("tahoma", 12, FontStyle.Bold), Brushes.Gray, 2, 2);
@@ -919,10 +908,12 @@ namespace Rise
                 catch { }
             }
             resourcebitmap = (Bitmap)gm.map.resources[srcid].Bitmap.Clone();
+            shadowbitmap = (Bitmap)gm.map.resources[srcid].shadowbitmap.Clone();
             if (basic)
             {
                 resourcebitmap2 = (Bitmap)gm.map.resources[srcid].bitmap2.Clone();
             }
+            
         }
         float anglestep = 5f;
         float opacitystep = 5f;
@@ -1092,14 +1083,23 @@ namespace Rise
             Bitmap shadow=null;
             if(type==type.air||true)
             {
-                shadow=resource.GenerateShadowImage(btmp,loadframe.opacity);
+                shadow = shadowbitmap;
+                if (loadframe.opacity == 1)
+                {
+                    var g = Graphics.FromImage(shadow);
+                    engine.draw(shadow, 0, 0, 0, g);
+                  //  engine.draw(shadow, 0, 0, 0, g);
+                }
+                shadow= resource.RotateAndCropBitmap(shadow, directionindegrees, type);
+               // shadow = RotateImage(shadow, directionindegrees);
+                // shadow=resource.GenerateShadowImage(btmp,loadframe.opacity);
             }
             if (!basic)
             {
                 
                 gm.map.resources[resourceid].setsecondresource(btmp,shadow, id1, id2, id3,id4, plus);
             }
-            if (first&&(type==type.building||true))
+            if (first&&(type==type.building||true)&&squarewidth>50)
             {
                 int w = (int)width / engine.gm.map.mod;
                 int h = (int)height / engine.gm.map.mod;

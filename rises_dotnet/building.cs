@@ -136,9 +136,12 @@ namespace Rise
             {
                 if (pieces_tobuild[0].buildtime_ms <= 0)
                 {
-                    pieces_tobuild[0].x = x + width / 2;
-                    pieces_tobuild[0].y = y + height / 2;
+                    pieces_tobuild[0].x = x + width / 2+30;
+                    pieces_tobuild[0].y = y + height / 2+30;
+                   
                     var b= engine.additem(pieces_tobuild[0]);
+              //      pieces_tobuild[0].army = new army(engine);
+                  //  pieces_tobuild[0].army.teamid=1005;
                     if (b)
                     {
                         pieces_tobuild.RemoveAt(0);

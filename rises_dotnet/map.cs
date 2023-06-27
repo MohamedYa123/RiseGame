@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Rise
@@ -24,6 +25,7 @@ namespace Rise
         public List<item> asstes = new List<item>();
         public square[,] squares;
          public List<item> itemsclonned=new List<item>();
+       
         public void addmapzone(mapzone zone)
         {
             mapzones.Add(zone);
@@ -64,18 +66,62 @@ namespace Rise
             }
         }
         public bool sqauresreset;
+        public void reset_squares_parallel()
+        {
+            sqauresreset = true;
+            int sets = 0;
+            Stopwatch sp = new Stopwatch();
+            sp.Start();
+            //(int i = 0; i < xlen; i++)
+            Parallel.For(0, 6, h =>
+            {
+                for (int i = ylen * h/6; i < ylen * (h + 1)/6; i++)
+                {
+                    
+                    for (int j = 0; j < ylen; j++)
+                    {
+                        int ii = i;
+                        int jj = j;
+                        if (squares[i, j].isaffected)
+                        {
+                            squares[i, j].piecethere2 = null;
+                            squares[i, j].decreasestaff();
+                        }
+                    }
+                }
+            });
+            //   while(sets< xlen * ylen)
+            {
+
+            }
+            sp.Stop();
+            var s = sp.ElapsedMilliseconds;
+          //  engine.GameEngineManager.message = $"{s}";
+        }
         public void reset_squares()
         {
             sqauresreset=true;
+
+            Stopwatch sp=new Stopwatch();
+            sp.Start();
             for (int i = 0; i < xlen; i++)
             {
                 for (int j = 0; j < ylen; j++)
                 {
-                    squares[i, j].piecethere = null;
-                    squares[i, j].decreasestaff();
+                    // Task.Run(() =>
+                    if (squares[i,j].isaffected){
+                        squares[i, j].piecethere2 = null;
+                        squares[i, j].decreasestaff();
+                    }
                 }
             }
-            
+         //   while(sets< xlen * ylen)
+            {
+
+            }
+            sp.Stop();
+            var s= sp.ElapsedMilliseconds;
+            engine.GameEngineManager.message = $"{s}";
         }
         public void swapawayfrompoint(item it,int x,int y,bool sweet=false)
         {
@@ -90,7 +136,7 @@ namespace Rise
             it.timeaway = Math.Max(4,it.timeaway);
             if (!it.walk)
             {
-                it.timeaway = 15;
+                it.timeaway = 35;
             }
             if (sweet)
             {
@@ -117,11 +163,12 @@ namespace Rise
             //   it.x -= 1;
             //   it.y -= 1;
             old.swapingitem= it;
+            
             engine.change_direction_direct(old, (int)it.x + (int)it.width / 2, (int)it.y + (int)it.height / 2);
             old.timeaway = 5;//زمن التباعد
             if (it.type == type.building)
             {
-                old.timeaway += 5;
+                old.timeaway += 15;
             }
             old.newspeedxtimed = old.newspeedx * -1;
             old.newspeedytimed = old.newspeedy * -1;
@@ -137,6 +184,14 @@ namespace Rise
             it.newspeedytimed = it.newspeedy * -1;
             it.newspeedx = ot;
             it.newspeedy = ot2;
+            if(it.type == type.building)
+            {
+                old.timeaway += 15;
+            } 
+            if(old.type == type.building)
+            {
+                it.timeaway = 35;
+            }
             if (old.newspeedxtimed > 0 == it.newspeedxtimed>0)
             {
                 it.newspeedxtimed *= -1;
@@ -158,6 +213,20 @@ namespace Rise
             tx++;
             int ax = (int)it.x / mod;
             int ay = (int)it.y / mod;
+            int adx = 0;
+
+                int vx = (int)(it.x + it.squarewidth) / mod + adx;
+                int vy = (int)(it.y + it.squareheight) / mod + adx;
+                if (it.squarewidth <=50||true)
+                {
+                // adx = 1;
+                    if(it.emptypixels.Count == 0)
+                {
+                    adx = 1;
+                }
+                   vx= (int)(it.x / mod) + (int)(it.squarewidth) / mod + adx;
+                    vy = (int)(it.y / mod) + (int)(it.squareheight) / mod + adx;
+                }
             for (int i = 0; i < it.emptypixels.Count; i++)
             {
                 var point = it.emptypixels[i];
@@ -169,9 +238,9 @@ namespace Rise
                 timeaway = true;
                 // return true;
             }
-            for (int i = (int)it.x / mod; i < (int)(it.x + it.squarewidth) / mod; i++)
+            for (int i = (int)it.x / mod; i < vx; i++)
             {
-                for (int j = (int)it.y / mod; j < (int)(it.y + it.squareheight) / mod; j++)
+                for (int j = (int)it.y / mod; j < vy; j++)
                 {
                     if (i >= xlen || j >= ylen)
                     {
@@ -284,14 +353,17 @@ namespace Rise
         {
             image = new resource($"maps/{picture}", "", "mappicture", null,1,1,1,1,1,1);
             image.Bitmap = resource.ResizeImage(image.Bitmap, new Size(width_resolution, height_resolution));
-            Stopwatch sp = Stopwatch.StartNew();
+            engine.progress += 20;
+            //Stopwatch sp = Stopwatch.StartNew();
            // engine.gm.drawstring(image.Bitmap, "cool", 0, 0, Color.Red, 10);
-            sp.Stop();
+            //sp.Stop();
             factorw = (float)(width_resolution) / (float)(realwidth);
             factorh = (float)(height_resolution) / (float)(realheight);
+            float dm = 70.0f/asstes.Count;
             foreach (var a in asstes)
             {
                 a.load_resouces(gm,factorw,factorh);
+                engine.progress += dm;
             }
         }
         int resourcesnum1=361;
@@ -304,13 +376,13 @@ namespace Rise
             resources.Add(rsc);
             return resources.Count - 1;
         }
-        public int mod = 30;//بيقسم مربعات الخريطة لمربعات أكبر علشان يوفر وقت في البروسيسنج
+        public int mod = 20;//بيقسم مربعات الخريطة لمربعات أكبر علشان يوفر وقت في البروسيسنج
         public int safzone = 0;
         public int xlen;
         public int ylen;
         public  int width_resolution;
         public int height_resolution;
-        public map(string name, int x, int y, string picture, int width, int height)
+        public map(string name, int x, int y, string picture, int width, int height,GameEngine engine)
         {
             width_resolution = width;
             height_resolution = height;
@@ -321,17 +393,24 @@ namespace Rise
             int newy = y / mod + 1;
             xlen = newx;
             ylen = newy;
+            this.engine=engine;
             squares = new square[newx, newy];
+            var gg =100.0f/( newx * newy);
             for (int i = 0; i < newx; i++)
             {
                 for (int j = 0; j < newy; j++)
                 {
+                    engine.progress += gg;
                     square square = new square();
                     square.x =  i; square.y = j;
                     squares[i, j] = square;
                 }
             }
             this.picture = picture;
+           // public map()
+            {
+                type = type.map;
+            }
         }
     }
 }

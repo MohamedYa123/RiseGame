@@ -24,7 +24,7 @@ namespace Rise
         {
             plformap = pl;
 
-
+            Stopwatch sw = Stopwatch.StartNew();
             for (int i = 0; i < map.items.Count; i++)
             {
                 var it = map.items[i];
@@ -46,7 +46,8 @@ namespace Rise
                     map.putpieceinsquares(it);
                 }
             }
-            map.reset_squares();
+            
+            map.reset_squares_parallel();
             for (int i = 0; i < map.items.Count; i++)
             {
 
@@ -56,14 +57,13 @@ namespace Rise
                     map.putpieceinsquares(it);
                 }
             }
-
             map.sqauresreset = false;
             map.cloneitems();
             var gm = this;
             squaresofinterest2.Clear();
-            for (int i = pl.x / gm.map.mod; i - pl.x / gm.map.mod < pl.width && i < gm.map.xlen; i++)
+            for (int i = pl.x / gm.map.mod; i - pl.x / gm.map.mod < pl.width / gm.map.mod && i < gm.map.xlen; i++)
             {
-                for (int j = pl.y / gm.map.mod; j - pl.y / gm.map.mod < pl.height && j < gm.map.ylen; j++)
+                for (int j = pl.y / gm.map.mod; j - pl.y / gm.map.mod < pl.height / gm.map.mod && j < gm.map.ylen; j++)
                 {
                     var sqrc = gm.map.squares[i, j];
                     sqrc.x = i;
@@ -81,7 +81,7 @@ namespace Rise
                     }
                     fact = (float)(sqrc.Explosion / 150.0);
                     sz = (int)((1 - fact) * 150);
-                    if ((sz > 0 && sqrc.Explosion > 0||sqrc.thinpasses>1)&&!added)
+                    if ((sz > 0 && sqrc.Explosion > 0||sqrc.Thinpasses>1)&&!added)
                     {
                         squaresofinterest2.Add(sqrc);
                      //   Brush b = new SolidBrush(Color.FromArgb(50, 100, 100, 0));
@@ -93,6 +93,8 @@ namespace Rise
             time++;
             squaresofinterest.Clear();
             squaresofinterest.AddRange(squaresofinterest2);
+            sw.Stop();
+            var s = sw.ElapsedMilliseconds;
             frame++;
         }
         public void drawmap(int enginespeed,player pl) {

@@ -11,7 +11,19 @@ namespace Rise
     {
         public float x;
         public float y;
-        public item piecethere;
+        public item piecethere2;
+        public item piecethere
+        {
+            get
+            {
+                return piecethere2;
+            }
+            set
+            {
+                piecethere2 = value;
+                isaffected = true;
+            }
+        }
         public mapzone mapzone;//= new mapzone();
         public float Gcost;//distance from source
         public float Hcost;//distance from target
@@ -35,7 +47,7 @@ namespace Rise
                 if(piecethere != null) {
                     //tt = 3;
                 }
-                return (gcost+hcost)*timing*tt; }
+                return (gcost+hcost)*tt; }
         }
         //public float fcost
         //{
@@ -90,8 +102,8 @@ namespace Rise
                     hcost = MathF.Abs(MathF.Abs(x - targetpoint.x) + MathF.Abs(y - targetpoint.y));
 
                 }
-                this.Gcost = gcost*product;
-                this.Hcost = hcost*product;
+                this.Gcost = gcost;// *product;
+                this.Hcost = hcost;//*product;
              //   fcost = this.gcost + this.hcost;
             }
         }
@@ -105,12 +117,12 @@ namespace Rise
         int lastpathfinding;
         List<item>piecestoswapaway= new List<item>();
         int lastorderid;
-        float timing = 1;
+       // float timing = 1;
         public bool marked;
         public void settiming(square sqrc)
         {
             
-            timing=Math.Max(sqrc.timing,timing);
+           // timing=Math.Max(sqrc.timing,timing);
         }
         public void resetpathfindingstaff(int pathfindingorder,int orderid)
         {
@@ -127,26 +139,28 @@ namespace Rise
             {
                 if (marked&&false)
                 {
-                    timing = 1.2f;
+                 //   timing = 1.2f;
                 }
             }
             else
             {
-                timing = 1;
+          //      timing = 1;
             }
             marked = false;
             lastpathfinding = pathfindingorder;
             lastorderid = orderid;
             piecestoswapaway.Clear();
         }
+       public  bool isaffected= false;
         public void decreasestaff()
         {
-            Rockettail -= dx;
-            Explosion -= 40;
+            rockettail -= dx;
+            explosion -= 40;
             thinpasses -= 30;
-            if (explosion >= 100)
+           
+            if(!(rockettail>=0||explosion>=0||thinpasses>=0))
             {
-
+                isaffected = false;
             }
         }
 
@@ -155,7 +169,19 @@ namespace Rise
         public float realyy = 0;
         int rockettail;
         int explosion;
-        public float thinpasses;
+        float thinpasses;
+        public float Thinpasses
+        {
+            get
+            {
+                return thinpasses;
+            }
+            set
+            {
+                isaffected = true;
+                thinpasses = value;
+            }
+        }
         public int dx = 7;
         public int Rockettail
         {
@@ -173,6 +199,7 @@ namespace Rise
                 {
                     dx = 3;
                 }
+                isaffected = true;
                 rockettail = value;
             }
         }
@@ -188,6 +215,7 @@ namespace Rise
             }
             set
             {
+                isaffected = true; 
                 explosion = value;
             }
         }
@@ -237,6 +265,10 @@ namespace Rise
                 //it.disapear();
             }
             if (piecethere!=null&& piecethere.workersinside != null && piecethere.workersinside.Count > 0 && piecethere.workersinside.Contains(it))
+            {
+                return true;
+            }
+            else if (piecethere != null && it.workersinside != null && it.workersinside.Count > 0 && it.workersinside.Contains(piecethere))
             {
                 return true;
             }

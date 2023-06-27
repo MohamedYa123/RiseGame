@@ -55,8 +55,8 @@ namespace Rise
     {
         public int Compare(item x, item y)
         {
-            var fg1 = (0);
-            var fg2 = (0);
+            var fg1 = (0.0);
+            var fg2 = (0.0);
             if(x.type== type.air)
             {
                 fg1 = 700;
@@ -64,6 +64,14 @@ namespace Rise
             if(y.type== type.air)
             {
                 fg2 = 700;
+            }
+            if (x.timeaway >= 0)
+            {
+                fg1 = 600;
+            }
+            if(y.timeaway >= 0)
+            {
+                fg2 = 600;
             }
             if (x.type == type.building)
             {
@@ -73,7 +81,8 @@ namespace Rise
             {
                 fg2 = 500;
             }
-
+            fg1 += ((float)x.id)/ int.MaxValue;
+            fg2 += ((float)y.id)/ int.MaxValue;
             return fg1.CompareTo(fg2);
         }
 
@@ -173,7 +182,7 @@ namespace Rise
                 }
             }
         }
-        bool imsleepy = false;
+        public bool imsleepy = false;
         string msg;
         public string message
         {
@@ -295,6 +304,7 @@ namespace Rise
         }
         int engineframe = 0;
         bool engineworking;
+        public int enginetime;
         void runme()
         {
             GameEngine.GameEngineManager = this;
@@ -314,8 +324,10 @@ namespace Rise
                 //   try
                 {
                     engineworking = true;
+                    Stopwatch sw = Stopwatch.StartNew();
                     GameEngine.update(player);
-
+                    sw.Stop();
+                    enginetime = (int)sw.ElapsedMilliseconds;
                     engineworking = false;
                     Thread.Sleep(enginespeed);
                     engineframe++;
@@ -504,7 +516,16 @@ namespace Rise
 
         public void sendorder()
         {
-
+            Stopwatch sp=new Stopwatch();
+            sp.Start();
+            while (!GameEngine.gm.map.sqauresreset)
+            {
+                if (sp.ElapsedMilliseconds > 5)
+                {
+                //    break;
+                }
+            }
+            sp.Stop();
             order order = new order();
             //  GameEngine.selectitems(player, fx, fy, mousex, mousey);
             item fv = GameEngine.match(mousex, mousey, player);

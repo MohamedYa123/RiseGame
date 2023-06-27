@@ -17,7 +17,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 namespace Rise
 {
 
-    public enum type {  vehicle, builder, building, grabber, soldier,worker, air, sea, bullet }
+    public enum type {  vehicle, builder, building, grabber, soldier,worker, air, sea, bullet,map }
     public enum piecemode {  protect,passive, agressive,stop }
     public enum tracktype { naive, simple, full }
     public enum generaltype { bullet,infantry,vehicle,plane,building}
@@ -119,6 +119,7 @@ namespace Rise
             {
                 return;
             }
+            int xd= (int)Math.Max(((basespeed / engine.gm.map.mod) / 1.6 * 4), 2);
             if (waited >= patience&&target!=null&&target.army.teamid==army.teamid)
             {
                 target = null;
@@ -126,9 +127,17 @@ namespace Rise
                 targety = -1;
             }
             frames++;
+            if (rangeofattack != 0)
+            {
+
+            }
             if (target == null && targetx <0)
             {
                 //auto attack
+                if (rangeofattack != 0)
+                {
+
+                }
                 if (mode == piecemode.protect)
                 {
                     target = gettarget(rangeofattack);
@@ -161,7 +170,7 @@ namespace Rise
                     if (targettype == generaltype.infantry)
                     {
                         engine.gm.map.squares[xx, yy].Rockettail = 10;
-                        engine.gm.map.squares[xx, yy].thinpasses = 30;
+                        engine.gm.map.squares[xx, yy].Thinpasses = 30;
                     }
                 }
 
@@ -322,7 +331,7 @@ namespace Rise
                            
                             if (target != null && target.walk)
                             {
-                                pointer -= 2;
+                                pointer -= (int)Math.Max(((basespeed/engine.gm.map.mod)/1.6*5),2);
                             }
                             //     minitargetx = sqrc.x * engine.gm.map.mod;
                             //     minitargety = sqrc.y * engine.gm.map.mod;
@@ -343,9 +352,9 @@ namespace Rise
                             minitargetx = sqrc.x * engine.gm.map.mod;
                             minitargety = sqrc.y * engine.gm.map.mod;
                             var dist = MathF.Sqrt(MathF.Pow(minitargetx - x-width/2, 2) + MathF.Pow(minitargety - y-height/2, 2));
-                            if (dist <= (float)engine.gm.map.mod*4f)
+                            if (dist <= (float)engine.gm.map.mod*4f*Math.Max( basespeed/8,1))
                             {
-                                pointer--;
+                                pointer -= xd ;
                                 numofhits = 0;
                             }
 
@@ -424,14 +433,14 @@ namespace Rise
                         z = 0;
                     }
                 }
-                if (target==null|| dist <Math.Min( 200,target.squarewidth*3))
+                if (target==null|| dist <Math.Min(engine.gm.map.mod*10, target.squarewidth*3))
                 {
                     if (targettype == generaltype.infantry&&target!=null)
                     {
 
                         firehit((int)target.x / engine.gm.map.mod, (int)target.y / engine.gm.map.mod);
                         health = 0.02f;
-                        if (onlyattacktarget)
+                        if (onlyattacktarget&&hitright)
                         {
                             health = -1;
                         }
