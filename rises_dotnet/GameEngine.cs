@@ -158,6 +158,47 @@ namespace Rise
             pc.basicdirection = 270;
             return pc;
         }
+        piece createpatriot(player player)
+        {
+            piece pc = new piece();
+            pc.generaltype = generaltype.vehicle;
+            pc.salary = 3;
+            pc.owner = player;
+            pc.workersrequired = 1;
+            pc.stealth = false;
+            pc.buildtime_ms = 60;
+            pc.buildtime = 60;
+            pc.army = player.army;
+            pc.image = "patriot.png";
+            pc.name = "patriot";
+            pc.width = 55;
+            pc.height = 55;
+            pc.speedx = 0f;
+            pc.newspeedx = 0.0f;
+            pc.speedy = -0.01f;
+            pc.basespeed = 6f;
+            pc.emergencyspeed = 14f;
+            pc.newspeedy = 0.0001f;
+            pc.power = 5;
+            pc.maxpower = 5;
+            pc.basicdirection = -1;
+            pc.engine = this;
+            pc.shot_time_ms = 15;
+            pc.reloadtime_ms = 30;
+            pc.maxbullets = 3;
+            pc.health = 50;
+            pc.maxhealth = 50;
+            pc.x = 5600;
+            pc.y = 5200;
+            pc.silver = 300;
+            //    pc.z = 20;
+            pc.type = type.vehicle;
+            pc.track = tracktype.full;
+            pc.type = type.vehicle;
+            pc.rangeofattack = 200f;
+            pc.basicdirection = 0;
+            return pc;
+        }
         piece createbullet(player player)
         {
             piece bullet = new piece();
@@ -518,8 +559,8 @@ namespace Rise
             warfactory.name = "house";
             warfactory.type = type.building;
             warfactory.generaltype= generaltype.building;
-            warfactory.width = 150;
-            warfactory.height = 150;
+            warfactory.width = 160;
+            warfactory.height = 160;
             warfactory.owner = player;
             warfactory.engine = this;
             warfactory.health = 60;
@@ -536,6 +577,62 @@ namespace Rise
             warfactory.silver = 200;
             warfactory.workersrequired = 2;
             warfactory.piecesallowed.Add(worker);
+            warfactory.autobuildms = 300;
+            warfactory.salary = 4;
+            return warfactory;
+        }
+        building createtower(player player,piece worker)
+        {
+            building warfactory = new building();
+            warfactory.name = "Tower";
+            warfactory.type = type.building;
+            warfactory.generaltype= generaltype.building;
+            warfactory.width = 170;
+            warfactory.height = 170;
+            warfactory.owner = player;
+            warfactory.engine = this;
+            warfactory.health = 1200;
+            warfactory.stealth = false;
+            warfactory.maxhealth = 1200;
+            warfactory.type = type.building;
+            warfactory.available = true;
+            warfactory.army = player.army;
+            warfactory.image = "bunker1.png";
+            warfactory.buildtime_ms = 90*2;
+            warfactory.buildtime = 90*2;
+            warfactory.posx = 50;
+            warfactory.posy = 70;
+            warfactory.silver = 1000;
+            warfactory.workersrequired = 5;
+          //  warfactory.piecesallowed.Add(worker);
+            warfactory.autobuildms = 300;
+            warfactory.salary = 4;
+            return warfactory;
+        }
+        building createbunker(player player,piece worker)
+        {
+            building warfactory = new building();
+            warfactory.name = "bunker";
+            warfactory.type = type.building;
+            warfactory.generaltype= generaltype.building;
+            warfactory.width = 100;
+            warfactory.height = 100;
+            warfactory.owner = player;
+            warfactory.engine = this;
+            warfactory.health = 1200;
+            warfactory.stealth = false;
+            warfactory.maxhealth = 1200;
+            warfactory.type = type.building;
+            warfactory.available = true;
+            warfactory.army = player.army;
+            warfactory.image = "bunker2.png";
+            warfactory.buildtime_ms = 90*2;
+            warfactory.buildtime = 90*2;
+            warfactory.posx = 50;
+            warfactory.posy = 70;
+            warfactory.silver = 500;
+            warfactory.workersrequired = 5;
+          //  warfactory.piecesallowed.Add(worker);
             warfactory.autobuildms = 300;
             warfactory.salary = 4;
             return warfactory;
@@ -714,9 +811,12 @@ namespace Rise
             var storagehouse = createstoragehouse(player);
             var goldzone = creategoldzone();
             var grasszone = creategrasszone();
-            var helicopterstealth=createhelicopter(player);
+            var tower = createtower(player, worker);
+            var bunker = createbunker(player, worker);
+          /*  var helicopterstealth=createhelicopter(player);
             helicopterstealth.silver = 1300;
-            helicopterstealth.name = "Stealth helicopter";
+            helicopterstealth.name = "Stealth helicopter";*/
+          var patriot= createpatriot(player);
             var helicopter=createhelicopter(player);
             var helicopter2=createhelicopter2(player);
             helicopter.stealth = false;
@@ -742,7 +842,9 @@ namespace Rise
             mp.asstes.Add(farm);
             mp.asstes.Add(helicopter);
             mp.asstes.Add(helicopter2);
-            mp.asstes.Add(helicopterstealth);
+            mp.asstes.Add(patriot);
+            mp.asstes.Add(tower);
+            mp.asstes.Add(bunker);
             godlmine.favoritemapzone = goldzone;
             farm.favoritemapzone = grasszone;
             building house = createhouse(player, worker);
@@ -752,7 +854,7 @@ namespace Rise
             warfactory.piecesallowed.Add(humvee);
             warfactory.piecesallowed.Add(xp);
             warfactory.piecesallowed.Add(helicopter);
-            warfactory.piecesallowed.Add(helicopterstealth);
+            warfactory.piecesallowed.Add(patriot);
             warfactory.piecesallowed.Add(helicopter2);
             building.buildingsallowed.Add(house);
             building.buildingsallowed.Add(storagehouse);
@@ -760,6 +862,8 @@ namespace Rise
             building.buildingsallowed.Add(godlmine);
             building.buildingsallowed.Add(barraks);
             building.buildingsallowed.Add(warfactory);
+            barraks.buildingsallowed.Add(tower);
+            barraks.buildingsallowed.Add(bunker);
            // building.piecesallowed.Add(worker);
             mp.load_resources(realwidth, realheight);
             fillzone(mp, goldzone);
@@ -1456,6 +1560,10 @@ namespace Rise
                         if (gm.map.squares[i, j].piecethere != null)
                         {
                             b = b2;
+                        }
+                        else
+                        {
+                            continue;
                         }
                         g.FillRectangle(b, i * gm.map.mod - pl.x, j * gm.map.mod - pl.y, gm.map.mod, gm.map.mod);
 

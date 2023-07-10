@@ -376,7 +376,7 @@ namespace Rise
             resources.Add(rsc);
             return resources.Count - 1;
         }
-        public int mod = 20;//بيقسم مربعات الخريطة لمربعات أكبر علشان يوفر وقت في البروسيسنج
+        public int mod = 10;//بيقسم مربعات الخريطة لمربعات أكبر علشان يوفر وقت في البروسيسنج
         public int safzone = 0;
         public int xlen;
         public int ylen;

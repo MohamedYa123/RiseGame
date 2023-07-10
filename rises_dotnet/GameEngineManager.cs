@@ -221,11 +221,14 @@ namespace Rise
                     lastms = (int)sp.ElapsedMilliseconds+1;
                   //  message = $"lastms : {lastms}";
                     //  Thread.Sleep(1);
-                    if (i % 1 == 0&&lastms<12)
+                    if (i % 1 == 0&&lastms<5)
                     {
                         Thread.Sleep(2);
                     }
-                 
+                    if (i % 3 == 0)
+                    {
+                        Thread.Sleep(1);
+                    }
                     if (false)
                     {
 

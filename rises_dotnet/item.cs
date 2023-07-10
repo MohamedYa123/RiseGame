@@ -11,7 +11,7 @@ namespace Rise
     public  class frameload
     {
         public int loadframes;
-        public float opacity = 0.5f;
+        public float opacity = 0.45f;
         public float plusopacityframe;
         public int c2 = 0;
         public int c1 = 0;
@@ -49,13 +49,13 @@ namespace Rise
             }
             if (loadframes % 1 == 0 && stealth)
             {
-                if (opacity <= 0.5f)
+                if (opacity <= 0.45f)
                 {
-                    plusopacityframe = 0.003f;
+                    plusopacityframe = 0.03f;
                 }
-                else if (opacity >= 0.65 && opacity <= 1.1f)
+                else if (opacity >= 0.75 && opacity <= 1.1f)
                 {
-                    plusopacityframe = -0.003f;
+                    plusopacityframe = -0.03f;
                 }
                 opacity += plusopacityframe;
             }
@@ -916,7 +916,7 @@ namespace Rise
             
         }
         float anglestep = 5f;
-        float opacitystep = 5f;
+        float opacitystep = 1f;
         float zstep = 1f;
         public frameload loadframe =new frameload();
         public float direction;
@@ -927,7 +927,7 @@ namespace Rise
         public int posheight=-1;
         int internalframe=-1;
         public bool first=true;
-        public int walklengthanimation=120;
+        public int walklengthanimation=200;
         public virtual Bitmap load(game gm, bool basic = false,int lastms=1)
         {
             
